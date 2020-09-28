@@ -5,6 +5,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
 )
 
@@ -20,6 +21,9 @@ type Config struct {
 
 	AzureCluster azureupdate.AzureClusterConfigValidatorConfig
 	AzureConfig  azureupdate.AzureConfigValidatorConfig
+
+	AzureMachinePoolCreate azuremachinepool.CreateValidatorConfig
+	AzureMachinePoolUpdate azuremachinepool.UpdateValidatorConfig
 }
 
 func Parse() (Config, error) {
@@ -42,6 +46,8 @@ func Parse() (Config, error) {
 	// add logger to each admission handler
 	result.AzureCluster.Logger = newLogger
 	result.AzureConfig.Logger = newLogger
+	result.AzureMachinePoolCreate.Logger = newLogger
+	result.AzureMachinePoolUpdate.Logger = newLogger
 
 	kingpin.Parse()
 	return result, nil

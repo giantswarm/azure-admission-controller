@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/azure-admission-controller/config"
+	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
@@ -30,10 +31,22 @@ func main() {
 		panic(microerror.JSON(err))
 	}
 
+	azureMachinePoolCreateValidator, err := azuremachinepool.NewCreateValidator(config.AzureMachinePoolCreate)
+	if err != nil {
+		panic(microerror.JSON(err))
+	}
+
+	azureMachinePoolUpdateValidator, err := azuremachinepool.NewUpdateValidator(config.AzureMachinePoolUpdate)
+	if err != nil {
+		panic(microerror.JSON(err))
+	}
+
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
 	handler.Handle("/azureconfig", validator.Handler(azureConfigValidator))
 	handler.Handle("/azureclusterconfig", validator.Handler(azureClusterConfigValidator))
+	handler.Handle("/azuremachinepoolcreate", validator.Handler(azureMachinePoolCreateValidator))
+	handler.Handle("/azuremachinepoolupdate", validator.Handler(azureMachinePoolUpdateValidator))
 	handler.HandleFunc("/healthz", healthCheck)
 
 	serve(config, handler)
