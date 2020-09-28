@@ -26,7 +26,6 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 	}
 	type testCase struct {
 		name         string
-		vmSize       string
 		nodePool     []byte
 		allowed      bool
 		errorMatcher func(err error) bool

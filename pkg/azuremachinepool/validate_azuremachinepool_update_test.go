@@ -18,10 +18,9 @@ import (
 func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 	tr := true
 	fa := false
-	supportedInstanceType := ""
+	supportedInstanceType := "Standard_D4_v3"
 	type testCase struct {
 		name         string
-		vmSize       string
 		oldNodePool  []byte
 		newNodePool  []byte
 		allowed      bool
