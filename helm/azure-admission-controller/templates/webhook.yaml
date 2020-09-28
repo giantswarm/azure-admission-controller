@@ -44,7 +44,7 @@ webhooks:
           - UPDATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: azurenodepools.create.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: azuremachinepools.create.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
@@ -53,7 +53,7 @@ webhooks:
         path: /azuremachinepoolcreate
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io/v1alpha3"]
+      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
         resources:
           - "azuremachinepool"
         apiVersions:
@@ -62,7 +62,7 @@ webhooks:
           - CREATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: azurenodepools.update.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: azuremachinepools.update.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
@@ -71,7 +71,7 @@ webhooks:
         path: /azuremachinepoolupdate
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io/v1alpha3"]
+      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
         resources:
           - "azuremachinepool"
         apiVersions:
