@@ -236,7 +236,7 @@ func TestAzureConfigValidate(t *testing.T) {
 			}
 
 			// Run admission request to validate AzureConfig updates.
-			allowed, err := admit.Validate(getAdmissionRequest(tc.oldVersion, tc.newVersion, tc.conditions))
+			allowed, err := admit.Validate(tc.ctx, getAdmissionRequest(tc.oldVersion, tc.newVersion, tc.conditions))
 
 			// Check if the error is the expected one.
 			switch {

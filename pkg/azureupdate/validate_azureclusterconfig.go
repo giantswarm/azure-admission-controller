@@ -60,10 +60,7 @@ func NewAzureClusterConfigValidator(config AzureClusterConfigValidatorConfig) (*
 	return validator, nil
 }
 
-func (a *AzureClusterConfigValidator) Validate(request *v1beta1.AdmissionRequest) (bool, error) {
-	// TODO use a real context.
-	ctx := context.Background()
-
+func (a *AzureClusterConfigValidator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {
 	AzureClusterConfigNewCR := &corev1alpha1.AzureClusterConfig{}
 	AzureClusterConfigOldCR := &corev1alpha1.AzureClusterConfig{}
 	if _, _, err := validator.Deserializer.Decode(request.Object.Raw, nil, AzureClusterConfigNewCR); err != nil {

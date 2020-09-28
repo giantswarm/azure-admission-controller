@@ -1,6 +1,7 @@
 package azureupdate
 
 import (
+	"context"
 	"fmt"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
@@ -17,7 +18,7 @@ func ensureReleases(g8sclient versioned.Interface, releases []string) error {
 			},
 		}
 
-		_, err := g8sclient.ReleaseV1alpha1().Releases().Create(req)
+		_, err := g8sclient.ReleaseV1alpha1().Releases().Create(context.Background(), req, metav1.CreateOptions{})
 		if err != nil {
 			return err
 		}

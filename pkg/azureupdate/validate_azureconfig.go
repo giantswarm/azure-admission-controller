@@ -65,9 +65,7 @@ func NewAzureConfigValidator(config AzureConfigValidatorConfig) (*AzureConfigVal
 	return admitter, nil
 }
 
-func (a *AzureConfigValidator) Validate(request *v1beta1.AdmissionRequest) (bool, error) {
-	// TODO use a real context.
-	ctx := context.Background()
+func (a *AzureConfigValidator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {
 	azureConfigNewCR := &v1alpha1.AzureConfig{}
 	azureConfigOldCR := &v1alpha1.AzureConfig{}
 	if _, _, err := validator.Deserializer.Decode(request.Object.Raw, nil, azureConfigNewCR); err != nil {
