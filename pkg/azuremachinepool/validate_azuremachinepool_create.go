@@ -12,7 +12,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	restclient "k8s.io/client-go/rest"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	apiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	apiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
@@ -36,7 +36,7 @@ func NewCreateValidator(config CreateValidatorConfig) (*CreateValidator, error) 
 		}
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				apiv1alpha2.AddToScheme,
+				apiv1alpha3.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
 			},
