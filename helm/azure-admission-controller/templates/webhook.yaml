@@ -55,7 +55,7 @@ webhooks:
     rules:
       - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
         resources:
-          - "azuremachinepool"
+          - "azuremachinepools"
         apiVersions:
           - "v1alpha3"
         operations:
@@ -73,7 +73,7 @@ webhooks:
     rules:
       - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
         resources:
-          - "azuremachinepool"
+          - "azuremachinepools"
         apiVersions:
           - "v1alpha3"
         operations:
