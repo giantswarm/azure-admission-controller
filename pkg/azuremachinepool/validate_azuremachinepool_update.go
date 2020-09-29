@@ -59,7 +59,6 @@ func NewUpdateValidator(config UpdateValidatorConfig) (*UpdateValidator, error) 
 }
 
 func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {
-	a.logger.LogCtx(ctx, "level", "debug", "message", "Validating update request")
 	azureMPNewCR := &expcapzv1alpha3.AzureMachinePool{}
 	azureMPOldCR := &expcapzv1alpha3.AzureMachinePool{}
 	if _, _, err := validator.Deserializer.Decode(request.Object.Raw, nil, azureMPNewCR); err != nil {
@@ -77,7 +76,6 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	if *azureMPOldCR.Spec.Template.AcceleratedNetworking != *azureMPNewCR.Spec.Template.AcceleratedNetworking {
 		return false, microerror.Maskf(invalidOperationError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
 	}
-	a.logger.LogCtx(ctx, "level", "debug", "message", "Validated update request")
 	return true, nil
 }
 
