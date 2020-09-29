@@ -6,11 +6,6 @@ type Capabilities struct {
 
 var (
 	instanceTypes = map[string]Capabilities{
-		"Standard_A2_v2":   {SupportsAcceleratedNetworking: false},
-		"Standard_A4_v2":   {SupportsAcceleratedNetworking: false},
-		"Standard_A8_v2":   {SupportsAcceleratedNetworking: false},
-		"Standard_D2_v3":   {SupportsAcceleratedNetworking: false},
-		"Standard_D2s_v3":  {SupportsAcceleratedNetworking: false},
 		"Standard_D4_v3":   {SupportsAcceleratedNetworking: true},
 		"Standard_D4s_v3":  {SupportsAcceleratedNetworking: true},
 		"Standard_D8_v3":   {SupportsAcceleratedNetworking: true},
