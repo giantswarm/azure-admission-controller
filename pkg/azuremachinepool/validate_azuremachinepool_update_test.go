@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
@@ -12,13 +14,17 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 
+	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
 func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 	tr := true
 	fa := false
-	supportedInstanceType := "Standard_D4_v3"
+	supportedInstanceType := []string{
+		"Standard_D4_v3",
+		"Standard_D8_v3",
+	}
 	type testCase struct {
 		name         string
 		oldNodePool  []byte
@@ -30,57 +36,64 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "case 0: Enabled and untouched",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &tr),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &tr),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      true,
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 1: Disabled and untouched",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &fa),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &fa),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      true,
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 2: Changed from true to false",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &tr),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &fa),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 3: Changed from false to true",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &fa),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &tr),
+			name:         "case 3: Changed from true to true but new vm does not support it",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
+			newNodePool:  azureMPRawObject(supportedInstanceType[1], &fa),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 4: changed from nil to true",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, nil),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &tr),
+			name:         "case 4: Changed from false to true",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 5: changed from true to nil",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &tr),
-			newNodePool:  azureMPRawObject(supportedInstanceType, nil),
+			name:         "case 5: changed from nil to true",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 6: changed from nil to false",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, nil),
-			newNodePool:  azureMPRawObject(supportedInstanceType, &fa),
+			name:         "case 6: changed from true to nil",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 7: changed from false to nil",
-			oldNodePool:  azureMPRawObject(supportedInstanceType, &fa),
-			newNodePool:  azureMPRawObject(supportedInstanceType, nil),
+			name:         "case 7: changed from nil to false",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
+			allowed:      false,
+			errorMatcher: IsInvalidOperationError,
+		},
+		{
+			name:         "case 8: changed from false to nil",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
@@ -99,9 +112,55 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 				}
 			}
 			fakeK8sClient := unittest.FakeK8sClient()
+			stubbedSKUs := map[string]compute.ResourceSku{
+				"Standard_D4_v3": {
+					Name: to.StringPtr("Standard_D4_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("True"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_D8_v3": {
+					Name: to.StringPtr("Standard_D8_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("True"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+			}
+			stubAPI := NewStubAPI(stubbedSKUs)
+			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
+				Azure:  stubAPI,
+				Logger: newLogger,
+			})
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+
 			admit := &UpdateValidator{
 				k8sClient: fakeK8sClient,
 				logger:    newLogger,
+				vmcaps:    vmcaps,
 			}
 
 			// Run admission request to validate AzureConfig updates.

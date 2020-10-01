@@ -38,8 +38,8 @@ func isAcceleratedNetworkingUnchanged(ctx context.Context, old expcapzv1alpha3.A
 	return true
 }
 
-func supportForAcceleratedNetworkingUnchanged(ctx context.Context, vmcaps *vmcapabilities.VMSKU, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	if old.Spec.Template.VMSize != new.Spec.Template.VMSize {
+func isNewVmSizeSupportingAcceleratedNetworking(ctx context.Context, vmcaps *vmcapabilities.VMSKU, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) (bool, error) {
+	if old.Spec.Template.VMSize == new.Spec.Template.VMSize {
 		// VM size unchanged, all good.
 		return true, nil
 	}

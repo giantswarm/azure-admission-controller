@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -63,7 +66,7 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking enabled", len(testCases), instanceType),
 			nodePool:     azureMPRawObject(instanceType, &tr),
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: vmcapabilities.IsSkuNotFoundError,
 		})
 	}
 
@@ -80,9 +83,106 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 				}
 			}
 			fakeK8sClient := unittest.FakeK8sClient()
+			stubbedSKUs := map[string]compute.ResourceSku{
+				"Standard_A2_v2": {
+					Name: to.StringPtr("Standard_A2_v2"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_A4_v2": {
+					Name: to.StringPtr("Standard_A4_v2"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_A8_v2": {
+					Name: to.StringPtr("Standard_A8_v2"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_D2_v3": {
+					Name: to.StringPtr("Standard_D2_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_D2s_v3": {
+					Name: to.StringPtr("Standard_D2s_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+			}
+			stubAPI := NewStubAPI(stubbedSKUs)
+			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
+				Azure:  stubAPI,
+				Logger: newLogger,
+			})
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+
 			admit := &CreateValidator{
 				k8sClient: fakeK8sClient,
 				logger:    newLogger,
+				vmcaps:    vmcaps,
 			}
 
 			// Run admission request to validate AzureConfig updates.
@@ -106,6 +206,18 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 			}
 		})
 	}
+}
+
+type StubAPI struct {
+	stubbedSKUs map[string]compute.ResourceSku
+}
+
+func NewStubAPI(stubbedSKUs map[string]compute.ResourceSku) vmcapabilities.API {
+	return &StubAPI{stubbedSKUs: stubbedSKUs}
+}
+
+func (s *StubAPI) List(ctx context.Context, filter string) (map[string]compute.ResourceSku, error) {
+	return s.stubbedSKUs, nil
 }
 
 func getCreateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {

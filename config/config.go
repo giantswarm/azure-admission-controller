@@ -1,11 +1,11 @@
 package config
 
 import (
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"gopkg.in/alecthomas/kingpin.v2"
-
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
@@ -45,17 +45,23 @@ func Parse() (Config, error) {
 
 	var resourceSkusClient *compute.ResourceSkusClient
 	{
-		//client := compute.NewResourceSkusClient(subscriptionID)
-		//client.Authorizer = authorizer
-		//_ = client.AddToUserAgent(partnerID)
-		//senddecorator.ConfigureClient(&backpressure.Backpressure{}, client)
+		settings, err := auth.GetSettingsFromEnvironment()
+		if err != nil {
+			panic(err)
+		}
+		authorizer, err := settings.GetAuthorizer()
+		if err != nil {
+			panic(err)
+		}
+		client := compute.NewResourceSkusClient(settings.GetSubscriptionID())
+		client.Client.Authorizer = authorizer
 	}
 
 	var vmcaps *vmcapabilities.VMSKU
 	{
 		vmcaps, err = vmcapabilities.New(vmcapabilities.Config{
-			Logger:             newLogger,
-			ResourceSkusClient: resourceSkusClient,
+			Logger: newLogger,
+			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: resourceSkusClient}),
 		})
 		if err != nil {
 			return Config{}, microerror.Mask(err)

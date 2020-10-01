@@ -90,7 +90,7 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(invalidOperationError, "Accelerated Networking is not supported by the selected machine type")
 	}
 
-	return false, microerror.Maskf(invalidOperationError, "Instance type does not support accelerated networking")
+	return true, nil
 }
 
 func (a *CreateValidator) Log(keyVals ...interface{}) {

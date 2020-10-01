@@ -91,11 +91,11 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(invalidOperationError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
 	}
 
-	changed, err := supportForAcceleratedNetworkingUnchanged(ctx, a.vmcaps, *azureMPOldCR, *azureMPNewCR)
+	isNewVmSizeSupportingAcceleratedNetworking, err := isNewVmSizeSupportingAcceleratedNetworking(ctx, a.vmcaps, *azureMPOldCR, *azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
-	if changed {
+	if !isNewVmSizeSupportingAcceleratedNetworking {
 		return false, microerror.Maskf(invalidOperationError, "This node pool has AcceleratedNetworking enabled. It is not possible to use a VM type that does not support it.")
 	}
 

@@ -24,30 +24,30 @@ const (
 )
 
 type Config struct {
-	Logger             micrologger.Logger
-	ResourceSkusClient *compute.ResourceSkusClient
+	Azure  API
+	Logger micrologger.Logger
 }
 
 type VMSKU struct {
-	initMutex         sync.Mutex
-	logger            micrologger.Logger
-	resourceSkuClient *compute.ResourceSkusClient
-	skus              map[string]cache
+	azure     API
+	initMutex sync.Mutex
+	logger    micrologger.Logger
+	skus      map[string]cache
 }
 
-type cache map[string]*compute.ResourceSku
+type cache map[string]compute.ResourceSku
 
 func New(config Config) (*VMSKU, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.ResourceSkusClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ResourceSkusClient must not be empty", config)
+	if config.Azure == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Azure must not be empty", config)
 	}
 	return &VMSKU{
-		logger:            config.Logger,
-		resourceSkuClient: config.ResourceSkusClient,
-		skus:              make(map[string]cache),
+		logger: config.Logger,
+		azure:  config.Azure,
+		skus:   make(map[string]cache),
 	}, nil
 }
 
@@ -118,23 +118,23 @@ func (v *VMSKU) getCapability(ctx context.Context, location string, vmType strin
 	return nil, nil
 }
 
-func (v *VMSKU) getSKU(ctx context.Context, location string, vmType string) (*compute.ResourceSku, error) {
+func (v *VMSKU) getSKU(ctx context.Context, location string, vmType string) (compute.ResourceSku, error) {
 	if location == "" {
-		return nil, microerror.Maskf(invalidRequestError, "location can't be empty")
+		return compute.ResourceSku{}, microerror.Maskf(invalidRequestError, "location can't be empty")
 	}
 	if vmType == "" {
-		return nil, microerror.Maskf(invalidRequestError, "vmType can't be empty")
+		return compute.ResourceSku{}, microerror.Maskf(invalidRequestError, "vmType can't be empty")
 	}
 
 	if _, ok := v.skus[location]; !ok {
 		err := v.initCache(ctx, location)
 		if err != nil {
-			return nil, microerror.Mask(err)
+			return compute.ResourceSku{}, microerror.Mask(err)
 		}
 	}
 	vmsku, found := v.skus[location][vmType]
 	if !found {
-		return nil, microerror.Maskf(skuNotFoundError, vmType)
+		return compute.ResourceSku{}, microerror.Maskf(skuNotFoundError, vmType)
 	}
 
 	return vmsku, nil
@@ -145,22 +145,9 @@ func (v *VMSKU) initCache(ctx context.Context, location string) error {
 	defer v.initMutex.Unlock()
 	filter := fmt.Sprintf("location eq '%s'", location)
 	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Initializing cache for location %s with filter: %s", location, filter))
-	iterator, err := v.resourceSkuClient.ListComplete(ctx, filter)
+	skus, err := v.azure.List(ctx, filter)
 	if err != nil {
 		return microerror.Mask(err)
-	}
-
-	skus := map[string]*compute.ResourceSku{}
-
-	for iterator.NotDone() {
-		sku := iterator.Value()
-
-		skus[*sku.Name] = &sku
-
-		err := iterator.NextWithContext(ctx)
-		if err != nil {
-			return microerror.Mask(err)
-		}
 	}
 
 	v.skus[location] = skus

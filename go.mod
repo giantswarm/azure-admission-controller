@@ -4,6 +4,8 @@ go 1.14
 
 require (
 	github.com/Azure/azure-sdk-for-go v45.0.0+incompatible
+	github.com/Azure/go-autorest/autorest/azure/auth v0.5.0
+	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/ghodss/yaml v1.0.0
