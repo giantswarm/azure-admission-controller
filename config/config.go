@@ -5,6 +5,9 @@ import (
 	"github.com/giantswarm/micrologger"
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+
+	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
 )
@@ -18,6 +21,7 @@ type Config struct {
 	KeyFile           string
 	Address           string
 	AvailabilityZones string
+	Location          string
 
 	AzureCluster azureupdate.AzureClusterConfigValidatorConfig
 	AzureConfig  azureupdate.AzureConfigValidatorConfig
@@ -39,6 +43,25 @@ func Parse() (Config, error) {
 		}
 	}
 
+	var resourceSkusClient *compute.ResourceSkusClient
+	{
+		//client := compute.NewResourceSkusClient(subscriptionID)
+		//client.Authorizer = authorizer
+		//_ = client.AddToUserAgent(partnerID)
+		//senddecorator.ConfigureClient(&backpressure.Backpressure{}, client)
+	}
+
+	var vmcaps *vmcapabilities.Interface
+	{
+		vmcaps, err = vmcapabilities.New(vmcapabilities.Config{
+			Logger:             newLogger,
+			ResourceSkusClient: resourceSkusClient,
+		})
+		if err != nil {
+			return Config{}, microerror.Mask(err)
+		}
+	}
+
 	kingpin.Flag("tls-cert-file", "File containing the certificate for HTTPS").Required().StringVar(&result.CertFile)
 	kingpin.Flag("tls-key-file", "File containing the private key for HTTPS").Required().StringVar(&result.KeyFile)
 	kingpin.Flag("address", "The address to listen on").Default(defaultAddress).StringVar(&result.Address)
@@ -48,6 +71,9 @@ func Parse() (Config, error) {
 	result.AzureConfig.Logger = newLogger
 	result.AzureMachinePoolCreate.Logger = newLogger
 	result.AzureMachinePoolUpdate.Logger = newLogger
+
+	// Add the VM capabilities helper to the handlers that need it.
+	result.AzureMachinePoolCreate.VMcaps = vmcaps
 
 	kingpin.Parse()
 	return result, nil
