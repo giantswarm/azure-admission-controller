@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/giantswarm/microerror"
@@ -27,26 +28,27 @@ type Config struct {
 	ResourceSkusClient *compute.ResourceSkusClient
 }
 
-type Interface struct {
+type VMSKU struct {
 	skus              map[string]map[string]*compute.ResourceSku
+	initMutex         sync.Mutex
 	logger            micrologger.Logger
 	resourceSkuClient *compute.ResourceSkusClient
 }
 
-func New(config Config) (*Interface, error) {
+func New(config Config) (*VMSKU, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 	if config.ResourceSkusClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.ResourceSkusClient must not be empty", config)
 	}
-	return &Interface{
+	return &VMSKU{
 		logger:            config.Logger,
 		resourceSkuClient: config.ResourceSkusClient,
 	}, nil
 }
 
-func (v *Interface) CPUs(ctx context.Context, location string, vmType string) (int, error) {
+func (v *VMSKU) CPUs(ctx context.Context, location string, vmType string) (int, error) {
 	capability, err := v.getCapability(ctx, location, vmType, capabilityCPUs)
 	if err != nil {
 		return 0, microerror.Mask(err)
@@ -64,7 +66,7 @@ func (v *Interface) CPUs(ctx context.Context, location string, vmType string) (i
 	return 0, microerror.Mask(invalidUpstreamResponseError)
 }
 
-func (v *Interface) HasCapability(ctx context.Context, location string, vmType string, name string) (bool, error) {
+func (v *VMSKU) HasCapability(ctx context.Context, location string, vmType string, name string) (bool, error) {
 	capability, err := v.getCapability(ctx, location, vmType, name)
 	if err != nil {
 		return false, microerror.Mask(err)
@@ -76,7 +78,7 @@ func (v *Interface) HasCapability(ctx context.Context, location string, vmType s
 	return false, nil
 }
 
-func (v *Interface) Memory(ctx context.Context, location string, vmType string) (int, error) {
+func (v *VMSKU) Memory(ctx context.Context, location string, vmType string) (int, error) {
 	capability, err := v.getCapability(ctx, location, vmType, capabilityMemory)
 	if err != nil {
 		return 0, microerror.Mask(err)
@@ -94,7 +96,7 @@ func (v *Interface) Memory(ctx context.Context, location string, vmType string) 
 	return 0, microerror.Mask(invalidUpstreamResponseError)
 }
 
-func (v *Interface) getCapability(ctx context.Context, location string, vmType string, name string) (*string, error) {
+func (v *VMSKU) getCapability(ctx context.Context, location string, vmType string, name string) (*string, error) {
 	if name == "" {
 		return nil, microerror.Maskf(invalidRequestError, "name can't be empty")
 	}
@@ -113,7 +115,7 @@ func (v *Interface) getCapability(ctx context.Context, location string, vmType s
 	return nil, nil
 }
 
-func (v *Interface) getSKU(ctx context.Context, location string, vmType string) (*compute.ResourceSku, error) {
+func (v *VMSKU) getSKU(ctx context.Context, location string, vmType string) (*compute.ResourceSku, error) {
 	if location == "" {
 		return nil, microerror.Maskf(invalidRequestError, "location can't be empty")
 	}
@@ -135,7 +137,9 @@ func (v *Interface) getSKU(ctx context.Context, location string, vmType string) 
 	return vmsku, nil
 }
 
-func (v *Interface) initCache(ctx context.Context, location string) error {
+func (v *VMSKU) initCache(ctx context.Context, location string) error {
+	v.initMutex.Lock()
+	defer v.initMutex.Unlock()
 	filter := fmt.Sprintf("location eq '%s'", location)
 	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Initializing cache for location %s with filter: %s", location, filter))
 	iterator, err := v.resourceSkuClient.ListComplete(ctx, filter)

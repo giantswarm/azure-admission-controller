@@ -51,7 +51,7 @@ func Parse() (Config, error) {
 		//senddecorator.ConfigureClient(&backpressure.Backpressure{}, client)
 	}
 
-	var vmcaps *vmcapabilities.Interface
+	var vmcaps *vmcapabilities.VMSKU
 	{
 		vmcaps, err = vmcapabilities.New(vmcapabilities.Config{
 			Logger:             newLogger,

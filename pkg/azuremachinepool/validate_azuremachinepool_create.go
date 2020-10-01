@@ -26,12 +26,12 @@ const (
 type CreateValidator struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
-	vmcaps    *vmcapabilities.Interface
+	vmcaps    *vmcapabilities.VMSKU
 }
 
 type CreateValidatorConfig struct {
 	Logger micrologger.Logger
-	VMcaps *vmcapabilities.Interface
+	VMcaps *vmcapabilities.VMSKU
 }
 
 func NewCreateValidator(config CreateValidatorConfig) (*CreateValidator, error) {
