@@ -18,11 +18,6 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
-const (
-	minMemory = 16
-	minCPUs   = 4
-)
-
 type CreateValidator struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
@@ -79,7 +74,7 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	}
 
 	// Check if instance type is valid and supported.
-	valid, err := a.CheckInstanceTypeIsValid(ctx, *azureMPNewCR)
+	valid, err := checkInstanceTypeIsValid(ctx, a.vmcaps, *azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -87,7 +82,7 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(invalidOperationError, "Instance type is invalid or unsupported")
 	}
 
-	valid, err = a.CheckAcceleratedNetworking(ctx, *azureMPNewCR)
+	valid, err = checkAcceleratedNetworking(ctx, a.vmcaps, *azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -100,42 +95,4 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 
 func (a *CreateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
-}
-
-func (a *CreateValidator) CheckInstanceTypeIsValid(ctx context.Context, mp expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	memory, err := a.vmcaps.Memory(ctx, mp.Spec.Location, mp.Spec.Template.VMSize)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	cpu, err := a.vmcaps.CPUs(ctx, mp.Spec.Location, mp.Spec.Template.VMSize)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	if memory < minMemory {
-		return false, nil
-	}
-
-	if cpu < minCPUs {
-		return false, nil
-	}
-
-	return true, nil
-}
-
-func (a *CreateValidator) CheckAcceleratedNetworking(ctx context.Context, mp expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	// If the instance type is invalid, the following function returns an error.
-	acceleratedNetworkingAvailable, err := a.vmcaps.HasCapability(ctx, mp.Spec.Location, mp.Spec.Template.VMSize, vmcapabilities.CapabilityAcceleratedNetworking)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	// Accelerated networking is disabled (false) or in auto-detect mode (nil). This is always allowed.
-	if mp.Spec.Template.AcceleratedNetworking == nil || !*mp.Spec.Template.AcceleratedNetworking {
-		return true, nil
-	}
-
-	// Accelerated networking is enabled (true).
-	return acceleratedNetworkingAvailable, nil
 }

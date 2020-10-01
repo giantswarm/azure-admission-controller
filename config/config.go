@@ -74,6 +74,7 @@ func Parse() (Config, error) {
 
 	// Add the VM capabilities helper to the handlers that need it.
 	result.AzureMachinePoolCreate.VMcaps = vmcaps
+	result.AzureMachinePoolUpdate.VMcaps = vmcaps
 
 	kingpin.Parse()
 	return result, nil
