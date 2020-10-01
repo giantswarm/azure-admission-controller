@@ -29,11 +29,13 @@ type Config struct {
 }
 
 type VMSKU struct {
-	skus              map[string]map[string]*compute.ResourceSku
 	initMutex         sync.Mutex
 	logger            micrologger.Logger
 	resourceSkuClient *compute.ResourceSkusClient
+	skus              map[string]cache
 }
+
+type cache map[string]*compute.ResourceSku
 
 func New(config Config) (*VMSKU, error) {
 	if config.Logger == nil {
@@ -45,6 +47,7 @@ func New(config Config) (*VMSKU, error) {
 	return &VMSKU{
 		logger:            config.Logger,
 		resourceSkuClient: config.ResourceSkusClient,
+		skus:              make(map[string]cache),
 	}, nil
 }
 
@@ -123,7 +126,7 @@ func (v *VMSKU) getSKU(ctx context.Context, location string, vmType string) (*co
 		return nil, microerror.Maskf(invalidRequestError, "vmType can't be empty")
 	}
 
-	if cache, ok := v.skus[location]; !ok || len(cache) == 0 {
+	if _, ok := v.skus[location]; !ok {
 		err := v.initCache(ctx, location)
 		if err != nil {
 			return nil, microerror.Mask(err)
