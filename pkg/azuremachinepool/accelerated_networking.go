@@ -25,7 +25,7 @@ func checkAcceleratedNetworking(ctx context.Context, vmcaps *vmcapabilities.VMSK
 	return acceleratedNetworkingAvailable, nil
 }
 
-func checkAcceleratedNetworkingUnchanged(ctx context.Context, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) bool {
+func isAcceleratedNetworkingUnchanged(ctx context.Context, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) bool {
 	if old.Spec.Template.AcceleratedNetworking == nil && new.Spec.Template.AcceleratedNetworking != nil ||
 		old.Spec.Template.AcceleratedNetworking != nil && new.Spec.Template.AcceleratedNetworking == nil {
 		return false
@@ -36,4 +36,28 @@ func checkAcceleratedNetworkingUnchanged(ctx context.Context, old expcapzv1alpha
 	}
 
 	return true
+}
+
+func supportForAcceleratedNetworkingUnchanged(ctx context.Context, vmcaps *vmcapabilities.VMSKU, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) (bool, error) {
+	if old.Spec.Template.VMSize != new.Spec.Template.VMSize {
+		// VM size unchanged, all good.
+		return true, nil
+	}
+	if old.Spec.Template.AcceleratedNetworking != nil && *old.Spec.Template.AcceleratedNetworking {
+		// Accelerated networking was explicitly enabled. New instance type needs support for accelerated networking.
+		supported, err := vmcaps.HasCapability(ctx, new.Spec.Location, new.Spec.Template.VMSize, vmcapabilities.CapabilityAcceleratedNetworking)
+		if err != nil {
+			return false, microerror.Mask(err)
+		}
+		if !supported {
+			// Edited the node pool to use an instance type that does not support accelerated networking.
+			return false, nil
+		}
+
+		// Edited the node pool to use an instance type that supports accelerated networking.
+		return true, nil
+	}
+
+	// Accelerated Networking was either nil or false. Any VM size changed is allowed.
+	return true, nil
 }
