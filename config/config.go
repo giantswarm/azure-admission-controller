@@ -43,7 +43,7 @@ func Parse() (Config, error) {
 		}
 	}
 
-	var resourceSkusClient *compute.ResourceSkusClient
+	var resourceSkusClient compute.ResourceSkusClient
 	{
 		settings, err := auth.GetSettingsFromEnvironment()
 		if err != nil {
@@ -53,7 +53,7 @@ func Parse() (Config, error) {
 		if err != nil {
 			panic(err)
 		}
-		resourceSkusClient := compute.NewResourceSkusClient(settings.GetSubscriptionID())
+		resourceSkusClient = compute.NewResourceSkusClient(settings.GetSubscriptionID())
 		resourceSkusClient.Client.Authorizer = authorizer
 	}
 
@@ -61,7 +61,7 @@ func Parse() (Config, error) {
 	{
 		vmcaps, err = vmcapabilities.New(vmcapabilities.Config{
 			Logger: newLogger,
-			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: resourceSkusClient}),
+			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: &resourceSkusClient}),
 		})
 		if err != nil {
 			return Config{}, microerror.Mask(err)
