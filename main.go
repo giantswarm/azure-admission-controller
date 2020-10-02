@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -49,6 +50,7 @@ func main() {
 	handler.Handle("/azuremachinepoolupdate", validator.Handler(azureMachinePoolUpdateValidator))
 	handler.HandleFunc("/healthz", healthCheck)
 
+	config.AzureCluster.Logger.LogCtx(context.Background(), "level", "debug", "message", fmt.Sprintf("Listening on port %s", config.Address))
 	serve(config, handler)
 }
 
