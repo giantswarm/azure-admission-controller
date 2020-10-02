@@ -858,12 +858,9 @@ modernc.org/strutil v1.0.0/go.mod h1:lstksw84oURvj9y3tn8lGvRxyRC1S2+g5uuIzNfIOBs
 modernc.org/xc v1.0.0/go.mod h1:mRNCo0bvLjGhHO9WsyuKVU4q0ceiDDDoEeWDJHrNx8I=
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.7/go.mod h1:PHgbrJT7lCHcxMU+mDHEm+nx46H4zuuHZkDP6icnhu0=
 sigs.k8s.io/cluster-api v0.3.7/go.mod h1:G6gscKzZTGhMOOF3rDZXCxsLIbhVaacbjaiikB/rBmA=
-sigs.k8s.io/cluster-api v0.3.9 h1:WongQFeW+vbII9Karc3nIarxMfuUuTr33QU9aSyiKfs=
-sigs.k8s.io/cluster-api v0.3.9/go.mod h1:A7Om/um/j7hvqTvm+KEMEjDOn6fHKRhcVtBiuAH+tYQ=
 sigs.k8s.io/cluster-api v0.3.10 h1:iUbnDdFQjp406hclEV1/rRMO7/NpyJ7IxozAaAA9Zns=
 sigs.k8s.io/cluster-api v0.3.10/go.mod h1:XBBDBiaczcyNlH4D7FNjSKc5bBofYRppfg0ZgaP2x1U=
 sigs.k8s.io/controller-runtime v0.5.8/go.mod h1:UI/unU7Q+mo/rWBrND0NAaVNj/Xjh/+aqSv/M3njpmo=
-sigs.k8s.io/controller-runtime v0.5.10/go.mod h1:OTqxLuz7gVcrq+BHGUgedRu6b2VIKCEc7Pu4Jbwui0A=
 sigs.k8s.io/controller-runtime v0.5.11/go.mod h1:OTqxLuz7gVcrq+BHGUgedRu6b2VIKCEc7Pu4Jbwui0A=
 sigs.k8s.io/controller-runtime v0.6.1/go.mod h1:XRYBPdbf5XJu9kpS84VJiZ7h/u1hF3gEORz0efEja7A=
 sigs.k8s.io/controller-runtime v0.6.3 h1:SBbr+inLPEKhvlJtrvDcwIpm+uhDvp63Bl72xYJtoOE=
