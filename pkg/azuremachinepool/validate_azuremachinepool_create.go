@@ -62,6 +62,7 @@ func NewCreateValidator(config CreateValidatorConfig) (*CreateValidator, error) 
 	admitter := &CreateValidator{
 		k8sClient: k8sClient,
 		logger:    config.Logger,
+		vmcaps:    config.VMcaps,
 	}
 
 	return admitter, nil
