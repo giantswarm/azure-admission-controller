@@ -53,8 +53,8 @@ func Parse() (Config, error) {
 		if err != nil {
 			panic(err)
 		}
-		client := compute.NewResourceSkusClient(settings.GetSubscriptionID())
-		client.Client.Authorizer = authorizer
+		resourceSkusClient := compute.NewResourceSkusClient(settings.GetSubscriptionID())
+		resourceSkusClient.Client.Authorizer = authorizer
 	}
 
 	var vmcaps *vmcapabilities.VMSKU
