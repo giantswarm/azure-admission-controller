@@ -3,5 +3,10 @@ Installation:
     Registry:
       Domain: quay.io
     Secret:
-      AzureOperator:
-        SecretYaml: ""
+      Credentiald:
+        Azure:
+          CredentialDefault:
+            ClientID: ""
+            ClientSecret: ""
+            TenantID: ""
+            SubscriptionID: ""
