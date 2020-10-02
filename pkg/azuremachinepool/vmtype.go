@@ -14,24 +14,24 @@ const (
 	minCPUs   = 4
 )
 
-func checkInstanceTypeIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, mp expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	memory, err := vmcaps.Memory(ctx, mp.Spec.Location, mp.Spec.Template.VMSize)
+func checkInstanceTypeIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMachinePool *expcapzv1alpha3.AzureMachinePool) error {
+	memory, err := vmcaps.Memory(ctx, azureMachinePool.Spec.Location, azureMachinePool.Spec.Template.VMSize)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
-	cpu, err := vmcaps.CPUs(ctx, mp.Spec.Location, mp.Spec.Template.VMSize)
+	cpu, err := vmcaps.CPUs(ctx, azureMachinePool.Spec.Location, azureMachinePool.Spec.Template.VMSize)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
 	if memory < minMemory {
-		return false, nil
+		return microerror.Maskf(invalidOperationError, "Memory has to be greater than %d GBs", minMemory)
 	}
 
 	if cpu < minCPUs {
-		return false, nil
+		return microerror.Maskf(invalidOperationError, "Number of cores has to be greater than %d", minCPUs)
 	}
 
-	return true, nil
+	return nil
 }

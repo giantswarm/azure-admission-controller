@@ -78,28 +78,34 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(parsingFailedError, "unable to parse azureMachinePool CR: %v", err)
 	}
 
-	// Instance type might be changed so we check it is still valid and supported.
-	valid, err := checkInstanceTypeIsValid(ctx, a.vmcaps, *azureMPNewCR)
+	err := checkInstanceTypeIsValid(ctx, a.vmcaps, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
-	if !valid {
-		return false, microerror.Maskf(invalidOperationError, "Instance type is invalid or unsupported")
-	}
 
-	if !isAcceleratedNetworkingUnchanged(ctx, *azureMPOldCR, *azureMPNewCR) {
-		return false, microerror.Maskf(invalidOperationError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
-	}
-
-	isNewVmSizeSupportingAcceleratedNetworking, err := isNewVmSizeSupportingAcceleratedNetworking(ctx, a.vmcaps, *azureMPOldCR, *azureMPNewCR)
+	err = checkAcceleratedNetworkingUpdateIsValid(ctx, a.vmcaps, azureMPOldCR, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
-	}
-	if !isNewVmSizeSupportingAcceleratedNetworking {
-		return false, microerror.Maskf(invalidOperationError, "This node pool has AcceleratedNetworking enabled. It is not possible to use a VM type that does not support it.")
 	}
 
 	return true, nil
+}
+
+func checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMPOldCR *expcapzv1alpha3.AzureMachinePool, azureMPNewCR *expcapzv1alpha3.AzureMachinePool) error {
+	if hasAcceleratedNetworkingPropertyChanged(ctx, azureMPOldCR, azureMPNewCR) {
+		return microerror.Maskf(invalidOperationError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
+	}
+
+	if azureMPOldCR.Spec.Template.VMSize == azureMPNewCR.Spec.Template.VMSize {
+		return nil
+	}
+
+	err := checkAcceleratedNetworking(ctx, vmcaps, azureMPNewCR)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	return nil
 }
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {

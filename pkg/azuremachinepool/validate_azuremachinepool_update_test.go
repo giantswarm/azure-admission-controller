@@ -21,6 +21,9 @@ import (
 func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 	tr := true
 	fa := false
+	unsupportedInstanceType := []string{
+		"Standard_D16_v3",
+	}
 	supportedInstanceType := []string{
 		"Standard_D4_v3",
 		"Standard_D8_v3",
@@ -35,63 +38,70 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:         "case 0: Enabled and untouched",
+			name:         "case 0: AcceleratedNetworking is enabled and we don't change it or the instance type",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      true,
 			errorMatcher: nil,
 		},
 		{
-			name:         "case 1: Disabled and untouched",
+			name:         "case 1: AcceleratedNetworking is disabled and we don't change it or the instance type",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      true,
 			errorMatcher: nil,
 		},
 		{
-			name:         "case 2: Changed from true to false",
+			name:         "case 2: Enabled and try disabling it, keeping same instance type",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 3: Changed from true to true but new vm does not support it",
+			name:         "case 3: Enabled, try updating to new instance type that supports it",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
-			newNodePool:  azureMPRawObject(supportedInstanceType[1], &fa),
+			newNodePool:  azureMPRawObject(supportedInstanceType[1], &tr),
+			allowed:      true,
+			errorMatcher: nil,
+		},
+		{
+			name:         "case 4: Enabled, try updating to new instance type that does NOT supports it",
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
+			newNodePool:  azureMPRawObject(unsupportedInstanceType[0], &tr),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 4: Changed from false to true",
+			name:         "case 5: Disabled and try enabling it",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 5: changed from nil to true",
+			name:         "case 6: changed from nil to true",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 6: changed from true to nil",
+			name:         "case 7: changed from true to nil",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 7: changed from nil to false",
+			name:         "case 8: changed from nil to false",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name:         "case 8: changed from false to nil",
+			name:         "case 9: changed from false to nil",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil),
 			allowed:      false,
@@ -136,6 +146,23 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 						{
 							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
 							Value: to.StringPtr("True"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+					},
+				},
+				"Standard_D16_v3": {
+					Name: to.StringPtr("Standard_D16_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("False"),
 						},
 						{
 							Name:  to.StringPtr("vCPUs"),

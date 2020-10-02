@@ -73,21 +73,14 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(parsingFailedError, "unable to parse azureMachinePool CR: %v", err)
 	}
 
-	// Check if instance type is valid and supported.
-	valid, err := checkInstanceTypeIsValid(ctx, a.vmcaps, *azureMPNewCR)
+	err := checkInstanceTypeIsValid(ctx, a.vmcaps, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
-	}
-	if !valid {
-		return false, microerror.Maskf(invalidOperationError, "Instance type is invalid or unsupported")
 	}
 
-	valid, err = checkAcceleratedNetworking(ctx, a.vmcaps, *azureMPNewCR)
+	err = checkAcceleratedNetworking(ctx, a.vmcaps, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
-	}
-	if !valid {
-		return false, microerror.Maskf(invalidOperationError, "Accelerated Networking is not supported by the selected machine type")
 	}
 
 	return true, nil

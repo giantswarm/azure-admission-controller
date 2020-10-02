@@ -9,55 +9,38 @@ import (
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 )
 
-func checkAcceleratedNetworking(ctx context.Context, vmcaps *vmcapabilities.VMSKU, mp expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	// If the instance type is invalid, the following function returns an error.
-	acceleratedNetworkingAvailable, err := vmcaps.HasCapability(ctx, mp.Spec.Location, mp.Spec.Template.VMSize, vmcapabilities.CapabilityAcceleratedNetworking)
+func checkAcceleratedNetworking(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMachinePool *expcapzv1alpha3.AzureMachinePool) error {
+	// Accelerated networking is disabled (false) or in auto-detect mode (nil). This is always allowed.
+	if azureMachinePool.Spec.Template.AcceleratedNetworking == nil || !*azureMachinePool.Spec.Template.AcceleratedNetworking {
+		return nil
+	}
+
+	isSupported, err := isAcceleratedNetworkingSupportedOnVmSize(ctx, vmcaps, azureMachinePool)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	if !isSupported {
+		return microerror.Maskf(invalidOperationError, "The new VMSize does not support AcceleratedNetworking")
+	}
+
+	return nil
+}
+
+func isAcceleratedNetworkingSupportedOnVmSize(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMachinePool *expcapzv1alpha3.AzureMachinePool) (bool, error) {
+	acceleratedNetworkingAvailable, err := vmcaps.HasCapability(ctx, azureMachinePool.Spec.Location, azureMachinePool.Spec.Template.VMSize, vmcapabilities.CapabilityAcceleratedNetworking)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
 
-	// Accelerated networking is disabled (false) or in auto-detect mode (nil). This is always allowed.
-	if mp.Spec.Template.AcceleratedNetworking == nil || !*mp.Spec.Template.AcceleratedNetworking {
-		return true, nil
-	}
-
-	// Accelerated networking is enabled (true).
 	return acceleratedNetworkingAvailable, nil
 }
 
-func isAcceleratedNetworkingUnchanged(ctx context.Context, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) bool {
+func hasAcceleratedNetworkingPropertyChanged(ctx context.Context, old *expcapzv1alpha3.AzureMachinePool, new *expcapzv1alpha3.AzureMachinePool) bool {
 	if old.Spec.Template.AcceleratedNetworking == nil && new.Spec.Template.AcceleratedNetworking != nil ||
 		old.Spec.Template.AcceleratedNetworking != nil && new.Spec.Template.AcceleratedNetworking == nil {
-		return false
+		return true
 	}
 
-	if *old.Spec.Template.AcceleratedNetworking != *new.Spec.Template.AcceleratedNetworking {
-		return false
-	}
-
-	return true
-}
-
-func isNewVmSizeSupportingAcceleratedNetworking(ctx context.Context, vmcaps *vmcapabilities.VMSKU, old expcapzv1alpha3.AzureMachinePool, new expcapzv1alpha3.AzureMachinePool) (bool, error) {
-	if old.Spec.Template.VMSize == new.Spec.Template.VMSize {
-		// VM size unchanged, all good.
-		return true, nil
-	}
-	if old.Spec.Template.AcceleratedNetworking != nil && *old.Spec.Template.AcceleratedNetworking {
-		// Accelerated networking was explicitly enabled. New instance type needs support for accelerated networking.
-		supported, err := vmcaps.HasCapability(ctx, new.Spec.Location, new.Spec.Template.VMSize, vmcapabilities.CapabilityAcceleratedNetworking)
-		if err != nil {
-			return false, microerror.Mask(err)
-		}
-		if !supported {
-			// Edited the node pool to use an instance type that does not support accelerated networking.
-			return false, nil
-		}
-
-		// Edited the node pool to use an instance type that supports accelerated networking.
-		return true, nil
-	}
-
-	// Accelerated Networking was either nil or false. Any VM size changed is allowed.
-	return true, nil
+	return *old.Spec.Template.AcceleratedNetworking != *new.Spec.Template.AcceleratedNetworking
 }
