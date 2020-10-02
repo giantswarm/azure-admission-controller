@@ -33,22 +33,22 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ include "resource.default.name"  . }}
-                key: service.azure.clientid
+                key: clientid
           - name: AZURE_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 name: {{ include "resource.default.name"  . }}
-                key: service.azure.clientsecret
+                key: clientsecret
           - name: AZURE_TENANT_ID
             valueFrom:
               secretKeyRef:
                 name: {{ include "resource.default.name"  . }}
-                key: service.azure.tenantid
+                key: tenantid
           - name: AZURE_SUBSCRIPTION_ID
             valueFrom:
               secretKeyRef:
                 name: {{ include "resource.default.name"  . }}
-                key: service.azure.subscriptionid
+                key: subscriptionid
           args:
             - ./azure-admission-controller
             - --tls-cert-file=/certs/ca.crt
