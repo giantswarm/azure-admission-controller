@@ -152,7 +152,7 @@ func (v *VMSKU) initCache(ctx context.Context, location string) error {
 
 	v.skus[location] = skus
 
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Number of SKUs in cache for location %s: '%d'", location, len(skus)))
+	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Initialized cache. Number of SKUs in cache for location %s: '%d'", location, len(skus)))
 
 	return nil
 }
