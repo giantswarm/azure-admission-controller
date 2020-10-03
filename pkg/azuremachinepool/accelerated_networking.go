@@ -37,10 +37,19 @@ func isAcceleratedNetworkingSupportedOnVmSize(ctx context.Context, vmcaps *vmcap
 }
 
 func hasAcceleratedNetworkingPropertyChanged(ctx context.Context, old *expcapzv1alpha3.AzureMachinePool, new *expcapzv1alpha3.AzureMachinePool) bool {
-	if old.Spec.Template.AcceleratedNetworking == nil && new.Spec.Template.AcceleratedNetworking != nil ||
-		old.Spec.Template.AcceleratedNetworking != nil && new.Spec.Template.AcceleratedNetworking == nil {
+	if old.Spec.Template.AcceleratedNetworking != nil {
+		if new.Spec.Template.AcceleratedNetworking != nil {
+			return *old.Spec.Template.AcceleratedNetworking != *new.Spec.Template.AcceleratedNetworking
+		} else {
+			return true
+		}
+	}
+
+	// Old AcceleratedNetworking is nil
+	if new.Spec.Template.AcceleratedNetworking != nil {
 		return true
 	}
 
-	return *old.Spec.Template.AcceleratedNetworking != *new.Spec.Template.AcceleratedNetworking
+	// Both are nil
+	return false
 }
