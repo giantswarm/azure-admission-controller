@@ -2,7 +2,6 @@ package azurecluster
 
 import (
 	"context"
-	"strings"
 
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -58,8 +57,4 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
-}
-
-func isAlphaRelease(release string) bool {
-	return strings.Contains(release, "alpha")
 }
