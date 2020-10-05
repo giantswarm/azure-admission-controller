@@ -80,25 +80,25 @@ webhooks:
           - UPDATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: cluster.update.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: azureclusters.update.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /cluster/update
+        path: /azurecluster/update
       caBundle: Cg==
     rules:
-      - apiGroups: ["cluster.x-k8s.io"]
+      - apiGroups: ["infrastructure.cluster.x-k8s.io"]
         resources:
-          - "clusters"
+          - "azureclusters"
         apiVersions:
           - "v1alpha3"
         operations:
           - UPDATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: azuremachinepools.update.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: azuremachines.update.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
@@ -116,18 +116,18 @@ webhooks:
           - UPDATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: azuremachinepools.update.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: cluster.update.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azurecluster/update
+        path: /cluster/update
       caBundle: Cg==
     rules:
-      - apiGroups: ["infrastructure.cluster.x-k8s.io"]
+      - apiGroups: ["cluster.x-k8s.io"]
         resources:
-          - "azureclusters"
+          - "clusters"
         apiVersions:
           - "v1alpha3"
         operations:
