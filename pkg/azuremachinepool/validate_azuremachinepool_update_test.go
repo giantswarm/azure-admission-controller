@@ -38,14 +38,14 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:         "case 0: AcceleratedNetworking is enabled and we don't change it or the instance type",
+			name:         "case 0: AcceleratedNetworking is enabled in CR and we don't change it or the instance type",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr),
 			allowed:      true,
 			errorMatcher: nil,
 		},
 		{
-			name:         "case 1: AcceleratedNetworking is disabled and we don't change it or the instance type",
+			name:         "case 1: AcceleratedNetworking is disabled in CR and we don't change it or the instance type",
 			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa),
 			allowed:      true,

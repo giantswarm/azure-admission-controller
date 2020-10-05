@@ -26,16 +26,23 @@ import (
 )
 
 func main() {
+	err := mainError()
+	if err != nil {
+		panic(fmt.Sprintf("%#v\n", err))
+	}
+}
+
+func mainError() error {
 	config, err := config.Parse()
 	if err != nil {
-		panic(microerror.JSON(err))
+		return microerror.Mask(err)
 	}
 
 	var newLogger micrologger.Logger
 	{
 		newLogger, err = micrologger.New(micrologger.Config{})
 		if err != nil {
-			panic(err)
+			return microerror.Mask(err)
 		}
 	}
 
@@ -43,7 +50,7 @@ func main() {
 	{
 		restConfig, err := restclient.InClusterConfig()
 		if err != nil {
-			panic(microerror.JSON(err))
+			return microerror.Mask(err)
 		}
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
@@ -58,7 +65,7 @@ func main() {
 
 		k8sClient, err = k8sclient.NewClients(c)
 		if err != nil {
-			panic(microerror.JSON(err))
+			return microerror.Mask(err)
 		}
 	}
 
@@ -66,11 +73,11 @@ func main() {
 	{
 		settings, err := auth.GetSettingsFromEnvironment()
 		if err != nil {
-			panic(err)
+			return microerror.Mask(err)
 		}
 		authorizer, err := settings.GetAuthorizer()
 		if err != nil {
-			panic(err)
+			return microerror.Mask(err)
 		}
 		resourceSkusClient = compute.NewResourceSkusClient(settings.GetSubscriptionID())
 		resourceSkusClient.Client.Authorizer = authorizer
@@ -83,7 +90,7 @@ func main() {
 			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: &resourceSkusClient}),
 		})
 		if err != nil {
-			panic(err)
+			return microerror.Mask(err)
 		}
 	}
 
@@ -93,7 +100,7 @@ func main() {
 	}
 	azureConfigValidator, err := azureupdate.NewAzureConfigValidator(azureConfigValidatorConfig)
 	if err != nil {
-		panic(microerror.JSON(err))
+		return microerror.Mask(err)
 	}
 
 	azureClusterConfigValidatorConfig := azureupdate.AzureClusterConfigValidatorConfig{
@@ -101,7 +108,7 @@ func main() {
 	}
 	azureClusterConfigValidator, err := azureupdate.NewAzureClusterConfigValidator(azureClusterConfigValidatorConfig)
 	if err != nil {
-		panic(microerror.JSON(err))
+		return microerror.Mask(err)
 	}
 
 	createValidatorConfig := azuremachinepool.CreateValidatorConfig{
@@ -110,7 +117,7 @@ func main() {
 	}
 	azureMachinePoolCreateValidator, err := azuremachinepool.NewCreateValidator(createValidatorConfig)
 	if err != nil {
-		panic(microerror.JSON(err))
+		return microerror.Mask(err)
 	}
 
 	updateValidatorConfig := azuremachinepool.UpdateValidatorConfig{
@@ -119,7 +126,7 @@ func main() {
 	}
 	azureMachinePoolUpdateValidator, err := azuremachinepool.NewUpdateValidator(updateValidatorConfig)
 	if err != nil {
-		panic(microerror.JSON(err))
+		return microerror.Mask(err)
 	}
 
 	// Here we register our endpoints.
@@ -132,6 +139,8 @@ func main() {
 
 	newLogger.LogCtx(context.Background(), "level", "debug", "message", fmt.Sprintf("Listening on port %s", config.Address))
 	serve(config, handler)
+
+	return nil
 }
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {
