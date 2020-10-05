@@ -14,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -58,7 +59,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.3.0",
 			newVersion:   "12.0.0",
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name: "case 3",
@@ -88,7 +89,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.3.1",
 			newVersion:   "",
 			allowed:      false,
-			errorMatcher: IsParsingFailed,
+			errorMatcher: errors.IsParsingFailed,
 		},
 		{
 			name: "case 6",
@@ -98,7 +99,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "",
 			newVersion:   "11.3.1",
 			allowed:      false,
-			errorMatcher: IsParsingFailed,
+			errorMatcher: errors.IsParsingFailed,
 		},
 		{
 			name: "case 7",
@@ -108,7 +109,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.3.0",
 			newVersion:   "11.4.0",
 			allowed:      false,
-			errorMatcher: IsInvalidReleaseError,
+			errorMatcher: errors.IsInvalidReleaseError,
 		},
 		{
 			name: "case 8",
@@ -118,7 +119,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.3.0",
 			newVersion:   "11.3.1",
 			allowed:      false,
-			errorMatcher: IsInvalidReleaseError,
+			errorMatcher: errors.IsInvalidReleaseError,
 		},
 		{
 			name: "case 9",
@@ -128,7 +129,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.3.1",
 			newVersion:   "11.3.0",
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name: "case 10",
@@ -148,7 +149,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.4.0", // exists
 			newVersion:   "11.5.0", // does not exist
 			allowed:      false,
-			errorMatcher: IsInvalidReleaseError,
+			errorMatcher: errors.IsInvalidReleaseError,
 		},
 		{
 			name: "case 12",
@@ -169,7 +170,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			newVersion:   "11.4.0",
 			conditions:   []string{"Updating"},
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name: "case 14",
@@ -180,7 +181,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			newVersion:   "11.4.0",
 			conditions:   []string{"Creating"},
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name: "case 15",
@@ -200,7 +201,7 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 			oldVersion:   "11.4.0",
 			newVersion:   "12.1.0",
 			allowed:      false,
-			errorMatcher: IsInvalidOperationError,
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 	}
 

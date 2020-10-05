@@ -147,7 +147,8 @@ func mainError() error {
 	var azureClusterUpdateValidator *azurecluster.UpdateValidator
 	{
 		c := azurecluster.UpdateValidatorConfig{
-			Logger: newLogger,
+			K8sClient: k8sClient,
+			Logger:    newLogger,
 		}
 		azureClusterUpdateValidator, err = azurecluster.NewUpdateValidator(c)
 		if err != nil {
@@ -158,7 +159,8 @@ func mainError() error {
 	var azureMachineUpdateValidator *azuremachine.UpdateValidator
 	{
 		c := azuremachine.UpdateValidatorConfig{
-			Logger: newLogger,
+			K8sClient: k8sClient,
+			Logger:    newLogger,
 		}
 		azureMachineUpdateValidator, err = azuremachine.NewUpdateValidator(c)
 		if err != nil {
@@ -169,7 +171,8 @@ func mainError() error {
 	var clusterUpdateValidator *cluster.UpdateValidator
 	{
 		c := cluster.UpdateValidatorConfig{
-			Logger: newLogger,
+			K8sClient: k8sClient,
+			Logger:    newLogger,
 		}
 		clusterUpdateValidator, err = cluster.NewUpdateValidator(c)
 		if err != nil {
