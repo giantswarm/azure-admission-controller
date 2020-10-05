@@ -51,12 +51,12 @@ func NewUpdateValidator(config UpdateValidatorConfig) (*UpdateValidator, error) 
 		}
 	}
 
-	validator := &UpdateValidator{
+	v := &UpdateValidator{
 		k8sClient: k8sClient,
 		logger:    config.Logger,
 	}
 
-	return validator, nil
+	return v, nil
 }
 
 func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {

@@ -2,6 +2,7 @@ package azureupdate
 
 import (
 	"context"
+	"strings"
 
 	"github.com/blang/semver"
 	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
@@ -68,6 +69,11 @@ func upgradeAllowed(ctx context.Context, g8sclient versioned.Interface, oldVersi
 			return false, microerror.Maskf(invalidOperationError, "downgrading is not allowed (attempted to downgrade from %s to %s)", oldVersion, newVersion)
 		}
 
+		// Check if either version is an alpha one.
+		if isAlphaRelease(oldVersion.String()) || isAlphaRelease(newVersion.String()) {
+			return false, microerror.Maskf(invalidOperationError, "It is not possible to upgrade to or from an alpha release")
+		}
+
 		if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
 			// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
 			for _, release := range availableReleases {
@@ -86,4 +92,8 @@ func upgradeAllowed(ctx context.Context, g8sclient versioned.Interface, oldVersi
 	}
 
 	return true, nil
+}
+
+func isAlphaRelease(release string) bool {
+	return strings.Contains(release, "alpha")
 }
