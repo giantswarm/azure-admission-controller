@@ -14,7 +14,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
-	apiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
@@ -37,7 +37,7 @@ func NewAzureClusterConfigValidator(config AzureClusterConfigValidatorConfig) (*
 		}
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				apiv1alpha2.AddToScheme,
+				capiv1alpha3.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
 			},

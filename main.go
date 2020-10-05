@@ -16,12 +16,15 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	restclient "k8s.io/client-go/rest"
-	apiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/config"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/pkg/azurecluster"
+	"github.com/giantswarm/azure-admission-controller/pkg/azuremachine"
 	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
+	"github.com/giantswarm/azure-admission-controller/pkg/cluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
@@ -33,7 +36,7 @@ func main() {
 }
 
 func mainError() error {
-	config, err := config.Parse()
+	cfg, err := config.Parse()
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -54,7 +57,7 @@ func mainError() error {
 		}
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				apiv1alpha2.AddToScheme,
+				capiv1alpha3.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
 			},
@@ -94,51 +97,99 @@ func mainError() error {
 		}
 	}
 
-	azureConfigValidatorConfig := azureupdate.AzureConfigValidatorConfig{
-		K8sClient: k8sClient,
-		Logger:    newLogger,
-	}
-	azureConfigValidator, err := azureupdate.NewAzureConfigValidator(azureConfigValidatorConfig)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	azureClusterConfigValidatorConfig := azureupdate.AzureClusterConfigValidatorConfig{
-		Logger: newLogger,
-	}
-	azureClusterConfigValidator, err := azureupdate.NewAzureClusterConfigValidator(azureClusterConfigValidatorConfig)
-	if err != nil {
-		return microerror.Mask(err)
+	var azureConfigValidator *azureupdate.AzureConfigValidator
+	{
+		azureConfigValidatorConfig := azureupdate.AzureConfigValidatorConfig{
+			K8sClient: k8sClient,
+			Logger:    newLogger,
+		}
+		azureConfigValidator, err = azureupdate.NewAzureConfigValidator(azureConfigValidatorConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
-	createValidatorConfig := azuremachinepool.CreateValidatorConfig{
-		Logger: newLogger,
-		VMcaps: vmcaps,
-	}
-	azureMachinePoolCreateValidator, err := azuremachinepool.NewCreateValidator(createValidatorConfig)
-	if err != nil {
-		return microerror.Mask(err)
+	var azureClusterConfigValidator *azureupdate.AzureClusterConfigValidator
+	{
+		azureClusterConfigValidatorConfig := azureupdate.AzureClusterConfigValidatorConfig{
+			Logger: newLogger,
+		}
+		azureClusterConfigValidator, err = azureupdate.NewAzureClusterConfigValidator(azureClusterConfigValidatorConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
-	updateValidatorConfig := azuremachinepool.UpdateValidatorConfig{
-		Logger: newLogger,
-		VMcaps: vmcaps,
+	var azureMachinePoolCreateValidator *azuremachinepool.CreateValidator
+	{
+		createValidatorConfig := azuremachinepool.CreateValidatorConfig{
+			Logger: newLogger,
+			VMcaps: vmcaps,
+		}
+		azureMachinePoolCreateValidator, err = azuremachinepool.NewCreateValidator(createValidatorConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
-	azureMachinePoolUpdateValidator, err := azuremachinepool.NewUpdateValidator(updateValidatorConfig)
-	if err != nil {
-		return microerror.Mask(err)
+
+	var azureMachinePoolUpdateValidator *azuremachinepool.UpdateValidator
+	{
+		updateValidatorConfig := azuremachinepool.UpdateValidatorConfig{
+			Logger: newLogger,
+			VMcaps: vmcaps,
+		}
+		azureMachinePoolUpdateValidator, err = azuremachinepool.NewUpdateValidator(updateValidatorConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var azureClusterUpdateValidator *azurecluster.UpdateValidator
+	{
+		c := azurecluster.UpdateValidatorConfig{
+			Logger: newLogger,
+		}
+		azureClusterUpdateValidator, err = azurecluster.NewUpdateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var azureMachineUpdateValidator *azuremachine.UpdateValidator
+	{
+		c := azuremachine.UpdateValidatorConfig{
+			Logger: newLogger,
+		}
+		azureMachineUpdateValidator, err = azuremachine.NewUpdateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var clusterUpdateValidator *cluster.UpdateValidator
+	{
+		c := cluster.UpdateValidatorConfig{
+			Logger: newLogger,
+		}
+		clusterUpdateValidator, err = cluster.NewUpdateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
-	handler.Handle("/azureconfig", validator.Handler(azureConfigValidator))
-	handler.Handle("/azureclusterconfig", validator.Handler(azureClusterConfigValidator))
-	handler.Handle("/azuremachinepoolcreate", validator.Handler(azureMachinePoolCreateValidator))
-	handler.Handle("/azuremachinepoolupdate", validator.Handler(azureMachinePoolUpdateValidator))
+	handler.Handle("/azureconfig/update", validator.Handler(azureConfigValidator))
+	handler.Handle("/azureclusterconfig/update", validator.Handler(azureClusterConfigValidator))
+	handler.Handle("/azurecluster/update", validator.Handler(azureClusterUpdateValidator))
+	handler.Handle("/azuremachine/update", validator.Handler(azureMachineUpdateValidator))
+	handler.Handle("/azuremachinepool/create", validator.Handler(azureMachinePoolCreateValidator))
+	handler.Handle("/azuremachinepool/update", validator.Handler(azureMachinePoolUpdateValidator))
+	handler.Handle("/cluster/update", validator.Handler(clusterUpdateValidator))
 	handler.HandleFunc("/healthz", healthCheck)
 
-	newLogger.LogCtx(context.Background(), "level", "debug", "message", fmt.Sprintf("Listening on port %s", config.Address))
-	serve(config, handler)
+	newLogger.LogCtx(context.Background(), "level", "debug", "message", fmt.Sprintf("Listening on port %s", cfg.Address))
+	serve(cfg, handler)
 
 	return nil
 }

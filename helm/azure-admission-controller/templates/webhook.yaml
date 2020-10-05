@@ -14,7 +14,7 @@ webhooks:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azureconfig
+        path: /azureconfig/update
       caBundle: Cg==
     rules:
       - apiGroups: ["provider.giantswarm.io"]
@@ -32,7 +32,7 @@ webhooks:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azureclusterconfig
+        path: /azureclusterconfig/update
       caBundle: Cg==
     rules:
       - apiGroups: ["core.giantswarm.io"]
@@ -50,7 +50,7 @@ webhooks:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azuremachinepoolcreate
+        path: /azuremachinepool/create
       caBundle: Cg==
     rules:
       - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
@@ -68,7 +68,7 @@ webhooks:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azuremachinepoolupdate
+        path: /azuremachinepool/update
       caBundle: Cg==
     rules:
       - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]

@@ -1,4 +1,4 @@
-package azuremachine
+package azurecluster
 
 import (
 	"context"
@@ -13,21 +13,22 @@ import (
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
 	restclient "k8s.io/client-go/rest"
-	apiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
-type Validator struct {
+type UpdateValidator struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
 }
 
-type Config struct {
+type UpdateValidatorConfig struct {
 	Logger micrologger.Logger
 }
 
-func NewAzureClusterConfigValidator(config Config) (*Validator, error) {
+func NewUpdateValidator(config UpdateValidatorConfig) (*UpdateValidator, error) {
 	var k8sClient k8sclient.Interface
 	{
 		restConfig, err := restclient.InClusterConfig()
@@ -36,7 +37,7 @@ func NewAzureClusterConfigValidator(config Config) (*Validator, error) {
 		}
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				apiv1alpha2.AddToScheme,
+				capiv1alpha3.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
 			},
@@ -51,26 +52,26 @@ func NewAzureClusterConfigValidator(config Config) (*Validator, error) {
 		}
 	}
 
-	validator := &Validator{
+	v := &UpdateValidator{
 		k8sClient: k8sClient,
 		logger:    config.Logger,
 	}
 
-	return validator, nil
+	return v, nil
 }
 
-func (a *Validator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {
-	AzureMachineNewCR := &capz.AzureMachine{}
-	AzureMachineOldCR := &capz.AzureMachine{}
-	if _, _, err := validator.Deserializer.Decode(request.Object.Raw, nil, AzureMachineNewCR); err != nil {
-		return false, microerror.Maskf(parsingFailedError, "unable to parse AzureMachine CR: %v", err)
+func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.AdmissionRequest) (bool, error) {
+	azureClusterNewCR := &capzv1alpha3.AzureCluster{}
+	azureClusterOldCR := &capzv1alpha3.AzureCluster{}
+	if _, _, err := validator.Deserializer.Decode(request.Object.Raw, nil, azureClusterNewCR); err != nil {
+		return false, microerror.Maskf(parsingFailedError, "unable to parse AzureCluster CR: %v", err)
 	}
-	if _, _, err := validator.Deserializer.Decode(request.OldObject.Raw, nil, AzureMachineOldCR); err != nil {
-		return false, microerror.Maskf(parsingFailedError, "unable to parse AzureMachine CR: %v", err)
+	if _, _, err := validator.Deserializer.Decode(request.OldObject.Raw, nil, azureClusterOldCR); err != nil {
+		return false, microerror.Maskf(parsingFailedError, "unable to parse AzureCluster CR: %v", err)
 	}
 
-	oldClusterVersion := AzureMachineOldCR.Labels[label.ReleaseVersion]
-	newClusterVersion := AzureMachineNewCR.Labels[label.ReleaseVersion]
+	oldClusterVersion := azureClusterOldCR.Labels[label.ReleaseVersion]
+	newClusterVersion := azureClusterNewCR.Labels[label.ReleaseVersion]
 
 	if oldClusterVersion != newClusterVersion {
 		if isAlphaRelease(oldClusterVersion) || isAlphaRelease(newClusterVersion) {
@@ -81,7 +82,7 @@ func (a *Validator) Validate(ctx context.Context, request *v1beta1.AdmissionRequ
 	return true, nil
 }
 
-func (a *Validator) Log(keyVals ...interface{}) {
+func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
 }
 
