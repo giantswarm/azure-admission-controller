@@ -11,6 +11,7 @@ import (
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
+	"github.com/giantswarm/azure-admission-controller/internal/semverhelper"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
@@ -43,16 +44,16 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse AzureMachine CR: %v", err)
 	}
 
-	oldClusterVersion, err := releaseversion.GetVersionFromCRLabels(AzureMachineOldCR.Labels)
+	oldClusterVersion, err := semverhelper.GetSemverFromLabels(AzureMachineOldCR.Labels)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (before edit)")
 	}
-	newClusterVersion, err := releaseversion.GetVersionFromCRLabels(AzureMachineNewCR.Labels)
+	newClusterVersion, err := semverhelper.GetSemverFromLabels(AzureMachineNewCR.Labels)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (after edit)")
 	}
 
-	return releaseversion.UpgradeAllowed(ctx, a.k8sClient.G8sClient(), oldClusterVersion, newClusterVersion)
+	return releaseversion.Validate(ctx, a.k8sClient.G8sClient(), oldClusterVersion, newClusterVersion)
 }
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {

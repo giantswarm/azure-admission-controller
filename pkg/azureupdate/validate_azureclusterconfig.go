@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/blang/semver"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/core/v1alpha1"
 	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
@@ -71,11 +72,11 @@ func (a *AzureClusterConfigValidator) Validate(ctx context.Context, request *v1b
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse AzureClusterConfig CR: %v", err)
 	}
 
-	oldVersion, err := releaseversion.GetVersionFromString(AzureClusterConfigOldCR.Spec.Guest.ReleaseVersion)
+	oldVersion, err := getSemver(AzureClusterConfigOldCR.Spec.Guest.ReleaseVersion)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureClusterConfig (before edit)")
 	}
-	newVersion, err := releaseversion.GetVersionFromString(AzureClusterConfigNewCR.Spec.Guest.ReleaseVersion)
+	newVersion, err := getSemver(AzureClusterConfigNewCR.Spec.Guest.ReleaseVersion)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureClusterConfig (after edit)")
 	}
@@ -94,7 +95,7 @@ func (a *AzureClusterConfigValidator) Validate(ctx context.Context, request *v1b
 			return false, microerror.Maskf(errors.InvalidOperationError, "cluster has condition: %s", status)
 		}
 
-		return releaseversion.UpgradeAllowed(ctx, a.k8sClient.G8sClient(), oldVersion, newVersion)
+		return releaseversion.Validate(ctx, a.k8sClient.G8sClient(), oldVersion, newVersion)
 	}
 
 	return true, nil
@@ -102,4 +103,8 @@ func (a *AzureClusterConfigValidator) Validate(ctx context.Context, request *v1b
 
 func (a *AzureClusterConfigValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
+}
+
+func getSemver(version string) (semver.Version, error) {
+	return semver.ParseTolerant(version)
 }

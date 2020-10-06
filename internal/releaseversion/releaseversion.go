@@ -12,28 +12,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
 
-const (
-	versionLabel = "release.giantswarm.io/version"
-)
-
-func GetVersionFromCRLabels(labels map[string]string) (semver.Version, error) {
-	version, ok := labels[versionLabel]
-	if !ok {
-		return semver.Version{}, microerror.Maskf(errors.ParsingFailedError, "CR didn't have expected label %s", versionLabel)
-	}
-
-	return GetVersionFromString(version)
-}
-
-func GetVersionFromString(version string) (semver.Version, error) {
-	return semver.ParseTolerant(version)
-}
-
-func IsAlphaRelease(release string) bool {
-	return strings.Contains(release, "alpha")
-}
-
-func UpgradeAllowed(ctx context.Context, g8sclient versioned.Interface, oldVersion semver.Version, newVersion semver.Version) (bool, error) {
+func Validate(ctx context.Context, g8sclient versioned.Interface, oldVersion semver.Version, newVersion semver.Version) (bool, error) {
 	if oldVersion.Equals(newVersion) {
 		return true, nil
 	}
@@ -54,7 +33,7 @@ func UpgradeAllowed(ctx context.Context, g8sclient versioned.Interface, oldVersi
 	}
 
 	// Check if either version is an alpha one.
-	if IsAlphaRelease(oldVersion.String()) || IsAlphaRelease(newVersion.String()) {
+	if isAlphaRelease(oldVersion.String()) || isAlphaRelease(newVersion.String()) {
 		return false, microerror.Maskf(errors.InvalidOperationError, "It is not possible to upgrade to or from an alpha release")
 	}
 
@@ -103,4 +82,8 @@ func included(releases []*semver.Version, release semver.Version) bool {
 	}
 
 	return false
+}
+
+func isAlphaRelease(release string) bool {
+	return strings.Contains(release, "alpha")
 }
