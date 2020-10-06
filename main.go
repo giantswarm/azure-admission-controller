@@ -17,6 +17,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	restclient "k8s.io/client-go/rest"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/config"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
@@ -49,7 +50,7 @@ func mainError() error {
 		}
 	}
 
-	var k8sClient k8sclient.Interface
+	var ctrlClient client.Client
 	{
 		restConfig, err := restclient.InClusterConfig()
 		if err != nil {
@@ -66,10 +67,12 @@ func mainError() error {
 			RestConfig: restConfig,
 		}
 
-		k8sClient, err = k8sclient.NewClients(c)
+		k8sClient, err := k8sclient.NewClients(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
+
+		ctrlClient = k8sClient.CtrlClient()
 	}
 
 	var resourceSkusClient compute.ResourceSkusClient
@@ -100,8 +103,8 @@ func mainError() error {
 	var azureConfigValidator *azureupdate.AzureConfigValidator
 	{
 		azureConfigValidatorConfig := azureupdate.AzureConfigValidatorConfig{
-			K8sClient: k8sClient,
-			Logger:    newLogger,
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
 		}
 		azureConfigValidator, err = azureupdate.NewAzureConfigValidator(azureConfigValidatorConfig)
 		if err != nil {
@@ -147,8 +150,8 @@ func mainError() error {
 	var azureClusterUpdateValidator *azurecluster.UpdateValidator
 	{
 		c := azurecluster.UpdateValidatorConfig{
-			K8sClient: k8sClient,
-			Logger:    newLogger,
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
 		}
 		azureClusterUpdateValidator, err = azurecluster.NewUpdateValidator(c)
 		if err != nil {
@@ -159,8 +162,8 @@ func mainError() error {
 	var azureMachineUpdateValidator *azuremachine.UpdateValidator
 	{
 		c := azuremachine.UpdateValidatorConfig{
-			K8sClient: k8sClient,
-			Logger:    newLogger,
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
 		}
 		azureMachineUpdateValidator, err = azuremachine.NewUpdateValidator(c)
 		if err != nil {
@@ -171,8 +174,8 @@ func mainError() error {
 	var clusterUpdateValidator *cluster.UpdateValidator
 	{
 		c := cluster.UpdateValidatorConfig{
-			K8sClient: k8sClient,
-			Logger:    newLogger,
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
 		}
 		clusterUpdateValidator, err = cluster.NewUpdateValidator(c)
 		if err != nil {

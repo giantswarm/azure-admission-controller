@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
 var (
@@ -224,14 +223,18 @@ func TestAzureConfigValidate(t *testing.T) {
 					panic(microerror.JSON(err))
 				}
 			}
-			fakeK8sClient := unittest.FakeK8sClient()
+			fakeCtrlClient, err := getFakeCtrlClient()
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+
 			admit := &AzureConfigValidator{
-				k8sClient: fakeK8sClient,
-				logger:    newLogger,
+				ctrlClient: fakeCtrlClient,
+				logger:     newLogger,
 			}
 
 			// Create needed releases.
-			err = ensureReleases(fakeK8sClient.G8sClient(), tc.releases)
+			err = ensureReleases(fakeCtrlClient, tc.releases)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -5,19 +5,19 @@ import (
 	"strings"
 
 	"github.com/blang/semver"
-	"github.com/giantswarm/apiextensions/v2/pkg/clientset/versioned"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
 
-func Validate(ctx context.Context, g8sclient versioned.Interface, oldVersion semver.Version, newVersion semver.Version) (bool, error) {
+func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.Version, newVersion semver.Version) (bool, error) {
 	if oldVersion.Equals(newVersion) {
 		return true, nil
 	}
 
-	availableReleases, err := availableReleases(ctx, g8sclient)
+	availableReleases, err := availableReleases(ctx, ctrlCLient)
 	if err != nil {
 		return false, err
 	}
@@ -56,8 +56,9 @@ func Validate(ctx context.Context, g8sclient versioned.Interface, oldVersion sem
 	return true, nil
 }
 
-func availableReleases(ctx context.Context, g8sclient versioned.Interface) ([]*semver.Version, error) {
-	releaseList, err := g8sclient.ReleaseV1alpha1().Releases().List(ctx, v1.ListOptions{})
+func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*semver.Version, error) {
+	releaseList := &v1alpha1.ReleaseList{}
+	err := ctrlClient.List(ctx, releaseList)
 	if err != nil {
 		return []*semver.Version{}, microerror.Mask(err)
 	}

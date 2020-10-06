@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
@@ -16,13 +16,13 @@ import (
 )
 
 type AzureConfigValidator struct {
-	k8sClient k8sclient.Interface
-	logger    micrologger.Logger
+	ctrlClient client.Client
+	logger     micrologger.Logger
 }
 
 type AzureConfigValidatorConfig struct {
-	K8sClient k8sclient.Interface
-	Logger    micrologger.Logger
+	CtrlClient client.Client
+	Logger     micrologger.Logger
 }
 
 const (
@@ -32,8 +32,8 @@ const (
 
 func NewAzureConfigValidator(config AzureConfigValidatorConfig) (*AzureConfigValidator, error) {
 	admitter := &AzureConfigValidator{
-		k8sClient: config.K8sClient,
-		logger:    config.Logger,
+		ctrlClient: config.CtrlClient,
+		logger:     config.Logger,
 	}
 
 	return admitter, nil
@@ -65,7 +65,7 @@ func (a *AzureConfigValidator) Validate(ctx context.Context, request *v1beta1.Ad
 			return false, microerror.Maskf(errors.InvalidOperationError, "cluster has condition: %s", status)
 		}
 
-		return releaseversion.Validate(ctx, a.k8sClient.G8sClient(), oldVersion, newVersion)
+		return releaseversion.Validate(ctx, a.ctrlClient, oldVersion, newVersion)
 	}
 
 	return true, nil
