@@ -1,6 +1,6 @@
 module github.com/giantswarm/azure-admission-controller
 
-go 1.14
+go 1.15
 
 require (
 	github.com/Azure/azure-sdk-for-go v45.0.0+incompatible
