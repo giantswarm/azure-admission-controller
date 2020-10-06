@@ -34,40 +34,42 @@ func IsAlphaRelease(release string) bool {
 }
 
 func UpgradeAllowed(ctx context.Context, g8sclient versioned.Interface, oldVersion semver.Version, newVersion semver.Version) (bool, error) {
-	if !oldVersion.Equals(newVersion) {
-		availableReleases, err := availableReleases(ctx, g8sclient)
-		if err != nil {
-			return false, err
-		}
+	if oldVersion.Equals(newVersion) {
+		return true, nil
+	}
 
-		// Check if old and new versions are valid.
-		if !included(availableReleases, newVersion) {
-			return false, microerror.Maskf(errors.InvalidReleaseError, "release %s was not found in this installation", newVersion)
-		}
+	availableReleases, err := availableReleases(ctx, g8sclient)
+	if err != nil {
+		return false, err
+	}
 
-		// Downgrades are not allowed.
-		if newVersion.LT(oldVersion) {
-			return false, microerror.Maskf(errors.InvalidOperationError, "downgrading is not allowed (attempted to downgrade from %s to %s)", oldVersion, newVersion)
-		}
+	// Check if old and new versions are valid.
+	if !included(availableReleases, newVersion) {
+		return false, microerror.Maskf(errors.InvalidReleaseError, "release %s was not found in this installation", newVersion)
+	}
 
-		// Check if either version is an alpha one.
-		if IsAlphaRelease(oldVersion.String()) || IsAlphaRelease(newVersion.String()) {
-			return false, microerror.Maskf(errors.InvalidOperationError, "It is not possible to upgrade to or from an alpha release")
-		}
+	// Downgrades are not allowed.
+	if newVersion.LT(oldVersion) {
+		return false, microerror.Maskf(errors.InvalidOperationError, "downgrading is not allowed (attempted to downgrade from %s to %s)", oldVersion, newVersion)
+	}
 
-		if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
-			// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
-			for _, release := range availableReleases {
-				if release.EQ(oldVersion) || release.EQ(newVersion) {
-					continue
-				}
-				// Look for a release with higher major or higher minor than the oldVersion and is LT the newVersion
-				if release.GT(oldVersion) && release.LT(newVersion) &&
-					(oldVersion.Major != release.Major || oldVersion.Minor != release.Minor) &&
-					(newVersion.Major != release.Major || newVersion.Minor != release.Minor) {
-					// Skipped one major or minor release.
-					return false, microerror.Maskf(errors.InvalidOperationError, "Upgrading from %s to %s is not allowed (skipped %s)", oldVersion, newVersion, release)
-				}
+	// Check if either version is an alpha one.
+	if IsAlphaRelease(oldVersion.String()) || IsAlphaRelease(newVersion.String()) {
+		return false, microerror.Maskf(errors.InvalidOperationError, "It is not possible to upgrade to or from an alpha release")
+	}
+
+	if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
+		// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
+		for _, release := range availableReleases {
+			if release.EQ(oldVersion) || release.EQ(newVersion) {
+				continue
+			}
+			// Look for a release with higher major or higher minor than the oldVersion and is LT the newVersion
+			if release.GT(oldVersion) && release.LT(newVersion) &&
+				(oldVersion.Major != release.Major || oldVersion.Minor != release.Minor) &&
+				(newVersion.Major != release.Major || newVersion.Minor != release.Minor) {
+				// Skipped one major or minor release.
+				return false, microerror.Maskf(errors.InvalidOperationError, "Upgrading from %s to %s is not allowed (skipped %s)", oldVersion, newVersion, release)
 			}
 		}
 	}
