@@ -153,7 +153,7 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Value: to.StringPtr("16"),
 						},
 						{
-							Name:  to.StringPtr("premiumIO"),
+							Name:  to.StringPtr("PremiumIO"),
 							Value: to.StringPtr("False"),
 						},
 					},
@@ -174,7 +174,7 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Value: to.StringPtr("16"),
 						},
 						{
-							Name:  to.StringPtr("premiumIO"),
+							Name:  to.StringPtr("PremiumIO"),
 							Value: to.StringPtr("True"),
 						},
 					},
@@ -195,7 +195,7 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Value: to.StringPtr("16"),
 						},
 						{
-							Name:  to.StringPtr("premiumIO"),
+							Name:  to.StringPtr("PremiumIO"),
 							Value: to.StringPtr("False"),
 						},
 					},
@@ -216,7 +216,7 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Value: to.StringPtr("16"),
 						},
 						{
-							Name:  to.StringPtr("premiumIO"),
+							Name:  to.StringPtr("PremiumIO"),
 							Value: to.StringPtr("False"),
 						},
 					},
