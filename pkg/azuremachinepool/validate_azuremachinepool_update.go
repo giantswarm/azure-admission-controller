@@ -67,7 +67,7 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		if oldPremium && !newPremium {
 			// We can't downgrade from a VM type supporting premium storage to one that doesn't.
 			// Azure doesn't support that.
-			return false, microerror.Maskf(invalidOperationError, "Chaning the node pool VM type from one that supports accelerated networking to one that does not is unsupported.")
+			return false, microerror.Maskf(invalidOperationError, "Changing the node pool VM type from one that supports accelerated networking to one that does not is unsupported.")
 		}
 	}
 
