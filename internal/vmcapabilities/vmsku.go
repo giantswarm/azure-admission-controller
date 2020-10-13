@@ -17,7 +17,7 @@ const (
 	CapabilitySupported = "True"
 
 	CapabilityAcceleratedNetworking = "AcceleratedNetworkingEnabled"
-	CapabilityPremiumIO             = "premiumIO"
+	CapabilityPremiumIO             = "PremiumIO"
 
 	// For internal use only.
 	capabilityMemory = "MemoryGB"
