@@ -27,6 +27,8 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 		"Standard_D4_v3",
 		"Standard_D8_v3",
 	}
+	premiumStorageInstanceType := "Standard_D4s_v3"
+	standardStorageInstanceType := "Standard_D4_v3"
 	type testCase struct {
 		name         string
 		oldNodePool  []byte
@@ -106,6 +108,20 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 			allowed:      false,
 			errorMatcher: IsInvalidOperationError,
 		},
+		{
+			name:         "case 10: changed from premium to standard storage",
+			oldNodePool:  azureMPRawObject(premiumStorageInstanceType, nil),
+			newNodePool:  azureMPRawObject(standardStorageInstanceType, nil),
+			allowed:      false,
+			errorMatcher: IsInvalidOperationError,
+		},
+		{
+			name:         "case 11: changed from standard to premium storage",
+			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil),
+			newNodePool:  azureMPRawObject(premiumStorageInstanceType, nil),
+			allowed:      true,
+			errorMatcher: nil,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -136,6 +152,31 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Name:  to.StringPtr("MemoryGB"),
 							Value: to.StringPtr("16"),
 						},
+						{
+							Name:  to.StringPtr("premiumIO"),
+							Value: to.StringPtr("False"),
+						},
+					},
+				},
+				"Standard_D4s_v3": {
+					Name: to.StringPtr("Standard_D4s_v3"),
+					Capabilities: &[]compute.ResourceSkuCapabilities{
+						{
+							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
+							Value: to.StringPtr("True"),
+						},
+						{
+							Name:  to.StringPtr("vCPUs"),
+							Value: to.StringPtr("4"),
+						},
+						{
+							Name:  to.StringPtr("MemoryGB"),
+							Value: to.StringPtr("16"),
+						},
+						{
+							Name:  to.StringPtr("premiumIO"),
+							Value: to.StringPtr("True"),
+						},
 					},
 				},
 				"Standard_D8_v3": {
@@ -153,6 +194,10 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 							Name:  to.StringPtr("MemoryGB"),
 							Value: to.StringPtr("16"),
 						},
+						{
+							Name:  to.StringPtr("premiumIO"),
+							Value: to.StringPtr("False"),
+						},
 					},
 				},
 				"Standard_D16_v3": {
@@ -169,6 +214,10 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 						{
 							Name:  to.StringPtr("MemoryGB"),
 							Value: to.StringPtr("16"),
+						},
+						{
+							Name:  to.StringPtr("premiumIO"),
+							Value: to.StringPtr("False"),
 						},
 					},
 				},
