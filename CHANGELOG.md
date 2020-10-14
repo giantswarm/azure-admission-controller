@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Addede mutating webhook to set storage account type in the AzureMachinePool CR if unset.
+- Add mutating webhook to set storage account type in the AzureMachinePool CR if unset.
 
 ### Changed
 
