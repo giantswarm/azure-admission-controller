@@ -63,6 +63,11 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Mask(err)
 	}
 
+	err = a.checkStorageAccountTypeUnchanged(ctx, azureMPOldCR, azureMPNewCR)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	return true, nil
 }
 
@@ -100,6 +105,15 @@ func (a *UpdateValidator) checkInstanceTypeChangeIsValid(ctx context.Context, az
 			// Azure doesn't support that.
 			return microerror.Maskf(invalidOperationError, "Changing the node pool VM type from one that supports accelerated networking to one that does not is unsupported.")
 		}
+	}
+
+	return nil
+}
+
+// Checks if the storage account type of the osDisk is changed. This is never allowed.
+func (a *UpdateValidator) checkStorageAccountTypeUnchanged(ctx context.Context, azureMPOldCR *expcapzv1alpha3.AzureMachinePool, azureMPNewCR *expcapzv1alpha3.AzureMachinePool) error {
+	if azureMPOldCR.Spec.Template.OSDisk.ManagedDisk.StorageAccountType != azureMPNewCR.Spec.Template.OSDisk.ManagedDisk.StorageAccountType {
+		return microerror.Maskf(invalidOperationError, "Changing the storage account type of the OS disk is not allowed.")
 	}
 
 	return nil
