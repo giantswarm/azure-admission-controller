@@ -53,25 +53,12 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Mask(err)
 	}
 
-	// Check if the instance type has changed.
-	if azureMPOldCR.Spec.Template.VMSize != azureMPNewCR.Spec.Template.VMSize {
-		oldPremium, err := a.vmcaps.HasCapability(ctx, azureMPOldCR.Spec.Location, azureMPOldCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
-		if err != nil {
-			return false, microerror.Mask(err)
-		}
-		newPremium, err := a.vmcaps.HasCapability(ctx, azureMPNewCR.Spec.Location, azureMPNewCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
-		if err != nil {
-			return false, microerror.Mask(err)
-		}
-
-		if oldPremium && !newPremium {
-			// We can't downgrade from a VM type supporting premium storage to one that doesn't.
-			// Azure doesn't support that.
-			return false, microerror.Maskf(invalidOperationError, "Changing the node pool VM type from one that supports accelerated networking to one that does not is unsupported.")
-		}
+	err = a.checkAcceleratedNetworkingUpdateIsValid(ctx, azureMPOldCR, azureMPNewCR)
+	if err != nil {
+		return false, microerror.Mask(err)
 	}
 
-	err = checkAcceleratedNetworkingUpdateIsValid(ctx, a.vmcaps, azureMPOldCR, azureMPNewCR)
+	err = a.checkInstanceTypeChangeIsValid(ctx, azureMPOldCR, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -79,7 +66,7 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	return true, nil
 }
 
-func checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMPOldCR *expcapzv1alpha3.AzureMachinePool, azureMPNewCR *expcapzv1alpha3.AzureMachinePool) error {
+func (a *UpdateValidator) checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, azureMPOldCR *expcapzv1alpha3.AzureMachinePool, azureMPNewCR *expcapzv1alpha3.AzureMachinePool) error {
 	if hasAcceleratedNetworkingPropertyChanged(ctx, azureMPOldCR, azureMPNewCR) {
 		return microerror.Maskf(invalidOperationError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
 	}
@@ -88,9 +75,31 @@ func checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, vmcaps *vmcapa
 		return nil
 	}
 
-	err := checkAcceleratedNetworking(ctx, vmcaps, azureMPNewCR)
+	err := checkAcceleratedNetworking(ctx, a.vmcaps, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
+	}
+
+	return nil
+}
+
+func (a *UpdateValidator) checkInstanceTypeChangeIsValid(ctx context.Context, azureMPOldCR *expcapzv1alpha3.AzureMachinePool, azureMPNewCR *expcapzv1alpha3.AzureMachinePool) error {
+	// Check if the instance type has changed.
+	if azureMPOldCR.Spec.Template.VMSize != azureMPNewCR.Spec.Template.VMSize {
+		oldPremium, err := a.vmcaps.HasCapability(ctx, azureMPOldCR.Spec.Location, azureMPOldCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		newPremium, err := a.vmcaps.HasCapability(ctx, azureMPNewCR.Spec.Location, azureMPNewCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		if oldPremium && !newPremium {
+			// We can't downgrade from a VM type supporting premium storage to one that doesn't.
+			// Azure doesn't support that.
+			return microerror.Maskf(invalidOperationError, "Changing the node pool VM type from one that supports accelerated networking to one that does not is unsupported.")
+		}
 	}
 
 	return nil
