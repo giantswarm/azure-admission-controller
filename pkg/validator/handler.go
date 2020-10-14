@@ -77,6 +77,8 @@ func writeResponse(validator Validator, writer http.ResponseWriter, response *v1
 	if _, err := writer.Write(resp); err != nil {
 		validator.Log("level", "error", "message", "unable to write response", microerror.JSON(err))
 	}
+
+	validator.Log("level", "info", "message", fmt.Sprintf("Validating request responded with result: %t", response.Allowed))
 }
 
 func errorResponse(uid types.UID, err error) *v1beta1.AdmissionResponse {
