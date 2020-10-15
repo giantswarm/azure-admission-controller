@@ -40,7 +40,7 @@ func Handler(mutator Mutator) http.HandlerFunc {
 
 		data, err := ioutil.ReadAll(request.Body)
 		if err != nil {
-			mutator.Log("level", "error", "message", "unable to read request")
+			mutator.Log("level", "error", "message", "unable to read request", "stack", microerror.JSON(err))
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
