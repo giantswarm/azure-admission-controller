@@ -128,7 +128,7 @@ webhooks:
           - UPDATE
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
-  - name: azuremachines.create.{{ include "resource.default.name" . }}.giantswarm.io
+  - name: validate.azuremachines.create.{{ include "resource.default.name" . }}.giantswarm.io
     failurePolicy: Fail
     clientConfig:
       service:
