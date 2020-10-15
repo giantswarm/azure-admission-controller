@@ -106,7 +106,7 @@ func writeResponse(mutator Mutator, writer http.ResponseWriter, response *v1beta
 		Response: response,
 	})
 	if err != nil {
-		mutator.Log("level", "error", "message", "unable to serialize response", microerror.JSON(err))
+		mutator.Log("level", "error", "message", "unable to serialize response", "stack", microerror.JSON(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 	if _, err := writer.Write(resp); err != nil {
