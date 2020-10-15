@@ -47,7 +47,7 @@ func Handler(mutator Mutator) http.HandlerFunc {
 
 		review := v1beta1.AdmissionReview{}
 		if _, _, err := Deserializer.Decode(data, nil, &review); err != nil {
-			mutator.Log("level", "error", "message", "unable to parse admission review request")
+			mutator.Log("level", "error", "message", "unable to parse admission review request", "stack", microerror.JSON(err))
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
