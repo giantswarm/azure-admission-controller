@@ -43,6 +43,7 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	var result []mutator.PatchOperation
 
 	if request.DryRun != nil && *request.DryRun {
+		m.logger.LogCtx(ctx, "level", "debug", "message", "Dry run is not supported. Request processing stopped.")
 		return result, nil
 	}
 
