@@ -178,8 +178,7 @@ func mainError() error {
 	var azureMachineCreateValidator *azuremachine.CreateValidator
 	{
 		c := azuremachine.CreateValidatorConfig{
-			CtrlClient: ctrlClient,
-			Logger:     newLogger,
+			Logger: newLogger,
 		}
 		azureMachineCreateValidator, err = azuremachine.NewCreateValidator(c)
 		if err != nil {
