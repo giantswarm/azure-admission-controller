@@ -61,7 +61,7 @@ func Handler(mutator Mutator) http.HandlerFunc {
 
 		patchData, err := json.Marshal(patch)
 		if err != nil {
-			mutator.Log("level", "error", "message", fmt.Sprintf("unable to serialize patch for %s: %v", resourceName, err))
+			mutator.Log("level", "error", "message", fmt.Sprintf("unable to serialize patch for %s", resourceName), "stack", microerror.JSON(err))
 			writeResponse(mutator, writer, errorResponse(review.Request.UID, InternalError))
 			return
 		}
