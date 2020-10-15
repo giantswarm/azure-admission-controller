@@ -110,7 +110,7 @@ func writeResponse(mutator Mutator, writer http.ResponseWriter, response *v1beta
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 	if _, err := writer.Write(resp); err != nil {
-		mutator.Log("level", "error", "message", "unable to write response", microerror.JSON(err))
+		mutator.Log("level", "error", "message", "unable to write response", "stack", microerror.JSON(err))
 	}
 }
 
