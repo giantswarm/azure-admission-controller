@@ -33,7 +33,7 @@ var (
 func Handler(mutator Mutator) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		if request.Header.Get("Content-Type") != "application/json" {
-			mutator.Log("level", "error", "message", fmt.Sprintf("invalid content-type: %s", request.Header.Get("Content-Type")))
+			mutator.Log("level", "error", "message", fmt.Sprintf("invalid content-type: %q", request.Header.Get("Content-Type")))
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
