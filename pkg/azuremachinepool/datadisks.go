@@ -23,14 +23,6 @@ var desiredDataDisks = []capzv1alpha3.DataDisk{
 	},
 }
 
-func checkDataDisksIsEmpty(ctx context.Context, mp *expcapzv1alpha3.AzureMachinePool) error {
-	if len(mp.Spec.Template.DataDisks) > 0 {
-		return microerror.Maskf(invalidOperationError, "AzureMachinePool.Spec.Template.DataDisks is unsupported and must be empty.")
-	}
-
-	return nil
-}
-
 func checkDataDisks(ctx context.Context, mp *expcapzv1alpha3.AzureMachinePool) error {
 	if !reflect.DeepEqual(mp.Spec.Template.DataDisks, desiredDataDisks) {
 		return microerror.Maskf(invalidOperationError, "AzureMachinePool.Spec.Template.DataDisks does not have required value.")

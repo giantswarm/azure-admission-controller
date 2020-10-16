@@ -64,7 +64,7 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Mask(err)
 	}
 
-	err = checkDataDisksIsEmpty(ctx, azureMPNewCR)
+	err = checkDataDisks(ctx, azureMPNewCR)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
