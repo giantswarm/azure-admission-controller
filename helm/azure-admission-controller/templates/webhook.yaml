@@ -134,7 +134,7 @@ webhooks:
       service:
         name: {{ include "resource.default.name" . }}
         namespace: {{ include "resource.default.namespace" . }}
-        path: /azuremachine/create
+        path: /validate/azuremachine/create
       caBundle: Cg==
     rules:
       - apiGroups: ["infrastructure.cluster.x-k8s.io"]
