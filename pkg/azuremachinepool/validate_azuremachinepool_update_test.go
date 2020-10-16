@@ -131,19 +131,8 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
-			name: "case 13: change datadisks",
-			oldNodePool: azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), []capzv1alpha3.DataDisk{
-				{
-					NameSuffix: "docker",
-					DiskSizeGB: 100,
-					Lun:        to.Int32Ptr(21),
-				},
-				{
-					NameSuffix: "kubelet",
-					DiskSizeGB: 100,
-					Lun:        to.Int32Ptr(22),
-				},
-			}),
+			name:        "case 13: change datadisks",
+			oldNodePool: azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks),
 			newNodePool: azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesPremiumLRS), []capzv1alpha3.DataDisk{
 				{
 					NameSuffix: "docker",
@@ -318,18 +307,7 @@ func getUpdateAdmissionRequest(oldMP []byte, newMP []byte) *v1beta1.AdmissionReq
 
 func azureMPRawObject(vmSize string, acceleratedNetworkingEnabled *bool, storageAccountType string, dataDisks []capzv1alpha3.DataDisk) []byte {
 	if dataDisks == nil {
-		dataDisks = []capzv1alpha3.DataDisk{
-			{
-				NameSuffix: "docker",
-				DiskSizeGB: 100,
-				Lun:        to.Int32Ptr(21),
-			},
-			{
-				NameSuffix: "kubelet",
-				DiskSizeGB: 100,
-				Lun:        to.Int32Ptr(22),
-			},
-		}
+		dataDisks = desiredDataDisks
 	}
 
 	mp := v1alpha3.AzureMachinePool{
