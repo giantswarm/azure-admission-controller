@@ -13,6 +13,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -41,13 +42,25 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 			errorMatcher: nil,
 		},
 		{
-			name:     fmt.Sprintf("case 0: unset storage account type with standard VM"),
+			name:     fmt.Sprintf("case 1: unset storage account type with standard VM"),
 			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
 					Path:      "/spec/template/osDisk/managedDisk/storageAccountType",
 					Value:     "Standard_LRS",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:     fmt.Sprintf("case 2: set data disks"),
+			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "Standard_LRS", []capzv1alpha3.DataDisk{}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/spec/template/dataDisks",
+					Value:     desiredDataDisks,
 				},
 			},
 			errorMatcher: nil,
