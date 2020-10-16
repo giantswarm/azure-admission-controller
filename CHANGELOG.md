@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Check that SSH keys are not set in AzureMachine and AzureMachinePool CRs.
+- Block configuring the `DataDisks` field in AzureMachinePool CRs, and set a default value for it.
 - Add mutating webhook to set storage account type in the AzureMachinePool CR if unset.
 
 ### Changed

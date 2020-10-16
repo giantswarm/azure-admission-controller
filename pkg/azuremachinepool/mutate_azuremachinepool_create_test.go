@@ -30,7 +30,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:     fmt.Sprintf("case 0: unset storage account type with premium VM"),
-			nodePool: azureMPRawObject("Standard_D4s_v3", &tr, ""),
+			nodePool: azureMPRawObject("Standard_D4s_v3", &tr, "", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -42,7 +42,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 		},
 		{
 			name:     fmt.Sprintf("case 0: unset storage account type with standard VM"),
-			nodePool: azureMPRawObject("Standard_D4_v3", &tr, ""),
+			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
