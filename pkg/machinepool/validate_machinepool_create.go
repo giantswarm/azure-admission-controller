@@ -74,6 +74,7 @@ func (a *CreateValidator) checkAvailabilityZones(ctx context.Context, mp *v1alph
 	amp := expcapzv1alpha3.AzureMachinePool{}
 	err := a.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
 	if err != nil {
+		a.logger.LogCtx(ctx, "level", "debug", "message", err.Error())
 		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
 	}
 
