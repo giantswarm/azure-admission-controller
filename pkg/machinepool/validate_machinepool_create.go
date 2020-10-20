@@ -2,7 +2,6 @@ package machinepool
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -70,11 +69,9 @@ func (a *CreateValidator) checkAvailabilityZones(ctx context.Context, mp *v1alph
 	if mp.Spec.Template.Spec.InfrastructureRef.Namespace == "" || mp.Spec.Template.Spec.InfrastructureRef.Name == "" {
 		return microerror.Maskf(azureMachinePoolNotFoundError, "MachinePool's InfrastructureRef has to be set")
 	}
-	a.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Looking for AzureMachinePool %s in namespace %s", mp.Spec.Template.Spec.InfrastructureRef.Name, mp.Spec.Template.Spec.InfrastructureRef.Namespace))
 	amp := expcapzv1alpha3.AzureMachinePool{}
 	err := a.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
 	if err != nil {
-		a.logger.LogCtx(ctx, "level", "debug", "message", err.Error())
 		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
 	}
 
