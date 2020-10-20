@@ -27,6 +27,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
 	"github.com/giantswarm/azure-admission-controller/pkg/cluster"
+	"github.com/giantswarm/azure-admission-controller/pkg/machinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
@@ -210,6 +211,30 @@ func mainError() error {
 		}
 	}
 
+	var machinePoolCreateValidator *machinepool.CreateValidator
+	{
+		c := machinepool.CreateValidatorConfig{
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
+			VMcaps:     vmcaps,
+		}
+		machinePoolCreateValidator, err = machinepool.NewCreateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var machinePoolUpdateValidator *machinepool.UpdateValidator
+	{
+		c := machinepool.UpdateValidatorConfig{
+			Logger: newLogger,
+		}
+		machinePoolUpdateValidator, err = machinepool.NewUpdateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
 	// Mutators.
@@ -224,6 +249,8 @@ func mainError() error {
 	handler.Handle("/validate/azuremachinepool/create", validator.Handler(azureMachinePoolCreateValidator))
 	handler.Handle("/validate/azuremachinepool/update", validator.Handler(azureMachinePoolUpdateValidator))
 	handler.Handle("/validate/cluster/update", validator.Handler(clusterUpdateValidator))
+	handler.Handle("/validate/machinepool/create", validator.Handler(machinePoolCreateValidator))
+	handler.Handle("/validate/machinepool/update", validator.Handler(machinePoolUpdateValidator))
 	handler.HandleFunc("/healthz", healthCheck)
 
 	newLogger.LogCtx(context.Background(), "level", "debug", "message", fmt.Sprintf("Listening on port %s", cfg.Address))
