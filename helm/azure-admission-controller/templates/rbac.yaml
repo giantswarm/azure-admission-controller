@@ -27,7 +27,7 @@ rules:
   - apiGroups:
       - exp.infrastructure.cluster.x-k8s.io
     resources:
-      - azuremachinepool
+      - azuremachinepools
     verbs:
       - "*"
   - apiGroups:
