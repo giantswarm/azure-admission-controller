@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -308,6 +309,14 @@ func machinePoolRawObject(failureDomains []string) []byte {
 		},
 		Spec: capiv1alpha3.MachinePoolSpec{
 			FailureDomains: failureDomains,
+			Template: v1alpha3.MachineTemplateSpec{
+				Spec: v1alpha3.MachineSpec{
+					InfrastructureRef: v1.ObjectReference{
+						Namespace: machinePoolNamespace,
+						Name:      machinePoolName,
+					},
+				},
+			},
 		},
 	}
 	byt, _ := json.Marshal(mp)

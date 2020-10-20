@@ -66,8 +66,11 @@ func (a *CreateValidator) Log(keyVals ...interface{}) {
 
 func (a *CreateValidator) checkAvailabilityZones(ctx context.Context, mp *v1alpha3.MachinePool) error {
 	// Get the AzureMachinePool CR related to this MachinePool (we need it to get the VM type).
+	if mp.Spec.Template.Spec.InfrastructureRef.Namespace == "" || mp.Spec.Template.Spec.InfrastructureRef.Name == "" {
+		return microerror.Maskf(azureMachinePoolNotFoundError, "MachinePool's InfrastructureRef has to be set")
+	}
 	amp := expcapzv1alpha3.AzureMachinePool{}
-	err := a.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Namespace, Name: mp.Name}, &amp)
+	err := a.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
 	if err != nil {
 		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
 	}
