@@ -108,8 +108,8 @@ func (v *VMSKU) SupportedAZs(ctx context.Context, location string, vmType string
 
 	var azs []string
 	for _, l := range *sku.LocationInfo {
-		for _, z := range *l.Zones {
-			azs = append(azs, z)
+		if l.Zones != nil {
+			azs = append(azs, *l.Zones...)
 		}
 	}
 
