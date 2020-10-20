@@ -17,8 +17,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	restclient "k8s.io/client-go/rest"
+	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
-	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/config"
@@ -66,7 +66,7 @@ func mainError() error {
 				providerv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
 				releasev1alpha1.AddToScheme,
-				expcapiv1alpha3.AddToScheme,
+				expcapzv1alpha3.AddToScheme,
 			},
 			Logger: newLogger,
 
