@@ -10,6 +10,40 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
 )
 
+func validateClusterNetwork(cluster capiv1alpha3.Cluster, baseDomain string) error {
+	//	clusterNetwork := capiv1alpha3.ClusterNetwork{
+	//			APIServerPort: to.Int32Ptr(443),
+	//			ServiceDomain: fmt.Sprintf("%s.%s", clusterCR.Name, m.baseDomain),
+	//			Services: &capiv1alpha3.NetworkRanges{
+	//				CIDRBlocks: []string{
+	//					"172.31.0.0/16",
+	//				},
+	//			},
+	//		}
+
+	if cluster.Spec.ClusterNetwork == nil {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be null")
+	}
+
+	if *cluster.Spec.ClusterNetwork.APIServerPort != key.ControlPlaneEndpointPort {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork.APIServerPort can only be set to %d", key.ControlPlaneEndpointPort)
+	}
+
+	if cluster.Spec.ClusterNetwork.ServiceDomain != key.ServiceDomain(cluster.Name, baseDomain) {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork.ServiceDomain can only be set to %s", key.ServiceDomain(cluster.Name, baseDomain))
+	}
+
+	if cluster.Spec.ClusterNetwork.Services == nil {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork.Services can't be null")
+	}
+
+	if !reflect.DeepEqual(cluster.Spec.ClusterNetwork.Services.CIDRBlocks, []string{key.ClusterNetworkServiceCIDR}) {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork.Services.CIDRBlocks can only be set to [%s]", key.ClusterNetworkServiceCIDR)
+	}
+
+	return nil
+}
+
 func validateControlPlaneEndpoint(cluster capiv1alpha3.Cluster, baseDomain string) error {
 	host := key.GetControlPlaneEndpointHost(cluster.Name, baseDomain)
 	if cluster.Spec.ControlPlaneEndpoint.Host != host {
@@ -24,7 +58,7 @@ func validateControlPlaneEndpoint(cluster capiv1alpha3.Cluster, baseDomain strin
 }
 
 func validateControlPlaneEndpointUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.Cluster) error {
-	if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
+	if !reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
 		return microerror.Maskf(errors.InvalidOperationError, "ControlPlaneEndpoint can't be changed.")
 	}
 

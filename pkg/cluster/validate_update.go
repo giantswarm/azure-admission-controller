@@ -79,7 +79,31 @@ func (a *UpdateValidator) Log(keyVals ...interface{}) {
 }
 
 func validateClusterNetworkUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.Cluster) error {
-	if reflect.DeepEqual(old.Spec.ClusterNetwork, new.Spec.ClusterNetwork) {
+	// Was nil and stayed nil. Not good but not changed so ok from this validator point of view.
+	if old.Spec.ClusterNetwork == nil && new.Spec.ClusterNetwork == nil {
+		return nil
+	}
+
+	// Was nil or became nil.
+	if old.Spec.ClusterNetwork == nil && new.Spec.ClusterNetwork != nil ||
+		old.Spec.ClusterNetwork != nil && new.Spec.ClusterNetwork == nil {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be changed.")
+	}
+
+	// Check APIServerPort and ServiceDomain is unchanged.
+	if *old.Spec.ClusterNetwork.APIServerPort != *new.Spec.ClusterNetwork.APIServerPort ||
+		old.Spec.ClusterNetwork.ServiceDomain != new.Spec.ClusterNetwork.ServiceDomain {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be changed.")
+	}
+
+	// Check Services have not blanked out.
+	if old.Spec.ClusterNetwork.Services == nil && new.Spec.ClusterNetwork.Services != nil ||
+		old.Spec.ClusterNetwork.Services != nil && new.Spec.ClusterNetwork.Services == nil {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be changed.")
+	}
+
+	// Check Services didn't change.
+	if !reflect.DeepEqual(*old.Spec.ClusterNetwork.Services, *new.Spec.ClusterNetwork.Services) {
 		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be changed.")
 	}
 

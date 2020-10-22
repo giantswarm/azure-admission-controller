@@ -31,14 +31,14 @@ func TestAzureClusterUpdateValidate(t *testing.T) {
 			errorMatcher:    nil,
 		},
 		{
-			name:            "case 0: host changed",
+			name:            "case 1: host changed",
 			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443),
 			newAzureCluster: azureClusterRawObject("ab123", "api.azure.gigantic.io", 443),
 			allowed:         false,
 			errorMatcher:    errors.IsInvalidOperationError,
 		},
 		{
-			name:            "case 0: port changed",
+			name:            "case 2: port changed",
 			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443),
 			newAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 80),
 			allowed:         false,

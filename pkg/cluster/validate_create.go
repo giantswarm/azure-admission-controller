@@ -50,7 +50,12 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse Cluster CR: %v", err)
 	}
 
-	err := validateControlPlaneEndpoint(*clusterCR, a.baseDomain)
+	err := validateClusterNetwork(*clusterCR, a.baseDomain)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	err = validateControlPlaneEndpoint(*clusterCR, a.baseDomain)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}

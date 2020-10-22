@@ -11,6 +11,7 @@ import (
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/pkg/key"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
@@ -92,11 +93,11 @@ func (m *CreateMutator) ensureClusterNetwork(ctx context.Context, clusterCR *cap
 	// Ensure ClusterNetwork is set.
 	if clusterCR.Spec.ClusterNetwork == nil {
 		clusterNetwork := capiv1alpha3.ClusterNetwork{
-			APIServerPort: to.Int32Ptr(443),
-			ServiceDomain: fmt.Sprintf("%s.%s", clusterCR.Name, m.baseDomain),
+			APIServerPort: to.Int32Ptr(key.ControlPlaneEndpointPort),
+			ServiceDomain: key.ServiceDomain(clusterCR.Name, m.baseDomain),
 			Services: &capiv1alpha3.NetworkRanges{
 				CIDRBlocks: []string{
-					"172.31.0.0/16",
+					key.ClusterNetworkServiceCIDR,
 				},
 			},
 		}
