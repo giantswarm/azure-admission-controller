@@ -50,10 +50,16 @@ func Handler(validator Validator) http.HandlerFunc {
 
 		allowed, err := validator.Validate(request.Context(), review.Request)
 		if err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
 			writeResponse(validator, writer, errorResponse(review.Request.UID, microerror.Mask(err)))
 			return
 		}
 
+		if allowed {
+			writer.WriteHeader(http.StatusAccepted)
+		} else {
+			writer.WriteHeader(http.StatusBadRequest)
+		}
 		writeResponse(validator, writer, &v1beta1.AdmissionResponse{
 			Allowed: allowed,
 			UID:     review.Request.UID,
@@ -79,11 +85,6 @@ func writeResponse(validator Validator, writer http.ResponseWriter, response *v1
 	}
 
 	validator.Log("level", "info", "message", fmt.Sprintf("Validated request responded with result: %t", response.Allowed))
-	if response.Allowed {
-		writer.WriteHeader(http.StatusAccepted)
-	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-	}
 }
 
 func errorResponse(uid types.UID, err error) *v1beta1.AdmissionResponse {
