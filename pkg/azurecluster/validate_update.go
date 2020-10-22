@@ -2,6 +2,7 @@ package azurecluster
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -51,6 +52,11 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse AzureCluster CR: %v", err)
 	}
 
+	err := validateControlPlaneEndpointUnchanged(*azureClusterOldCR, *azureClusterNewCR)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	oldClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterOldCR.Labels)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (before edit)")
@@ -65,4 +71,12 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
+}
+
+func validateControlPlaneEndpointUnchanged(old capzv1alpha3.AzureCluster, new capzv1alpha3.AzureCluster) error {
+	if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
+		return microerror.Maskf(errors.InvalidOperationError, "ControlPlaneEndpoint can't be changed.")
+	}
+
+	return nil
 }

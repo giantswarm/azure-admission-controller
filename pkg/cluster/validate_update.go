@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -51,6 +52,16 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse Cluster CR: %v", err)
 	}
 
+	err := validateClusterNetworkUnchanged(*clusterOldCR, *clusterNewCR)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	err = validateControlPlaneEndpointUnchanged(*clusterOldCR, *clusterNewCR)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	oldClusterVersion, err := semverhelper.GetSemverFromLabels(clusterOldCR.Labels)
 	if err != nil {
 		return false, microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (before edit)")
@@ -65,4 +76,20 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
+}
+
+func validateClusterNetworkUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.Cluster) error {
+	if reflect.DeepEqual(old.Spec.ClusterNetwork, new.Spec.ClusterNetwork) {
+		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be changed.")
+	}
+
+	return nil
+}
+
+func validateControlPlaneEndpointUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.Cluster) error {
+	if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
+		return microerror.Maskf(errors.InvalidOperationError, "ControlPlaneEndpoint can't be changed.")
+	}
+
+	return nil
 }
