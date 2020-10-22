@@ -50,7 +50,7 @@ func Handler(validator Validator) http.HandlerFunc {
 
 		allowed, err := validator.Validate(request.Context(), review.Request)
 		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
+			writer.WriteHeader(http.StatusBadRequest)
 			writeResponse(validator, writer, errorResponse(review.Request.UID, microerror.Mask(err)))
 			return
 		}
