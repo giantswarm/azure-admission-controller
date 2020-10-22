@@ -55,7 +55,6 @@ func Handler(mutator Mutator) http.HandlerFunc {
 
 		patch, err := mutator.Mutate(request.Context(), review.Request)
 		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
 			writeResponse(mutator, writer, errorResponse(review.Request.UID, microerror.Mask(err)))
 			return
 		}
@@ -63,13 +62,11 @@ func Handler(mutator Mutator) http.HandlerFunc {
 		patchData, err := json.Marshal(patch)
 		if err != nil {
 			mutator.Log("level", "error", "message", fmt.Sprintf("unable to serialize patch for %s", resourceName), "stack", microerror.JSON(err))
-			writer.WriteHeader(http.StatusInternalServerError)
 			writeResponse(mutator, writer, errorResponse(review.Request.UID, InternalError))
 			return
 		}
 
 		mutator.Log("level", "debug", "message", fmt.Sprintf("admitted %s (with %d patches)", resourceName, len(patch)))
-		writer.WriteHeader(http.StatusAccepted)
 
 		pt := v1beta1.PatchTypeJSONPatch
 		writeResponse(mutator, writer, &v1beta1.AdmissionResponse{
