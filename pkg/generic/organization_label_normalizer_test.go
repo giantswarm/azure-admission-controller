@@ -32,13 +32,13 @@ func Test_EnsureOrganizationLabelNormalized(t *testing.T) {
 		{
 			name:          "case 1: lowercase uppercase letters",
 			input:         newObjectWithOrganization("GiantSwarm"),
-			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io\\/organization", Value: "giantswarm"},
+			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "giantswarm"},
 			errorMatcher:  nil,
 		},
 		{
 			name:          "case 2: lowercase uppercase letters combined with dashes",
 			input:         newObjectWithOrganization("FOO-Pre-Production-Shipment-Team"),
-			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io\\/organization", Value: "foo-pre-production-shipment-team"},
+			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "foo-pre-production-shipment-team"},
 			errorMatcher:  nil,
 		},
 	}

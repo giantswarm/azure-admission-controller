@@ -26,7 +26,8 @@ func EnsureOrganizationLabelNormalized(ctx context.Context, obj metav1.Object) (
 	}
 
 	// Replace Organization label with normalized value.
-	path := fmt.Sprintf("/metadata/labels/%s", strings.ReplaceAll(label.Organization, "/", "\\/"))
+	// NOTE: Label key must be encoded as per RFC6901: https://tools.ietf.org/html/rfc6901#section-3
+	path := fmt.Sprintf("/metadata/labels/%s", strings.ReplaceAll(label.Organization, "/", "~1"))
 	p := mutator.PatchReplace(path, normalized)
 	return &p, nil
 }
