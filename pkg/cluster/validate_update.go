@@ -85,11 +85,3 @@ func validateClusterNetworkUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.
 
 	return nil
 }
-
-func validateControlPlaneEndpointUnchanged(old capiv1alpha3.Cluster, new capiv1alpha3.Cluster) error {
-	if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
-		return microerror.Maskf(errors.InvalidOperationError, "ControlPlaneEndpoint can't be changed.")
-	}
-
-	return nil
-}

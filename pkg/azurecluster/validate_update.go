@@ -2,7 +2,6 @@ package azurecluster
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -71,12 +70,4 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
-}
-
-func validateControlPlaneEndpointUnchanged(old capzv1alpha3.AzureCluster, new capzv1alpha3.AzureCluster) error {
-	if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, new.Spec.ControlPlaneEndpoint) {
-		return microerror.Maskf(errors.InvalidOperationError, "ControlPlaneEndpoint can't be changed.")
-	}
-
-	return nil
 }

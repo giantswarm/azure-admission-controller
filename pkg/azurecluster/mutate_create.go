@@ -2,7 +2,6 @@ package azurecluster
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -10,6 +9,7 @@ import (
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/pkg/key"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
@@ -81,7 +81,7 @@ func (m *CreateMutator) Resource() string {
 
 func (m *CreateMutator) ensureControlPlaneEndpointHost(ctx context.Context, clusterCR *capzv1alpha3.AzureCluster) (*mutator.PatchOperation, error) {
 	if clusterCR.Spec.ControlPlaneEndpoint.Host == "" {
-		return mutator.PatchAdd("/spec/controlPlaneEndpoint/host", fmt.Sprintf("api.%s.%s", clusterCR.Name, m.baseDomain)), nil
+		return mutator.PatchAdd("/spec/controlPlaneEndpoint/host", key.GetControlPlaneEndpointHost(clusterCR.Name, m.baseDomain)), nil
 	}
 
 	return nil, nil
@@ -89,7 +89,7 @@ func (m *CreateMutator) ensureControlPlaneEndpointHost(ctx context.Context, clus
 
 func (m *CreateMutator) ensureControlPlaneEndpointPort(ctx context.Context, clusterCR *capzv1alpha3.AzureCluster) (*mutator.PatchOperation, error) {
 	if clusterCR.Spec.ControlPlaneEndpoint.Port == 0 {
-		return mutator.PatchAdd("/spec/controlPlaneEndpoint/port", 443), nil
+		return mutator.PatchAdd("/spec/controlPlaneEndpoint/port", key.ControlPlaneEndpointPort), nil
 	}
 
 	return nil, nil

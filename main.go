@@ -189,6 +189,18 @@ func mainError() error {
 		}
 	}
 
+	var azureClusterCreateValidator *azurecluster.CreateValidator
+	{
+		c := azurecluster.CreateValidatorConfig{
+			BaseDomain: cfg.BaseDomain,
+			Logger:     newLogger,
+		}
+		azureClusterCreateValidator, err = azurecluster.NewCreateValidator(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	var azureClusterUpdateValidator *azurecluster.UpdateValidator
 	{
 		c := azurecluster.UpdateValidatorConfig{
@@ -231,6 +243,18 @@ func mainError() error {
 			Logger:     newLogger,
 		}
 		clusterCreateMutator, err = cluster.NewCreateMutator(conf)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var clusterCreateValidator *cluster.CreateValidator
+	{
+		c := cluster.CreateValidatorConfig{
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
+		}
+		clusterCreateValidator, err = cluster.NewCreateValidator(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -295,11 +319,13 @@ func mainError() error {
 	// Validators.
 	handler.Handle("/validate/azureconfig/update", validator.Handler(azureConfigValidator))
 	handler.Handle("/validate/azureclusterconfig/update", validator.Handler(azureClusterConfigValidator))
+	handler.Handle("/validate/azurecluster/create", validator.Handler(azureClusterCreateValidator))
 	handler.Handle("/validate/azurecluster/update", validator.Handler(azureClusterUpdateValidator))
 	handler.Handle("/validate/azuremachine/create", validator.Handler(azureMachineCreateValidator))
 	handler.Handle("/validate/azuremachine/update", validator.Handler(azureMachineUpdateValidator))
 	handler.Handle("/validate/azuremachinepool/create", validator.Handler(azureMachinePoolCreateValidator))
 	handler.Handle("/validate/azuremachinepool/update", validator.Handler(azureMachinePoolUpdateValidator))
+	handler.Handle("/validate/cluster/create", validator.Handler(clusterCreateValidator))
 	handler.Handle("/validate/cluster/update", validator.Handler(clusterUpdateValidator))
 	handler.Handle("/validate/machinepool/create", validator.Handler(machinePoolCreateValidator))
 	handler.Handle("/validate/machinepool/update", validator.Handler(machinePoolUpdateValidator))
