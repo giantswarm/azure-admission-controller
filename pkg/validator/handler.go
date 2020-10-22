@@ -86,6 +86,7 @@ func errorResponse(uid types.UID, err error) *v1beta1.AdmissionResponse {
 		Allowed: false,
 		UID:     uid,
 		Result: &metav1.Status{
+			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		},
 	}
