@@ -79,6 +79,11 @@ func writeResponse(validator Validator, writer http.ResponseWriter, response *v1
 	}
 
 	validator.Log("level", "info", "message", fmt.Sprintf("Validated request responded with result: %t", response.Allowed))
+	if response.Allowed {
+		writer.WriteHeader(http.StatusAccepted)
+	} else {
+		writer.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 func errorResponse(uid types.UID, err error) *v1beta1.AdmissionResponse {
