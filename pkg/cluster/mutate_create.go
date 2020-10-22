@@ -61,14 +61,6 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		result = append(result, *patch)
 	}
 
-	patch, err = m.ensureServiceDomain(ctx, clusterCR)
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
 	patch, err = m.ensureControlPlaneEndpointHost(ctx, clusterCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
@@ -101,6 +93,7 @@ func (m *CreateMutator) ensureClusterNetwork(ctx context.Context, clusterCR *cap
 	if clusterCR.Spec.ClusterNetwork == nil {
 		clusterNetwork := capiv1alpha3.ClusterNetwork{
 			APIServerPort: to.Int32Ptr(443),
+			ServiceDomain: fmt.Sprintf("%s.%s", clusterCR.Name, m.baseDomain),
 			Services: &capiv1alpha3.NetworkRanges{
 				CIDRBlocks: []string{
 					"172.31.0.0/16",
@@ -109,15 +102,6 @@ func (m *CreateMutator) ensureClusterNetwork(ctx context.Context, clusterCR *cap
 		}
 
 		return mutator.PatchAdd("/spec/clusterNetwork", clusterNetwork), nil
-	}
-
-	return nil, nil
-}
-
-func (m *CreateMutator) ensureServiceDomain(ctx context.Context, clusterCR *capiv1alpha3.Cluster) (*mutator.PatchOperation, error) {
-	// Ensure ServiceDomain is set.
-	if clusterCR.Spec.ClusterNetwork.ServiceDomain == "" {
-		return mutator.PatchAdd("/spec/clusterNetwork/serviceDomain", fmt.Sprintf("%s.%s", clusterCR.Name, m.baseDomain)), nil
 	}
 
 	return nil, nil
