@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 type GenericObject struct {
