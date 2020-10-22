@@ -120,10 +120,11 @@ func mainError() error {
 
 	var azureClusterCreateMutator *azurecluster.CreateMutator
 	{
-		c := azurecluster.CreateMutatorConfig{
-			Logger: newLogger,
+		conf := azurecluster.CreateMutatorConfig{
+			BaseDomain: cfg.BaseDomain,
+			Logger:     newLogger,
 		}
-		azureClusterCreateMutator, err = azurecluster.NewCreateMutator(c)
+		azureClusterCreateMutator, err = azurecluster.NewCreateMutator(conf)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -225,10 +226,11 @@ func mainError() error {
 
 	var clusterCreateMutator *cluster.CreateMutator
 	{
-		c := cluster.CreateMutatorConfig{
-			Logger: newLogger,
+		conf := cluster.CreateMutatorConfig{
+			BaseDomain: cfg.BaseDomain,
+			Logger:     newLogger,
 		}
-		clusterCreateMutator, err = cluster.NewCreateMutator(c)
+		clusterCreateMutator, err = cluster.NewCreateMutator(conf)
 		if err != nil {
 			return microerror.Mask(err)
 		}
