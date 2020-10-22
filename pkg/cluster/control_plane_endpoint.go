@@ -11,16 +11,6 @@ import (
 )
 
 func validateClusterNetwork(cluster capiv1alpha3.Cluster, baseDomain string) error {
-	//	clusterNetwork := capiv1alpha3.ClusterNetwork{
-	//			APIServerPort: to.Int32Ptr(443),
-	//			ServiceDomain: fmt.Sprintf("%s.%s", clusterCR.Name, m.baseDomain),
-	//			Services: &capiv1alpha3.NetworkRanges{
-	//				CIDRBlocks: []string{
-	//					"172.31.0.0/16",
-	//				},
-	//			},
-	//		}
-
 	if cluster.Spec.ClusterNetwork == nil {
 		return microerror.Maskf(errors.InvalidOperationError, "ClusterNetwork can't be null")
 	}
