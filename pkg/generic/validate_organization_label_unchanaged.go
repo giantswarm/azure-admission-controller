@@ -2,9 +2,10 @@ package generic
 
 import (
 	"github.com/giantswarm/apiextensions/v2/pkg/label"
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
 
 func ValidateOrganizationLabelUnchanged(old, new metav1.Object) error {
