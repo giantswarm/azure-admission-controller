@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/to"
 )
 
 type GenericObject struct {
@@ -25,19 +26,19 @@ func Test_EnsureOrganizationLabelNormalized(t *testing.T) {
 	}{
 		{
 			name:          "case 0: no need for changes",
-			input:         newObjectWithOrganization("giantswarm"),
+			input:         newObjectWithOrganization(to.StringP("giantswarm")),
 			expectedPatch: nil,
 			errorMatcher:  nil,
 		},
 		{
 			name:          "case 1: lowercase uppercase letters",
-			input:         newObjectWithOrganization("GiantSwarm"),
+			input:         newObjectWithOrganization(to.StringP("GiantSwarm")),
 			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "giantswarm"},
 			errorMatcher:  nil,
 		},
 		{
 			name:          "case 2: lowercase uppercase letters combined with dashes",
-			input:         newObjectWithOrganization("FOO-Pre-Production-Shipment-Team"),
+			input:         newObjectWithOrganization(to.StringP("FOO-Pre-Production-Shipment-Team")),
 			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "foo-pre-production-shipment-team"},
 			errorMatcher:  nil,
 		},
@@ -65,27 +66,4 @@ func Test_EnsureOrganizationLabelNormalized(t *testing.T) {
 			}
 		})
 	}
-}
-
-func newObjectWithOrganization(org string) metav1.Object {
-	obj := &GenericObject{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Unknown",
-			APIVersion: "unknown.generic.example/v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "ab123",
-			Namespace: "default",
-			Labels: map[string]string{
-				"azure-operator.giantswarm.io/version": "5.0.0",
-				"giantswarm.io/cluster":                "ab123",
-				"cluster.x-k8s.io/cluster-name":        "ab123",
-				"cluster.x-k8s.io/control-plane":       "true",
-				"giantswarm.io/machine-pool":           "ab123",
-				"giantswarm.io/organization":           org,
-				"release.giantswarm.io/version":        "13.0.0",
-			},
-		},
-	}
-	return obj
 }
