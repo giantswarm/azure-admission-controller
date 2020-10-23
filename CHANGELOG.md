@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are ensured to have normalized form of giantswarm.io/organization label
   value via mutating webhook on CREATE.
 
+### Changed
+
+- Set `400` status code if a request is invalid.
+
 ## [1.9.1] - 2020-10-21
 
 ### Fixed
