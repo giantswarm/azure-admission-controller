@@ -251,6 +251,7 @@ func mainError() error {
 	var clusterCreateValidator *cluster.CreateValidator
 	{
 		c := cluster.CreateValidatorConfig{
+			BaseDomain: cfg.BaseDomain,
 			CtrlClient: ctrlClient,
 			Logger:     newLogger,
 		}
