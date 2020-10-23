@@ -72,7 +72,7 @@ webhooks:
       path: /mutate/cluster/create
     caBundle: Cg==
   rules:
-    - apiGroups: ["infrastructure.cluster.x-k8s.io"]
+    - apiGroups: ["cluster.x-k8s.io"]
       resources:
         - "clusters"
       apiVersions:
