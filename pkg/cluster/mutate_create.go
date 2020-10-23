@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/microerror"
@@ -110,7 +109,7 @@ func (m *CreateMutator) ensureClusterNetwork(ctx context.Context, clusterCR *cap
 
 func (m *CreateMutator) ensureControlPlaneEndpointHost(ctx context.Context, clusterCR *capiv1alpha3.Cluster) (*mutator.PatchOperation, error) {
 	if clusterCR.Spec.ControlPlaneEndpoint.Host == "" {
-		return mutator.PatchAdd("/spec/controlPlaneEndpoint/host", fmt.Sprintf("api.%s.%s", clusterCR.Name, m.baseDomain)), nil
+		return mutator.PatchAdd("/spec/controlPlaneEndpoint/host", key.GetControlPlaneEndpointHost(clusterCR.Name, m.baseDomain)), nil
 	}
 
 	return nil, nil
@@ -118,7 +117,7 @@ func (m *CreateMutator) ensureControlPlaneEndpointHost(ctx context.Context, clus
 
 func (m *CreateMutator) ensureControlPlaneEndpointPort(ctx context.Context, clusterCR *capiv1alpha3.Cluster) (*mutator.PatchOperation, error) {
 	if clusterCR.Spec.ControlPlaneEndpoint.Port == 0 {
-		return mutator.PatchAdd("/spec/controlPlaneEndpoint/port", 443), nil
+		return mutator.PatchAdd("/spec/controlPlaneEndpoint/port", key.ControlPlaneEndpointPort), nil
 	}
 
 	return nil, nil

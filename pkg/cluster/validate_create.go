@@ -37,6 +37,7 @@ func NewCreateValidator(config CreateValidatorConfig) (*CreateValidator, error) 
 	}
 
 	v := &CreateValidator{
+		baseDomain: config.BaseDomain,
 		ctrlClient: config.CtrlClient,
 		logger:     config.Logger,
 	}
