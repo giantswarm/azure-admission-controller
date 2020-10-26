@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevent Organization label value change on CR updates.
 
+### Removed
+
+- Removed Organization label value normalization on CR creation.
+
 ## [1.11.0] - 2020-10-23
 
 ### Added
