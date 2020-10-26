@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/to"
+	"github.com/Azure/go-autorest/autorest/to"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
@@ -19,26 +19,26 @@ func Test_ValidateOrganizationLabelUnchanged(t *testing.T) {
 	}{
 		{
 			name:         "case 0: no changes",
-			old:          newObjectWithOrganization(to.StringP("giantswarm")),
-			new:          newObjectWithOrganization(to.StringP("giantswarm")),
+			old:          newObjectWithOrganization(to.StringPtr("giantswarm")),
+			new:          newObjectWithOrganization(to.StringPtr("giantswarm")),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 1: old CR missing organization label",
 			old:          newObjectWithOrganization(nil),
-			new:          newObjectWithOrganization(to.StringP("giantswarm")),
+			new:          newObjectWithOrganization(to.StringPtr("giantswarm")),
 			errorMatcher: errors.IsNotFoundError,
 		},
 		{
 			name:         "case 2: new CR missing organization label",
-			old:          newObjectWithOrganization(to.StringP("giantswarm")),
+			old:          newObjectWithOrganization(to.StringPtr("giantswarm")),
 			new:          newObjectWithOrganization(nil),
 			errorMatcher: errors.IsNotFoundError,
 		},
 		{
 			name:         "case 3: old and new CR have different organization label",
-			old:          newObjectWithOrganization(to.StringP("giantswarm")),
-			new:          newObjectWithOrganization(to.StringP("dockzero")),
+			old:          newObjectWithOrganization(to.StringPtr("giantswarm")),
+			new:          newObjectWithOrganization(to.StringPtr("dockzero")),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 	}

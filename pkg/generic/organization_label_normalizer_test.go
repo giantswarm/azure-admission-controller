@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/to"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -26,19 +26,19 @@ func Test_EnsureOrganizationLabelNormalized(t *testing.T) {
 	}{
 		{
 			name:          "case 0: no need for changes",
-			input:         newObjectWithOrganization(to.StringP("giantswarm")),
+			input:         newObjectWithOrganization(to.StringPtr("giantswarm")),
 			expectedPatch: nil,
 			errorMatcher:  nil,
 		},
 		{
 			name:          "case 1: lowercase uppercase letters",
-			input:         newObjectWithOrganization(to.StringP("GiantSwarm")),
+			input:         newObjectWithOrganization(to.StringPtr("GiantSwarm")),
 			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "giantswarm"},
 			errorMatcher:  nil,
 		},
 		{
 			name:          "case 2: lowercase uppercase letters combined with dashes",
-			input:         newObjectWithOrganization(to.StringP("FOO-Pre-Production-Shipment-Team")),
+			input:         newObjectWithOrganization(to.StringPtr("FOO-Pre-Production-Shipment-Team")),
 			expectedPatch: &mutator.PatchOperation{Operation: "replace", Path: "/metadata/labels/giantswarm.io~1organization", Value: "foo-pre-production-shipment-team"},
 			errorMatcher:  nil,
 		},
