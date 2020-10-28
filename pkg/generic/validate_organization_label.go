@@ -6,6 +6,7 @@ import (
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -36,8 +37,10 @@ func ValidateOrganizationLabelContainsExistingOrganization(ctx context.Context, 
 
 	organization := &securityv1alpha1.Organization{}
 	err := ctrlClient.Get(ctx, client.ObjectKey{Name: organizationName}, organization)
-	if err != nil {
+	if apierrors.IsNotFound(err) {
 		return microerror.Maskf(errors.InvalidOperationError, "Organization label %#q must contain an existing organization, got %#q", label.Organization, organizationName)
+	} else if err != nil {
+		return microerror.Mask(err)
 	}
 
 	return nil
