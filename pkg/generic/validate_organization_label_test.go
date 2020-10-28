@@ -1,11 +1,15 @@
 package generic
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	securityv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/security/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
@@ -60,5 +64,31 @@ func Test_ValidateOrganizationLabelUnchanged(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 		})
+	}
+}
+
+func Test_ValidateOrganizationLabelContainsExistingOrganization(t *testing.T) {
+	var err error
+	ctx := context.Background()
+
+	scheme := runtime.NewScheme()
+	err = securityv1alpha1.AddToScheme(scheme)
+	if err != nil {
+		panic(err)
+	}
+
+	organization := &securityv1alpha1.Organization{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "giantswarm",
+		},
+		Spec: securityv1alpha1.OrganizationSpec{},
+	}
+
+	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
+
+	obj := newObjectWithOrganization(to.StringPtr("non-existing"))
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	if err == nil {
+		t.Fatalf("it should fail when using a non existing Organization")
 	}
 }
