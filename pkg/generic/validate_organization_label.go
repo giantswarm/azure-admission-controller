@@ -39,7 +39,7 @@ func ValidateOrganizationLabelContainsExistingOrganization(ctx context.Context, 
 	organization := &securityv1alpha1.Organization{}
 	err := ctrlClient.Get(ctx, client.ObjectKey{Name: normalize.AsDNSLabelName(organizationName)}, organization)
 	if apierrors.IsNotFound(err) {
-		return microerror.Maskf(errors.InvalidOperationError, "Organization label %#q must contain an existing organization, got %#q", label.Organization, organizationName)
+		return microerror.Maskf(errors.InvalidOperationError, "Organization label %#q must contain an existing organization, got %#q but didn't find any CR with name %#q", label.Organization, organizationName, normalize.AsDNSLabelName(organizationName))
 	} else if err != nil {
 		return microerror.Mask(err)
 	}
