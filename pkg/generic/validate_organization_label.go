@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/internal/normalize"
 )
 
 func ValidateOrganizationLabelUnchanged(old, new metav1.Object) error {
@@ -36,7 +37,7 @@ func ValidateOrganizationLabelContainsExistingOrganization(ctx context.Context, 
 	}
 
 	organization := &securityv1alpha1.Organization{}
-	err := ctrlClient.Get(ctx, client.ObjectKey{Name: organizationName}, organization)
+	err := ctrlClient.Get(ctx, client.ObjectKey{Name: normalize.AsDNSLabelName(organizationName)}, organization)
 	if apierrors.IsNotFound(err) {
 		return microerror.Maskf(errors.InvalidOperationError, "Organization label %#q must contain an existing organization, got %#q", label.Organization, organizationName)
 	} else if err != nil {

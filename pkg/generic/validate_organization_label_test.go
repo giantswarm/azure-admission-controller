@@ -67,7 +67,33 @@ func Test_ValidateOrganizationLabelUnchanged(t *testing.T) {
 	}
 }
 
-func Test_ValidateOrganizationLabelContainsExistingOrganization(t *testing.T) {
+func Test_WhenCreatingClusterWithExistingOrganizationThenValidationSucceeds(t *testing.T) {
+	var err error
+	ctx := context.Background()
+
+	scheme := runtime.NewScheme()
+	err = securityv1alpha1.AddToScheme(scheme)
+	if err != nil {
+		panic(err)
+	}
+
+	organization := &securityv1alpha1.Organization{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "giantswarm",
+		},
+		Spec: securityv1alpha1.OrganizationSpec{},
+	}
+
+	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
+
+	obj := newObjectWithOrganization(to.StringPtr("giantswarm"))
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	if err != nil {
+		t.Fatalf("it shouldn't fail when using an existing Organization")
+	}
+}
+
+func Test_WhenCreatingClusterWithNonExistingOrganizationThenValidationFails(t *testing.T) {
 	var err error
 	ctx := context.Background()
 
@@ -90,5 +116,31 @@ func Test_ValidateOrganizationLabelContainsExistingOrganization(t *testing.T) {
 	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
 	if err == nil {
 		t.Fatalf("it should fail when using a non existing Organization")
+	}
+}
+
+func Test_WhenCreatingClusterWithExistingOrganizationWithNonNormalizedNameThenValidationSucceeds(t *testing.T) {
+	var err error
+	ctx := context.Background()
+
+	scheme := runtime.NewScheme()
+	err = securityv1alpha1.AddToScheme(scheme)
+	if err != nil {
+		panic(err)
+	}
+
+	organization := &securityv1alpha1.Organization{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "my-awesome-organization",
+		},
+		Spec: securityv1alpha1.OrganizationSpec{},
+	}
+
+	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
+
+	obj := newObjectWithOrganization(to.StringPtr("My Awesome Organization"))
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	if err != nil {
+		t.Fatalf("it didn't find the Organization with the normalized name")
 	}
 }
