@@ -87,7 +87,7 @@ func Test_WhenCreatingClusterWithExistingOrganizationThenValidationSucceeds(t *t
 	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
 
 	obj := newObjectWithOrganization(to.StringPtr("giantswarm"))
-	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, ctrlClient, obj)
 	if err != nil {
 		t.Fatalf("it shouldn't fail when using an existing Organization")
 	}
@@ -113,7 +113,7 @@ func Test_WhenCreatingClusterWithNonExistingOrganizationThenValidationFails(t *t
 	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
 
 	obj := newObjectWithOrganization(to.StringPtr("non-existing"))
-	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, ctrlClient, obj)
 	if err == nil {
 		t.Fatalf("it should fail when using a non existing Organization")
 	}
@@ -139,7 +139,7 @@ func Test_WhenCreatingClusterWithExistingOrganizationWithNonNormalizedNameThenVa
 	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
 
 	obj := newObjectWithOrganization(to.StringPtr("My Awesome Organization"))
-	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, obj, ctrlClient)
+	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, ctrlClient, obj)
 	if err != nil {
 		t.Fatalf("it didn't find the Organization with the normalized name")
 	}

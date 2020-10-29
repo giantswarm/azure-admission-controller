@@ -30,7 +30,7 @@ func ValidateOrganizationLabelUnchanged(old, new metav1.Object) error {
 	return nil
 }
 
-func ValidateOrganizationLabelContainsExistingOrganization(ctx context.Context, obj metav1.Object, ctrlClient client.Client) error {
+func ValidateOrganizationLabelContainsExistingOrganization(ctx context.Context, ctrlClient client.Client, obj metav1.Object) error {
 	organizationName, ok := obj.GetLabels()[label.Organization]
 	if !ok {
 		return microerror.Maskf(errors.NotFoundError, "CR doesn't contain Organization label %#q", label.Organization)
