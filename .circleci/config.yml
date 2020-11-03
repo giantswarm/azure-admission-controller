@@ -58,3 +58,15 @@ workflows:
             tags:
               only: /^v.*/
 
+      - architect/integration-test:
+          context: architect
+          name: admission-integration-test
+          setup-script: "integration/test/organization/setup.sh"
+          test-dir: "integration/test/organization"
+          filters:
+            # Do not trigger the job on merge to master.
+            branches:
+              ignore:
+                - master
+          requires:
+            - push-azure-admission-controller-to-control-plane-app-catalog
