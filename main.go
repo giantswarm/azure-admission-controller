@@ -199,6 +199,7 @@ func mainError() error {
 		c := azurecluster.CreateValidatorConfig{
 			BaseDomain: cfg.BaseDomain,
 			CtrlClient: ctrlClient,
+			Location:   cfg.Location,
 			Logger:     newLogger,
 		}
 		azureClusterCreateValidator, err = azurecluster.NewCreateValidator(c)
