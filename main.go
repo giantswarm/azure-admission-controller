@@ -224,6 +224,7 @@ func mainError() error {
 	{
 		c := azuremachine.CreateValidatorConfig{
 			CtrlClient: ctrlClient,
+			Location:   cfg.Location,
 			Logger:     newLogger,
 		}
 		azureMachineCreateValidator, err = azuremachine.NewCreateValidator(c)
