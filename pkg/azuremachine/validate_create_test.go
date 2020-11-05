@@ -82,34 +82,6 @@ func TestAzureMachineCreateValidate(t *testing.T) {
 			}
 
 			stubbedSKUs := map[string]compute.ResourceSku{
-				"Standard_D4_v3": {
-					Name: to.StringPtr("Standard_D4_v3"),
-					Capabilities: &[]compute.ResourceSkuCapabilities{
-						{
-							Name:  to.StringPtr("AcceleratedNetworkingEnabled"),
-							Value: to.StringPtr("False"),
-						},
-						{
-							Name:  to.StringPtr("vCPUs"),
-							Value: to.StringPtr("4"),
-						},
-						{
-							Name:  to.StringPtr("MemoryGB"),
-							Value: to.StringPtr("16"),
-						},
-						{
-							Name:  to.StringPtr("PremiumIO"),
-							Value: to.StringPtr("False"),
-						},
-					},
-					LocationInfo: &[]compute.ResourceSkuLocationInfo{
-						{
-							Zones: &[]string{
-								"1",
-							},
-						},
-					},
-				},
 				"Standard_D4s_v3": {
 					Name: to.StringPtr("Standard_D4s_v3"),
 					Capabilities: &[]compute.ResourceSkuCapabilities{

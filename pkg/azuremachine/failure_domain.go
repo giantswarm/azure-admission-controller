@@ -1,6 +1,7 @@
 package azuremachine
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/giantswarm/microerror"
@@ -20,7 +21,12 @@ func validateFailureDomain(azureMachine capzv1alpha3.AzureMachine, supportedAZs 
 		}
 	}
 
-	return microerror.Maskf(invalidOperationError, "AzureMachine.Spec.FailureDomain is invalid for machine type %s in location %s. Supported AZs are %s", azureMachine.Spec.VMSize, azureMachine.Spec.Location, strings.Join(supportedAZs, ", "))
+	supportedAZsMsg := fmt.Sprintf("Location %s support failure domains %s for VM size %s", azureMachine.Spec.Location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize)
+	if len(supportedAZs) == 0 {
+		supportedAZsMsg = fmt.Sprintf("Location %s does not support specifying FailureDomain for VM size %s", azureMachine.Spec.Location, azureMachine.Spec.VMSize)
+	}
+
+	return microerror.Maskf(invalidOperationError, supportedAZsMsg)
 }
 
 func validateFailureDomainUnchanged(old capzv1alpha3.AzureMachine, new capzv1alpha3.AzureMachine) error {
