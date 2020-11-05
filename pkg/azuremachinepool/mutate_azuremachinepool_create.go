@@ -14,16 +14,21 @@ import (
 )
 
 type CreateMutator struct {
-	logger micrologger.Logger
-	vmcaps *vmcapabilities.VMSKU
+	location string
+	logger   micrologger.Logger
+	vmcaps   *vmcapabilities.VMSKU
 }
 
 type CreateMutatorConfig struct {
-	Logger micrologger.Logger
-	VMcaps *vmcapabilities.VMSKU
+	Location string
+	Logger   micrologger.Logger
+	VMcaps   *vmcapabilities.VMSKU
 }
 
 func NewCreateMutator(config CreateMutatorConfig) (*CreateMutator, error) {
+	if config.Location == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Location must not be empty", config)
+	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
@@ -32,8 +37,9 @@ func NewCreateMutator(config CreateMutatorConfig) (*CreateMutator, error) {
 	}
 
 	m := &CreateMutator{
-		logger: config.Logger,
-		vmcaps: config.VMcaps,
+		location: config.Location,
+		logger:   config.Logger,
+		vmcaps:   config.VMcaps,
 	}
 
 	return m, nil
@@ -61,6 +67,14 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	}
 
 	patch, err = m.ensureDataDisks(ctx, azureMPCR)
+	if err != nil {
+		return []mutator.PatchOperation{}, microerror.Mask(err)
+	}
+	if patch != nil {
+		result = append(result, *patch)
+	}
+
+	patch, err = m.ensureLocation(ctx, azureMPCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}
@@ -110,4 +124,12 @@ func (m *CreateMutator) ensureDataDisks(ctx context.Context, mpCR *expcapzv1alph
 	}
 
 	return mutator.PatchAdd("/spec/template/dataDisks", desiredDataDisks), nil
+}
+
+func (m *CreateMutator) ensureLocation(ctx context.Context, mpCR *expcapzv1alpha3.AzureMachinePool) (*mutator.PatchOperation, error) {
+	if len(mpCR.Spec.Location) > 0 {
+		return nil, nil
+	}
+
+	return mutator.PatchAdd("/spec/location", m.location), nil
 }
