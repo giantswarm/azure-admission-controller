@@ -27,7 +27,7 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 		// Retrieve the `Cluster` CR related to this object.
 		cluster := &capiv1alpha3.Cluster{}
 		{
-			err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID}, cluster)
+			err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID, Namespace: meta.GetNamespace()}, cluster)
 			if apierrors.IsNotFound(err) {
 				return nil, microerror.Maskf(errors.InvalidOperationError, "Looking for Cluster named %s but it was not found. Can't continue.", clusterID)
 			} else if err != nil {
