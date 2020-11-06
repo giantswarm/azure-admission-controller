@@ -53,7 +53,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 			meta: newObjectWithRelease(to.StringPtr("ab123"), nil),
 			patch: &mutator.PatchOperation{
 				Operation: "add",
-				Path:      "/metadata/labels/release.giantswarm.io/version",
+				Path:      "/metadata/labels/release.giantswarm.io~1version",
 				Value:     "13.0.0",
 			},
 			errorMatcher: nil,
