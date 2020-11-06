@@ -3,6 +3,7 @@ package generic
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -41,8 +42,16 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 			return nil, microerror.Maskf(errors.InvalidOperationError, "Cluster %s did not have a release label set. Can't continue.", clusterID)
 		}
 
-		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", label.ReleaseVersion), release), nil
+		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(label.ReleaseVersion)), release), nil
 	}
 
 	return nil, nil
+}
+
+// Ensure the needed escapes are in place. See https://tools.ietf.org/html/rfc6901#section-3 .
+func escapeJSONPatchString(input string) string {
+	input = strings.ReplaceAll(input, "~", "~0")
+	input = strings.ReplaceAll(input, "/", "~1")
+
+	return input
 }
