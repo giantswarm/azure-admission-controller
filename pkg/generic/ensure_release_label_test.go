@@ -70,7 +70,8 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 
 			ab123 := &v1alpha3.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ab123",
+					Name:      "ab123",
+					Namespace: "default",
 					Labels: map[string]string{
 						"release.giantswarm.io/version": "13.0.0",
 					},
@@ -82,7 +83,8 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 			}
 			ef789 := &v1alpha3.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ef789",
+					Name:      "ef789",
+					Namespace: "default",
 				},
 			}
 			err = ctrlClient.Create(ctx, ef789)
