@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	corev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/core/v1alpha1"
-	providerv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/crd"
 	"github.com/giantswarm/apptest"
 	"github.com/giantswarm/micrologger"
@@ -22,8 +22,6 @@ import (
 const (
 	testCatalogName = "control-plane-test"
 	prodCatalogName = "control-plane"
-	testCatalogUrl  = "https://giantswarm.github.io/control-plane-test-catalog"
-	prodCatalogUrl  = "https://giantswarm.github.io/control-plane-catalog"
 	// API Groups for upstream Cluster API types.
 	clusterAPIGroup                    = "cluster.x-k8s.io"
 	infrastructureAPIGroup             = "infrastructure.cluster.x-k8s.io"
@@ -81,7 +79,6 @@ func TestMain(m *testing.M) {
 		apps := []apptest.App{
 			{
 				CatalogName:   prodCatalogName,
-				CatalogURL:    prodCatalogUrl,
 				Name:          "cert-manager-app",
 				Namespace:     metav1.NamespaceDefault,
 				Version:       "2.3.1",
@@ -89,7 +86,6 @@ func TestMain(m *testing.M) {
 			},
 			{
 				CatalogName:   testCatalogName,
-				CatalogURL:    testCatalogUrl,
 				Name:          "azure-admission-controller",
 				Namespace:     metav1.NamespaceDefault,
 				SHA:           env.CircleSHA(),
