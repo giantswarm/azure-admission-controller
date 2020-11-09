@@ -24,26 +24,26 @@ func TestAzureClusterUpdateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:            "case 0: unchanged ControlPlaneEndpoint",
-			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westeurope"),
-			newAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westeurope"),
+			oldAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
+			newAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
 			errorMatcher:    nil,
 		},
 		{
 			name:            "case 1: host changed",
-			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westeurope"),
-			newAzureCluster: azureClusterRawObject("ab123", "api.azure.gigantic.io", 443, "westeurope"),
+			oldAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
+			newAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.azure.gigantic.io", 443)),
 			errorMatcher:    errors.IsInvalidOperationError,
 		},
 		{
 			name:            "case 2: port changed",
-			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westeurope"),
-			newAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 80, "westeurope"),
+			oldAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
+			newAzureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 80)),
 			errorMatcher:    errors.IsInvalidOperationError,
 		},
 		{
 			name:            "case 3: location changed",
-			oldAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westeurope"),
-			newAzureCluster: azureClusterRawObject("ab123", "api.ab123.test.westeurope.azure.gigantic.io", 443, "westpoland"),
+			oldAzureCluster: BuildAzureClusterAsJson("ab123", Location("westeurope")),
+			newAzureCluster: BuildAzureClusterAsJson("ab123", Location("westpoland")),
 			errorMatcher:    errors.IsInvalidOperationError,
 		},
 	}
