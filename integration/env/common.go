@@ -41,11 +41,6 @@ func init() {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarE2EKubeconfig))
 	}
 
-	kubeconfig = os.Getenv(EnvVarE2EKubeconfig)
-	if kubeconfig == "" {
-		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarE2EKubeconfig))
-	}
-
 	azureClientID = os.Getenv(EnvVarAzureClientID)
 	if azureClientID == "" {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarAzureClientID))
