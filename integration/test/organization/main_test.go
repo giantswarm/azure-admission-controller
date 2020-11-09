@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	testCatalogName = "control-plane-test"
-	prodCatalogName = "control-plane"
+	prodCatalogName = "control-plane-catalog"
+	testCatalogName = "control-plane-test-catalog"
 	// API Groups for upstream Cluster API types.
 	clusterAPIGroup                    = "cluster.x-k8s.io"
 	infrastructureAPIGroup             = "infrastructure.cluster.x-k8s.io"
