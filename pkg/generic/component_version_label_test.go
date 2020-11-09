@@ -9,8 +9,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -100,7 +99,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			ctrlClient := fakeK8sClient.CtrlClient()
 
 			// Cluster with both operator annotations.
-			ab123 := &v1alpha3.Cluster{
+			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
@@ -116,7 +115,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			}
 
 			// Cluster lacking cluster-operator annotation.
-			cd456 := &v1alpha3.Cluster{
+			cd456 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "cd456",
 					Namespace: "default",
@@ -132,7 +131,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			}
 
 			// Cluster lacking any operator annotation.
-			ef789 := &v1alpha3.Cluster{
+			ef789 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
 					Namespace: "default",
@@ -145,9 +144,9 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 
 			var patches []mutator.PatchOperation
 			var patch1, patch2 *mutator.PatchOperation
-			patch1, err = CopyComponentVersionLabelFromClusterCR(ctx, ctrlClient, tc.meta, label.AzureOperatorVersion)
+			patch1, err = CopyComponentVersionLabelFromAzureClusterCR(ctx, ctrlClient, tc.meta, label.AzureOperatorVersion)
 			if err == nil {
-				patch2, err = CopyComponentVersionLabelFromClusterCR(ctx, ctrlClient, tc.meta, label.ClusterOperatorVersion)
+				patch2, err = CopyComponentVersionLabelFromAzureClusterCR(ctx, ctrlClient, tc.meta, label.ClusterOperatorVersion)
 			}
 
 			switch {

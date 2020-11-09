@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -99,14 +100,36 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
+			release13 := &v1alpha1.Release{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "v13.0.0-alpha4",
+					Namespace: "default",
+				},
+				Spec: v1alpha1.ReleaseSpec{
+					Components: []v1alpha1.ReleaseSpecComponent{
+						{
+							Name:    "azure-operator",
+							Version: "5.0.0",
+						},
+						{
+							Name:    "cluster-operator",
+							Version: "0.23.18",
+						},
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, release13)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			// Cluster with both operator annotations.
-			ab123 := &v1alpha3.Cluster{
+			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						"azure-operator.giantswarm.io/version":   "5.0.0",
-						"cluster-operator.giantswarm.io/version": "0.23.18",
+						"azure-operator.giantswarm.io/version": "5.0.0",
 					},
 				},
 			}

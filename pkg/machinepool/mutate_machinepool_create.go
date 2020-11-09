@@ -66,7 +66,7 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		result = append(result, *patch)
 	}
 
-	patch, err = generic.CopyComponentVersionLabelFromClusterCR(ctx, m.ctrlClient, machinePoolCR.GetObjectMeta(), label.AzureOperatorVersion)
+	patch, err = generic.CopyComponentVersionLabelFromAzureClusterCR(ctx, m.ctrlClient, machinePoolCR.GetObjectMeta(), label.AzureOperatorVersion)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}
@@ -74,7 +74,7 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		result = append(result, *patch)
 	}
 
-	patch, err = generic.CopyComponentVersionLabelFromClusterCR(ctx, m.ctrlClient, machinePoolCR.GetObjectMeta(), label.ClusterOperatorVersion)
+	patch, err = generic.CopyComponentVersionLabelFromAzureClusterCR(ctx, m.ctrlClient, machinePoolCR.GetObjectMeta(), label.ClusterOperatorVersion)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}

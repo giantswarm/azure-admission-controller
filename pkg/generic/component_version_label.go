@@ -14,15 +14,15 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/release"
 )
 
-func CopyComponentVersionLabelFromClusterCR(ctx context.Context, ctrlClient client.Client, meta metav1.Object, labelName string) (*mutator.PatchOperation, error) {
+func CopyComponentVersionLabelFromAzureClusterCR(ctx context.Context, ctrlClient client.Client, meta metav1.Object, labelName string) (*mutator.PatchOperation, error) {
 	if meta.GetLabels()[labelName] == "" {
-		componentVersion, err := getLabelValueFromCluster(ctx, ctrlClient, meta, labelName)
+		componentVersion, err := getLabelValueFromAzureCluster(ctx, ctrlClient, meta, labelName)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
 		if componentVersion == "" {
-			return nil, microerror.Maskf(errors.InvalidOperationError, "Cannot find label %q in Cluster CR. Can't continue.", labelName)
+			return nil, microerror.Maskf(errors.InvalidOperationError, "Cannot find label %q in AzureCluster CR. Can't continue.", labelName)
 		}
 
 		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(labelName)), componentVersion), nil
