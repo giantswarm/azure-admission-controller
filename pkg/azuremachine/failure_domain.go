@@ -35,7 +35,7 @@ func validateFailureDomainUnchanged(old capzv1alpha3.AzureMachine, new capzv1alp
 		return nil
 	}
 
-	// Allow changing from nil to "" and from "" to nil. They are synonims.
+	// Allow changing from nil to "" and from "" to nil. They are synonyms.
 	if old.Spec.FailureDomain == nil && *new.Spec.FailureDomain == "" ||
 		*old.Spec.FailureDomain == "" && new.Spec.FailureDomain == nil {
 		return nil
