@@ -25,27 +25,42 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 			return nil, microerror.Maskf(errors.InvalidOperationError, "Object has no %s label, can't detect release version.", label.Cluster)
 		}
 
-		// Retrieve the `Cluster` CR related to this object.
-		cluster := &capiv1alpha3.Cluster{}
-		{
-			err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID, Namespace: meta.GetNamespace()}, cluster)
-			if apierrors.IsNotFound(err) {
-				return nil, microerror.Maskf(errors.InvalidOperationError, "Looking for Cluster named %s but it was not found. Can't continue.", clusterID)
-			} else if err != nil {
-				return nil, microerror.Mask(err)
-			}
-		}
-
-		// Extract release from Cluster.
-		release := cluster.GetLabels()[label.ReleaseVersion]
-		if release == "" {
-			return nil, microerror.Maskf(errors.InvalidOperationError, "Cluster %s did not have a release label set. Can't continue.", clusterID)
+		release, err := getReleaseVersionFromCluster(ctx, ctrlClient, meta)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 
 		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(label.ReleaseVersion)), release), nil
 	}
 
 	return nil, nil
+}
+
+func getReleaseVersionFromCluster(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (string, error) {
+	// Get version from cluster.
+	clusterID := meta.GetLabels()[label.Cluster]
+	if clusterID == "" {
+		return "", microerror.Maskf(errors.InvalidOperationError, "Object has no %s label, can't detect release version.", label.Cluster)
+	}
+
+	// Retrieve the `Cluster` CR related to this object.
+	cluster := &capiv1alpha3.Cluster{}
+	{
+		err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID, Namespace: meta.GetNamespace()}, cluster)
+		if apierrors.IsNotFound(err) {
+			return "", microerror.Maskf(errors.InvalidOperationError, "Looking for Cluster named %s but it was not found. Can't continue.", clusterID)
+		} else if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	// Extract release from Cluster.
+	release := cluster.GetLabels()[label.ReleaseVersion]
+	if release == "" {
+		return "", microerror.Maskf(errors.InvalidOperationError, "Cluster %s did not have a release label set. Can't continue.", clusterID)
+	}
+
+	return release, nil
 }
 
 // Ensure the needed escapes are in place. See https://tools.ietf.org/html/rfc6901#section-3 .
