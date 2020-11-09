@@ -12,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	builder "github.com/giantswarm/azure-admission-controller/internal/test/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -25,27 +26,27 @@ func TestAzureClusterCreateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "case 0: empty ControlPlaneEndpoint",
-			azureCluster: BuildAzureClusterAsJson("ab123", Location("westeurope")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab132"), builder.Location("westeurope")),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 1: Invalid Port",
-			azureCluster: BuildAzureClusterAsJson("ab132", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 80)),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 80)),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 2: Invalid Host",
-			azureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.gigantic.io", 443), Location("westeurope")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.ControlPlaneEndpoint("api.gigantic.io", 443), builder.Location("westeurope")),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 3: Valid values",
-			azureCluster: BuildAzureClusterAsJson("ab123", ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443), Location("westeurope")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443), builder.Location("westeurope")),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 4: Invalid region",
-			azureCluster: BuildAzureClusterAsJson("ab123", Location("westpoland")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Location("westpoland")),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 	}

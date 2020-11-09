@@ -12,6 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	builder "github.com/giantswarm/azure-admission-controller/internal/test/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
@@ -26,7 +27,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         fmt.Sprintf("case 0: ControlPlaneEndpoint left empty"),
-			azureCluster: BuildAzureClusterAsJson("ab132", ControlPlaneEndpoint("", 0)),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab132"), builder.ControlPlaneEndpoint("", 0)),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -43,13 +44,13 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         fmt.Sprintf("case 1: ControlPlaneEndpoint has a value"),
-			azureCluster: BuildAzureClusterAsJson("ab132", ControlPlaneEndpoint("api.giantswarm.io", 123)),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.ControlPlaneEndpoint("api.giantswarm.io", 123)),
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},
 		{
 			name:         fmt.Sprintf("case 2: Location empty"),
-			azureCluster: BuildAzureClusterAsJson("ab132", Location("")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Location("")),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -61,7 +62,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         fmt.Sprintf("case 3: Location has value"),
-			azureCluster: BuildAzureClusterAsJson("ab132", Location("westeurope")),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Location("westeurope")),
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},

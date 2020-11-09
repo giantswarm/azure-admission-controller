@@ -2,13 +2,26 @@ package azurecluster
 
 import (
 	"encoding/json"
+	"math/rand"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 )
 
 type BuilderOption func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func Name(name string) BuilderOption {
+	return func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster {
+		azureCluster.ObjectMeta.Name = name
+		azureCluster.Labels[capiv1alpha3.ClusterLabelName] = name
+		azureCluster.Labels[label.Cluster] = name
+		return azureCluster
+	}
+}
 
 func Location(location string) BuilderOption {
 	return func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster {
@@ -25,7 +38,8 @@ func ControlPlaneEndpoint(controlPlaneEndpointHost string, controlPlaneEndpointP
 	}
 }
 
-func BuildAzureCluster(clusterName string, opts ...BuilderOption) *capzv1alpha3.AzureCluster {
+func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
+	clusterName := generateName()
 	azureCluster := &capzv1alpha3.AzureCluster{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AzureCluster",
@@ -35,17 +49,17 @@ func BuildAzureCluster(clusterName string, opts ...BuilderOption) *capzv1alpha3.
 			Name:      clusterName,
 			Namespace: "org-giantswarm",
 			Labels: map[string]string{
-				"azure-operator.giantswarm.io/version": "5.0.0",
-				"cluster.x-k8s.io/cluster-name":        clusterName,
-				"giantswarm.io/cluster":                clusterName,
-				"giantswarm.io/organization":           "giantswarm",
-				"release.giantswarm.io/version":        "13.0.0-alpha3",
+				label.AzureOperatorVersion:    "5.0.0",
+				capiv1alpha3.ClusterLabelName: clusterName,
+				label.Cluster:                 clusterName,
+				label.Organization:            "giantswarm",
+				label.ReleaseVersion:          "13.0.0-alpha3",
 			},
 		},
 		Spec: capzv1alpha3.AzureClusterSpec{
 			ResourceGroup: clusterName,
 			Location:      "westeurope",
-			ControlPlaneEndpoint: v1alpha3.APIEndpoint{
+			ControlPlaneEndpoint: capiv1alpha3.APIEndpoint{
 				Host: "api.gigantic.io",
 				Port: 8080,
 			},
@@ -59,10 +73,18 @@ func BuildAzureCluster(clusterName string, opts ...BuilderOption) *capzv1alpha3.
 	return azureCluster
 }
 
-func BuildAzureClusterAsJson(clusterName string, opts ...BuilderOption) []byte {
-	azureCluster := BuildAzureCluster(clusterName, opts...)
+func BuildAzureClusterAsJson(opts ...BuilderOption) []byte {
+	azureCluster := BuildAzureCluster(opts...)
 
 	byt, _ := json.Marshal(azureCluster)
 
 	return byt
+}
+
+func generateName() string {
+	b := make([]rune, 5)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
