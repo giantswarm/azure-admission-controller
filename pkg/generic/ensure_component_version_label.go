@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
-func EnsureComponentVersionLabel(ctx context.Context, ctrlClient client.Client, meta metav1.Object, componentName string, labelName string) (*mutator.PatchOperation, error) {
+func EnsureComponentVersionLabel(ctx context.Context, ctrlClient client.Client, meta metav1.Object, labelName string) (*mutator.PatchOperation, error) {
 	if meta.GetLabels()[labelName] == "" {
 		componentVersion, err := getLabelValueFromCluster(ctx, ctrlClient, meta, labelName)
 		if err != nil {

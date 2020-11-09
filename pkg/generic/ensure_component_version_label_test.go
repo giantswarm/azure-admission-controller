@@ -145,9 +145,9 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 
 			var patches []mutator.PatchOperation
 			var patch1, patch2 *mutator.PatchOperation
-			patch1, err = EnsureComponentVersionLabel(ctx, ctrlClient, tc.meta, "azure-operator", label.AzureOperatorVersion)
+			patch1, err = EnsureComponentVersionLabel(ctx, ctrlClient, tc.meta, label.AzureOperatorVersion)
 			if err == nil {
-				patch2, err = EnsureComponentVersionLabel(ctx, ctrlClient, tc.meta, "cluster-operator", label.ClusterOperatorVersion)
+				patch2, err = EnsureComponentVersionLabel(ctx, ctrlClient, tc.meta, label.ClusterOperatorVersion)
 			}
 
 			switch {
