@@ -63,6 +63,7 @@ workflows:
           name: admission-integration-test
           install-app-platform: true
           test-dir: "integration/test/organization"
+          test-timeout: "10m"
           filters:
             # Do not trigger the job on merge to master.
             branches:
