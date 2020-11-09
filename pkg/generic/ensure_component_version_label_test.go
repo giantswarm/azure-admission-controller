@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -27,53 +26,6 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 	}{
 		{
 			name: "case 0: both operators missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0"}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name: "case 1: cluster operator missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.AzureOperatorVersion: "5.0.0"}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name: "case 2: azure operator missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.ClusterOperatorVersion: "0.23.18"}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 3: both operators present",
-			meta:         newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.AzureOperatorVersion: "5.0.0", label.ClusterOperatorVersion: "0.23.18"}),
-			patches:      nil,
-			errorMatcher: nil,
-		},
-		{
-			name: "case 4: both operators missing, release label missing, cluster present and with release label set",
 			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{}),
 			patches: []mutator.PatchOperation{
 				{
@@ -90,14 +42,50 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			errorMatcher: nil,
 		},
 		{
-			name:         "case 5: both operators missing, release label missing, cluster not present",
-			meta:         newObjectWithLabels(to.StringPtr("nf404"), map[string]string{}),
+			name: "case 1: cluster operator missing",
+			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.AzureOperatorVersion: "5.0.0"}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
+					Value:     "0.23.18",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name: "case 2: azure operator missing",
+			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ClusterOperatorVersion: "0.23.18"}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:         "case 3: both operators present",
+			meta:         newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.AzureOperatorVersion: "5.0.0", label.ClusterOperatorVersion: "0.23.18"}),
 			patches:      nil,
+			errorMatcher: nil,
+		},
+		{
+			name: "case 4: both operators missing, cluster present but lacks one operator's label",
+			meta: newObjectWithLabels(to.StringPtr("cd456"), map[string]string{}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+			},
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
-			name:         "case 6: both operators missing, release label missing, cluster exists but with no release label",
-			meta:         newObjectWithLabels(to.StringPtr("ef789"), map[string]string{}),
+			name:         "case 5: both operators missing, cluster not present",
+			meta:         newObjectWithLabels(to.StringPtr("nf404"), map[string]string{}),
 			patches:      nil,
 			errorMatcher: errors.IsInvalidOperationError,
 		},
@@ -111,12 +99,15 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
+			// Cluster with both operator annotations.
 			ab123 := &v1alpha3.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						"release.giantswarm.io/version": "13.0.0",
+						//"release.giantswarm.io/version": "13.0.0",
+						"azure-operator.giantswarm.io/version":   "5.0.0",
+						"cluster-operator.giantswarm.io/version": "0.23.18",
 					},
 				},
 			}
@@ -124,6 +115,24 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+
+			// Cluster lacking cluster-operator annotation.
+			cd456 := &v1alpha3.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "cd456",
+					Namespace: "default",
+					Labels: map[string]string{
+						"release.giantswarm.io/version":        "13.0.0",
+						"azure-operator.giantswarm.io/version": "5.0.0",
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, cd456)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Cluster lacking any operator annotation.
 			ef789 := &v1alpha3.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
@@ -131,29 +140,6 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 				},
 			}
 			err = ctrlClient.Create(ctx, ef789)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			release13 := &v1alpha1.Release{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "v13.0.0",
-					Namespace: "default",
-				},
-				Spec: v1alpha1.ReleaseSpec{
-					Components: []v1alpha1.ReleaseSpecComponent{
-						{
-							Name:    "azure-operator",
-							Version: "5.0.0",
-						},
-						{
-							Name:    "cluster-operator",
-							Version: "0.23.18",
-						},
-					},
-				},
-			}
-			err = ctrlClient.Create(ctx, release13)
 			if err != nil {
 				t.Fatal(err)
 			}
