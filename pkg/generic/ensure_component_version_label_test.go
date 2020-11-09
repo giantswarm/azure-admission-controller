@@ -105,7 +105,6 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						//"release.giantswarm.io/version": "13.0.0",
 						"azure-operator.giantswarm.io/version":   "5.0.0",
 						"cluster-operator.giantswarm.io/version": "0.23.18",
 					},
