@@ -15,6 +15,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -42,12 +43,12 @@ func TestClusterCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:    fmt.Sprintf("case 0: ControlPlaneEndpoint left empty"),
-			cluster: clusterRawObject("ab132", clusterNetwork, "", 0, nil),
+			cluster: clusterRawObject("ab123", clusterNetwork, "", 0, nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
 					Path:      "/spec/controlPlaneEndpoint/host",
-					Value:     "api.ab132.k8s.test.westeurope.azure.gigantic.io",
+					Value:     "api.ab123.k8s.test.westeurope.azure.gigantic.io",
 				},
 				{
 					Operation: "add",
@@ -59,13 +60,13 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         fmt.Sprintf("case 1: ControlPlaneEndpoint has a value"),
-			cluster:      clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, nil),
+			cluster:      clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, nil),
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},
 		{
 			name:    fmt.Sprintf("case 2: Azure Operator version empty"),
-			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.AzureOperatorVersion: ""}),
+			cluster: clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.AzureOperatorVersion: ""}),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -77,7 +78,7 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:    fmt.Sprintf("case 3: Cluster Operator version empty"),
-			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: ""}),
+			cluster: clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: ""}),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -89,7 +90,7 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:    fmt.Sprintf("case 4: Cluster and Azure Operator versions empty"),
-			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: "", label.AzureOperatorVersion: ""}),
+			cluster: clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: "", label.AzureOperatorVersion: ""}),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -142,6 +143,21 @@ func TestClusterCreateMutate(t *testing.T) {
 				},
 			}
 			err = ctrlClient.Create(ctx, release13)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Cluster with both operator annotations.
+			ab123 := &capzv1alpha3.AzureCluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "ab123",
+					Namespace: "default",
+					Labels: map[string]string{
+						"azure-operator.giantswarm.io/version": "5.0.0",
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, ab123)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -213,7 +229,7 @@ func clusterRawObject(clusterName string, clusterNetwork *v1alpha3.ClusterNetwor
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      clusterName,
-			Namespace: "org-giantswarm",
+			Namespace: "default",
 			Labels:    mergedLabels,
 		},
 		Spec: v1alpha3.ClusterSpec{

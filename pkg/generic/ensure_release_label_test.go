@@ -9,6 +9,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 
@@ -68,7 +69,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
-			ab123 := &v1alpha3.Cluster{
+			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
