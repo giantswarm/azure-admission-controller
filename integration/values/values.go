@@ -13,6 +13,9 @@ const Template = `Installation:
       Kubernetes:
         API:
           EndpointBase: k8s.test.westeurope.azure.gigantic.io
+    Provider:
+      Azure:
+        Location: westeurope
     Registry:
       Domain: quay.io
     Secret:
