@@ -40,19 +40,19 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 	for i, instanceType := range unsupportedInstanceType {
 		testCases = append(testCases, testCase{
 			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking enabled", i*3, instanceType),
-			nodePool:     azureMPRawObject(instanceType, &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks),
+			nodePool:     azureMPRawObject(instanceType, &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
 			errorMatcher: IsInvalidOperationError,
 		})
 
 		testCases = append(testCases, testCase{
 			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking disabled", i*3+1, instanceType),
-			nodePool:     azureMPRawObject(instanceType, &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks),
+			nodePool:     azureMPRawObject(instanceType, &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
 			errorMatcher: nil,
 		})
 
 		testCases = append(testCases, testCase{
 			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking nil", i*3+2, instanceType),
-			nodePool:     azureMPRawObject(instanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks),
+			nodePool:     azureMPRawObject(instanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
 			errorMatcher: nil,
 		})
 	}
@@ -61,8 +61,8 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 	{
 		instanceType := "this_is_a_random_name"
 		testCases = append(testCases, testCase{
-			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking enabled", len(testCases)-1, instanceType),
-			nodePool:     azureMPRawObject(instanceType, &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks),
+			name:         fmt.Sprintf("case %d: instance type %s with accelerated networking enabled", len(testCases), instanceType),
+			nodePool:     azureMPRawObject(instanceType, &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
 			errorMatcher: vmcapabilities.IsSkuNotFoundError,
 		})
 	}
@@ -81,10 +81,16 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 					DiskSizeGB: 50,
 					Lun:        to.Int32Ptr(22),
 				},
-			}),
+			}, "westeurope"),
 			errorMatcher: IsInvalidOperationError,
 		})
 	}
+
+	testCases = append(testCases, testCase{
+		name:         fmt.Sprintf("case %d: invalid location", len(testCases)-1),
+		nodePool:     azureMPRawObject("Standard_A2_v2", nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "eastgalicia"),
+		errorMatcher: IsInvalidOperationError,
+	})
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -213,6 +219,7 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 
 			admit := &CreateValidator{
 				ctrlClient: ctrlClient,
+				location:   "westeurope",
 				logger:     newLogger,
 				vmcaps:     vmcaps,
 			}

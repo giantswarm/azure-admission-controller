@@ -25,23 +25,28 @@ func TestAzureClusterCreateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "case 0: empty ControlPlaneEndpoint",
-			azureCluster: azureClusterRawObject("ab123", "", 0),
+			azureCluster: azureClusterRawObject("ab123", "", 0, "westeurope"),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 1: Invalid Port",
-			azureCluster: azureClusterRawObject("ab123", "api.ab123.k8s.test.westeurope.azure.gigantic.io", 80),
+			azureCluster: azureClusterRawObject("ab123", "api.ab123.k8s.test.westeurope.azure.gigantic.io", 80, "westeurope"),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 2: Invalid Host",
-			azureCluster: azureClusterRawObject("ab123", "api.gigantic.io", 443),
+			azureCluster: azureClusterRawObject("ab123", "api.gigantic.io", 443, "westeurope"),
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 		{
 			name:         "case 3: Valid values",
-			azureCluster: azureClusterRawObject("ab123", "api.ab123.k8s.test.westeurope.azure.gigantic.io", 443),
+			azureCluster: azureClusterRawObject("ab123", "api.ab123.k8s.test.westeurope.azure.gigantic.io", 443, "westeurope"),
 			errorMatcher: nil,
+		},
+		{
+			name:         "case 4: Invalid region",
+			azureCluster: azureClusterRawObject("ab123", "api.ab123.k8s.test.westeurope.azure.gigantic.io", 443, "westpoland"),
+			errorMatcher: errors.IsInvalidOperationError,
 		},
 	}
 
@@ -77,6 +82,7 @@ func TestAzureClusterCreateValidate(t *testing.T) {
 			admit := &CreateValidator{
 				baseDomain: "k8s.test.westeurope.azure.gigantic.io",
 				ctrlClient: ctrlClient,
+				location:   "westeurope",
 				logger:     newLogger,
 			}
 

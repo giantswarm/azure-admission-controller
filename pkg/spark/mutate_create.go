@@ -1,14 +1,15 @@
-package machinepool
+package spark
 
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
@@ -47,17 +48,12 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		return result, nil
 	}
 
-	machinePoolCR := &capiexp.MachinePool{}
-	if _, _, err := mutator.Deserializer.Decode(request.Object.Raw, nil, machinePoolCR); err != nil {
-		return []mutator.PatchOperation{}, microerror.Maskf(parsingFailedError, "unable to parse MachinePool CR: %v", err)
+	sparkCR := &v1alpha1.Spark{}
+	if _, _, err := mutator.Deserializer.Decode(request.Object.Raw, nil, sparkCR); err != nil {
+		return []mutator.PatchOperation{}, microerror.Maskf(errors.ParsingFailedError, "unable to parse Spark CR: %v", err)
 	}
 
-	defaultSpecValues := setDefaultSpecValues(m, ctx, machinePoolCR)
-	if defaultSpecValues != nil {
-		result = append(result, defaultSpecValues...)
-	}
-
-	patch, err := generic.EnsureReleaseVersionLabel(ctx, m.ctrlClient, machinePoolCR.GetObjectMeta())
+	patch, err := generic.EnsureReleaseVersionLabel(ctx, m.ctrlClient, sparkCR.GetObjectMeta())
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}
@@ -73,5 +69,5 @@ func (m *CreateMutator) Log(keyVals ...interface{}) {
 }
 
 func (m *CreateMutator) Resource() string {
-	return "machinepool"
+	return "spark"
 }
