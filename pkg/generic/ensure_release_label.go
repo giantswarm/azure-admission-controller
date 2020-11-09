@@ -25,28 +25,19 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 			return nil, microerror.Maskf(errors.InvalidOperationError, "Object has no %s label, can't detect release version.", label.Cluster)
 		}
 
-		release, err := getReleaseVersionFromCluster(ctx, ctrlClient, meta)
+		// Get release from Cluster.
+		release, err := getLabelValueFromCluster(ctx, ctrlClient, meta, label.ReleaseVersion)
 		if err != nil {
 			return nil, microerror.Mask(err)
+		}
+		if release == "" {
+			return nil, microerror.Maskf(errors.InvalidOperationError, "Cluster %s did not have a release label set. Can't continue.", clusterID)
 		}
 
 		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(label.ReleaseVersion)), release), nil
 	}
 
 	return nil, nil
-}
-
-func getReleaseVersionFromCluster(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (string, error) {
-	// Get release from Cluster.
-	release, err := getLabelValueFromCluster(ctx, ctrlClient, meta, label.ReleaseVersion)
-	if err != nil {
-		return "", microerror.Mask(err)
-	}
-	if release == "" {
-		return "", microerror.Maskf(errors.InvalidOperationError, "Cluster CR did not have a release label set. Can't continue.")
-	}
-
-	return release, nil
 }
 
 func getLabelValueFromCluster(ctx context.Context, ctrlClient client.Client, meta metav1.Object, labelName string) (string, error) {
