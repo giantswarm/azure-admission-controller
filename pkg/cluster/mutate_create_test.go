@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
@@ -16,6 +18,7 @@ import (
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
 func TestClusterCreateMutate(t *testing.T) {
@@ -39,7 +42,7 @@ func TestClusterCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:    fmt.Sprintf("case 0: ControlPlaneEndpoint left empty"),
-			cluster: clusterRawObject("ab132", clusterNetwork, "", 0),
+			cluster: clusterRawObject("ab132", clusterNetwork, "", 0, nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -56,23 +59,51 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         fmt.Sprintf("case 1: ControlPlaneEndpoint has a value"),
-			cluster:      clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123),
+			cluster:      clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, nil),
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},
-		// This test doesn't work because the clusterNetwork struct has pointers in it and we can't compare them.
-		//{
-		//	name:         fmt.Sprintf("case 2: ClusterNetwork empty"),
-		//	cluster:      clusterRawObject("ab132", nil, "api.giantswarm.io", 123),
-		//	patches:      []mutator.PatchOperation{
-		//		{
-		//			Operation: "add",
-		//			Path:      "/spec/clusterNetwork",
-		//			Value:     *clusterNetwork,
-		//		},
-		//	},
-		//	errorMatcher: nil,
-		//},
+		{
+			name:    fmt.Sprintf("case 2: Azure Operator version empty"),
+			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.AzureOperatorVersion: ""}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:    fmt.Sprintf("case 3: Cluster Operator version empty"),
+			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: ""}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
+					Value:     "0.23.18",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:    fmt.Sprintf("case 4: Cluster and Azure Operator versions empty"),
+			cluster: clusterRawObject("ab132", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: "", label.AzureOperatorVersion: ""}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
+					Value:     "0.23.18",
+				},
+			},
+			errorMatcher: nil,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -88,8 +119,36 @@ func TestClusterCreateMutate(t *testing.T) {
 				}
 			}
 
+			ctx := context.Background()
+			fakeK8sClient := unittest.FakeK8sClient()
+			ctrlClient := fakeK8sClient.CtrlClient()
+
+			release13 := &v1alpha1.Release{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "v13.0.0-alpha4",
+					Namespace: "default",
+				},
+				Spec: v1alpha1.ReleaseSpec{
+					Components: []v1alpha1.ReleaseSpecComponent{
+						{
+							Name:    "azure-operator",
+							Version: "5.0.0",
+						},
+						{
+							Name:    "cluster-operator",
+							Version: "0.23.18",
+						},
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, release13)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			admit := &CreateMutator{
 				baseDomain: "k8s.test.westeurope.azure.gigantic.io",
+				ctrlClient: ctrlClient,
 				logger:     newLogger,
 			}
 
@@ -121,7 +180,7 @@ func TestClusterCreateMutate(t *testing.T) {
 func getCreateMutateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {
 	req := &v1beta1.AdmissionRequest{
 		Resource: metav1.GroupVersionResource{
-			Version:  "cluster.x-k8s.io/v1alpha3",
+			Version:  "cluster.x-k8s.io/v1alpha4",
 			Resource: "cluster",
 		},
 		Operation: v1beta1.Create,
@@ -134,7 +193,19 @@ func getCreateMutateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {
 	return req
 }
 
-func clusterRawObject(clusterName string, clusterNetwork *v1alpha3.ClusterNetwork, controlPlaneEndpointHost string, controlPlaneEndpointPort int32) []byte {
+func clusterRawObject(clusterName string, clusterNetwork *v1alpha3.ClusterNetwork, controlPlaneEndpointHost string, controlPlaneEndpointPort int32, labels map[string]string) []byte {
+	mergedLabels := map[string]string{
+		"azure-operator.giantswarm.io/version":   "5.0.0",
+		"cluster-operator.giantswarm.io/version": "0.23.18",
+		"cluster.x-k8s.io/cluster-name":          clusterName,
+		"giantswarm.io/cluster":                  clusterName,
+		"giantswarm.io/organization":             "giantswarm",
+		"release.giantswarm.io/version":          "13.0.0-alpha4",
+	}
+	for k, v := range labels {
+		mergedLabels[k] = v
+	}
+
 	mp := v1alpha3.Cluster{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Cluster",
@@ -143,14 +214,7 @@ func clusterRawObject(clusterName string, clusterNetwork *v1alpha3.ClusterNetwor
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      clusterName,
 			Namespace: "org-giantswarm",
-			Labels: map[string]string{
-				"azure-operator.giantswarm.io/version":   "5.0.0",
-				"cluster-operator.giantswarm.io/version": "",
-				"cluster.x-k8s.io/cluster-name":          clusterName,
-				"giantswarm.io/cluster":                  clusterName,
-				"giantswarm.io/organization":             "giantswarm",
-				"release.giantswarm.io/version":          "13.0.0-alpha3",
-			},
+			Labels:    mergedLabels,
 		},
 		Spec: v1alpha3.ClusterSpec{
 			ClusterNetwork: clusterNetwork,

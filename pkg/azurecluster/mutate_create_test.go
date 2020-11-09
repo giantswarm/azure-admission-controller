@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
@@ -14,6 +15,7 @@ import (
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
 func TestAzureClusterCreateMutate(t *testing.T) {
@@ -32,7 +34,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 				{
 					Operation: "add",
 					Path:      "/spec/controlPlaneEndpoint/host",
-					Value:     "api.ab132.k8s.test.westeurope.azure.gigantic.io",
+					Value:     "api.ab123.k8s.test.westeurope.azure.gigantic.io",
 				},
 				{
 					Operation: "add",
@@ -66,6 +68,18 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},
+		{
+			name:         fmt.Sprintf("case 4: Azure operator label missing"),
+			azureCluster: azureClusterRawObject("ab123", "api.giantswarm.io", 123, "westeurope", map[string]string{label.AzureOperatorVersion: ""}),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+			},
+			errorMatcher: nil,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -81,8 +95,29 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 				}
 			}
 
+			ctx := context.Background()
+			fakeK8sClient := unittest.FakeK8sClient()
+			ctrlClient := fakeK8sClient.CtrlClient()
+
+			// Cluster with both operator annotations.
+			ab123 := &v1alpha3.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "ab123",
+					Namespace: "default",
+					Labels: map[string]string{
+						"azure-operator.giantswarm.io/version":   "5.0.0",
+						"cluster-operator.giantswarm.io/version": "0.23.18",
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, ab123)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			admit := &CreateMutator{
 				baseDomain: "k8s.test.westeurope.azure.gigantic.io",
+				ctrlClient: ctrlClient,
 				location:   "westeurope",
 				logger:     newLogger,
 			}
