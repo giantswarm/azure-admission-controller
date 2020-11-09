@@ -91,7 +91,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 		},
 		{
 			name:         "case 5: both operators missing, release label missing, cluster not present",
-			meta:         newObjectWithLabels(to.StringPtr("404nf"), map[string]string{}),
+			meta:         newObjectWithLabels(to.StringPtr("nf404"), map[string]string{}),
 			patches:      nil,
 			errorMatcher: errors.IsInvalidOperationError,
 		},
