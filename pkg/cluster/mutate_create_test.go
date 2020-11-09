@@ -196,7 +196,7 @@ func TestClusterCreateMutate(t *testing.T) {
 func getCreateMutateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {
 	req := &v1beta1.AdmissionRequest{
 		Resource: metav1.GroupVersionResource{
-			Version:  "cluster.x-k8s.io/v1alpha4",
+			Version:  "cluster.x-k8s.io/v1alpha3",
 			Resource: "cluster",
 		},
 		Operation: v1beta1.Create,
