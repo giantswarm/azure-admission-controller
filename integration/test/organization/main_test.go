@@ -17,7 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
-	"github.com/giantswarm/azure-admission-controller/integration/template"
+	"github.com/giantswarm/azure-admission-controller/integration/values"
 )
 
 const (
@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 	}
 
 	{
-		values, err := template.Values(env.AzureClientID(), env.AzureClientSecret(), env.AzureTenantID(), env.AzureSubscriptionID())
+		valuesYAML, err := values.YAML(env.AzureClientID(), env.AzureClientSecret(), env.AzureTenantID(), env.AzureSubscriptionID())
 		if err != nil {
 			logger.LogCtx(ctx, "level", "error", "message", "install apps failed", "stack", fmt.Sprintf("%#v\n", err))
 			os.Exit(-1)
@@ -87,7 +87,7 @@ func TestMain(m *testing.M) {
 				Name:          "azure-admission-controller",
 				Namespace:     metav1.NamespaceDefault,
 				SHA:           env.CircleSHA(),
-				ValuesYAML:    values,
+				ValuesYAML:    valuesYAML,
 				WaitForDeploy: true,
 			},
 		}

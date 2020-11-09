@@ -1,4 +1,4 @@
-package template
+package values
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 )
 
-const ValuesTemplate = `Installation:
+const Template = `Installation:
   V1:
     Guest:
       Kubernetes:
@@ -32,8 +32,8 @@ type Credentials struct {
 	TenantID       string
 }
 
-func Values(clientID, clientSecret, subscriptionID, tenantID string) (string, error) {
-	tmpl, err := template.New("values").Parse(ValuesTemplate)
+func YAML(clientID, clientSecret, subscriptionID, tenantID string) (string, error) {
+	tmpl, err := template.New("values").Parse(Template)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
