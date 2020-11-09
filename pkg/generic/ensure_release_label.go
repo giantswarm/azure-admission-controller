@@ -41,7 +41,6 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 }
 
 func getLabelValueFromCluster(ctx context.Context, ctrlClient client.Client, meta metav1.Object, labelName string) (string, error) {
-	// Get version from cluster.
 	clusterID := meta.GetLabels()[label.Cluster]
 	if clusterID == "" {
 		return "", microerror.Maskf(errors.InvalidOperationError, "Object has no %s label, can't detect cluster ID.", label.Cluster)
