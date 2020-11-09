@@ -51,7 +51,7 @@ func getLabelValueFromCluster(ctx context.Context, ctrlClient client.Client, met
 	{
 		err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID, Namespace: meta.GetNamespace()}, cluster)
 		if apierrors.IsNotFound(err) {
-			return "", microerror.Maskf(errors.InvalidOperationError, "Looking for Cluster named %s but it was not found. Can't continue.", clusterID)
+			return "", microerror.Maskf(errors.InvalidOperationError, "Looking for Cluster named %q but it was not found. Can't continue.", clusterID)
 		} else if err != nil {
 			return "", microerror.Mask(err)
 		}

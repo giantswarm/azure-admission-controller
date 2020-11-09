@@ -40,85 +40,85 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "case 0: AcceleratedNetworking is enabled in CR and we don't change it or the instance type",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 1: AcceleratedNetworking is disabled in CR and we don't change it or the instance type",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 2: Enabled and try disabling it, keeping same instance type",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 3: Enabled, try updating to new instance type that supports it",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[1], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[1], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 4: Enabled, try updating to new instance type that does NOT supports it",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(unsupportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(unsupportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 5: Disabled and try enabling it",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 6: changed from nil to true",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 7: changed from true to nil",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &tr, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 8: changed from nil to false",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 9: changed from false to nil",
-			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(supportedInstanceType[0], &fa, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(supportedInstanceType[0], nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 10: changed from premium to standard storage",
-			oldNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 11: changed from standard to premium storage",
-			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: nil,
 		},
 		{
 			name:         "case 12: change storage account type",
-			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesPremiumLRS), desiredDataDisks, "westeurope"),
+			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesPremiumLRS), desiredDataDisks, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:        "case 13: change datadisks",
-			oldNodePool: azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
+			oldNodePool: azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
 			newNodePool: azureMPRawObject(premiumStorageInstanceType, nil, string(compute.StorageAccountTypesPremiumLRS), []capzv1alpha3.DataDisk{
 				{
 					NameSuffix: "docker",
@@ -130,13 +130,13 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 					DiskSizeGB: 50,
 					Lun:        to.Int32Ptr(22),
 				},
-			}, "westeurope"),
+			}, "westeurope", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 		{
 			name:         "case 14: changed location",
-			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope"),
-			newNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "northeastitaly"),
+			oldNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "westeurope", nil),
+			newNodePool:  azureMPRawObject(standardStorageInstanceType, nil, string(compute.StorageAccountTypesStandardLRS), desiredDataDisks, "northeastitaly", nil),
 			errorMatcher: IsInvalidOperationError,
 		},
 	}
@@ -291,7 +291,17 @@ func getUpdateAdmissionRequest(oldMP []byte, newMP []byte) *v1beta1.AdmissionReq
 	return req
 }
 
-func azureMPRawObject(vmSize string, acceleratedNetworkingEnabled *bool, storageAccountType string, dataDisks []capzv1alpha3.DataDisk, location string) []byte {
+func azureMPRawObject(vmSize string, acceleratedNetworkingEnabled *bool, storageAccountType string, dataDisks []capzv1alpha3.DataDisk, location string, labels map[string]string) []byte {
+	mergedLabels := map[string]string{
+		"azure-operator.giantswarm.io/version": "5.0.0",
+		"giantswarm.io/cluster":                "ab123",
+		"giantswarm.io/machine-pool":           "ab123",
+		"giantswarm.io/organization":           "giantswarm",
+		"release.giantswarm.io/version":        "13.0.0",
+	}
+	for k, v := range labels {
+		mergedLabels[k] = v
+	}
 	mp := v1alpha3.AzureMachinePool{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AzureMachinePool",
@@ -300,13 +310,7 @@ func azureMPRawObject(vmSize string, acceleratedNetworkingEnabled *bool, storage
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "ab123",
 			Namespace: "default",
-			Labels: map[string]string{
-				"azure-operator.giantswarm.io/version": "5.0.0",
-				"giantswarm.io/cluster":                "ab123",
-				"giantswarm.io/machine-pool":           "ab123",
-				"giantswarm.io/organization":           "giantswarm",
-				"release.giantswarm.io/version":        "13.0.0",
-			},
+			Labels:    mergedLabels,
 		},
 		Spec: v1alpha3.AzureMachinePoolSpec{
 			Location: location,

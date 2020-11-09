@@ -8,14 +8,17 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
 func TestAzureMachinePoolCreateMutate(t *testing.T) {
@@ -30,7 +33,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:     fmt.Sprintf("case 0: unset storage account type with premium VM"),
-			nodePool: azureMPRawObject("Standard_D4s_v3", &tr, "", desiredDataDisks, "westeurope"),
+			nodePool: azureMPRawObject("Standard_D4s_v3", &tr, "", desiredDataDisks, "westeurope", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -42,7 +45,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 		},
 		{
 			name:     fmt.Sprintf("case 1: unset storage account type with standard VM"),
-			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "", desiredDataDisks, "westeurope"),
+			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "", desiredDataDisks, "westeurope", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -54,7 +57,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 		},
 		{
 			name:     fmt.Sprintf("case 2: set data disks"),
-			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "Standard_LRS", nil, "westeurope"),
+			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "Standard_LRS", nil, "westeurope", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -66,7 +69,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 		},
 		{
 			name:     fmt.Sprintf("case 3: set location"),
-			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "Standard_LRS", desiredDataDisks, ""),
+			nodePool: azureMPRawObject("Standard_D4_v3", &tr, "Standard_LRS", desiredDataDisks, "", nil),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -143,10 +146,54 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 				panic(microerror.JSON(err))
 			}
 
+			ctx := context.Background()
+			fakeK8sClient := unittest.FakeK8sClient()
+			ctrlClient := fakeK8sClient.CtrlClient()
+
+			release13 := &v1alpha1.Release{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "v13.0.0-alpha4",
+					Namespace: "default",
+				},
+				Spec: v1alpha1.ReleaseSpec{
+					Components: []v1alpha1.ReleaseSpecComponent{
+						{
+							Name:    "azure-operator",
+							Version: "5.0.0",
+						},
+						{
+							Name:    "cluster-operator",
+							Version: "0.23.18",
+						},
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, release13)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Cluster with both operator annotations.
+			ab123 := &v1alpha3.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "ab123",
+					Namespace: "default",
+					Labels: map[string]string{
+						"azure-operator.giantswarm.io/version":   "5.0.0",
+						"cluster-operator.giantswarm.io/version": "0.23.18",
+					},
+				},
+			}
+			err = ctrlClient.Create(ctx, ab123)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			admit := &CreateMutator{
-				location: "westeurope",
-				logger:   newLogger,
-				vmcaps:   vmcaps,
+				ctrlClient: ctrlClient,
+				location:   "westeurope",
+				logger:     newLogger,
+				vmcaps:     vmcaps,
 			}
 
 			// Run admission request to validate AzureConfig updates.
