@@ -17,6 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
+	"github.com/giantswarm/azure-admission-controller/integration/template"
 )
 
 const (
@@ -59,23 +60,20 @@ func TestMain(m *testing.M) {
 	}
 
 	{
-		values := `Installation:
-  V1:
-    Guest:
-      Kubernetes:
-        API:
-          EndpointBase: k8s.test.westeurope.azure.gigantic.io
-    Registry:
-      Domain: quay.io
-    Secret:
-      Credentiald:
-        Azure:
-          CredentialDefault:
-            ClientID: %s
-            ClientSecret: %s
-            TenantID: %s
-            SubscriptionID: %s
-`
+		err = appTest.EnsureCRDs(ctx, getRequiredCRDs())
+		if err != nil {
+			logger.LogCtx(ctx, "level", "error", "message", "failed ensuring crds", "stack", fmt.Sprintf("%#v\n", err))
+			os.Exit(-1)
+		}
+	}
+
+	{
+		values, err := template.Values(env.AzureClientID(), env.AzureClientSecret(), env.AzureTenantID(), env.AzureSubscriptionID())
+		if err != nil {
+			logger.LogCtx(ctx, "level", "error", "message", "install apps failed", "stack", fmt.Sprintf("%#v\n", err))
+			os.Exit(-1)
+		}
+
 		apps := []apptest.App{
 			{
 				CatalogName:   prodCatalogName,
@@ -89,22 +87,13 @@ func TestMain(m *testing.M) {
 				Name:          "azure-admission-controller",
 				Namespace:     metav1.NamespaceDefault,
 				SHA:           env.CircleSHA(),
-				ValuesYAML:    fmt.Sprintf(values, env.AzureClientID(), env.AzureClientSecret(), env.AzureTenantID(), env.AzureSubscriptionID()),
+				ValuesYAML:    values,
 				WaitForDeploy: true,
 			},
 		}
 		err = appTest.InstallApps(ctx, apps)
 		if err != nil {
 			logger.LogCtx(ctx, "level", "error", "message", "install apps failed", "stack", fmt.Sprintf("%#v\n", err))
-			os.Exit(-1)
-		}
-	}
-
-	{
-
-		err = appTest.EnsureCRDs(ctx, getRequiredCRDs())
-		if err != nil {
-			logger.LogCtx(ctx, "level", "error", "message", "failed ensuring crds", "stack", fmt.Sprintf("%#v\n", err))
 			os.Exit(-1)
 		}
 	}
