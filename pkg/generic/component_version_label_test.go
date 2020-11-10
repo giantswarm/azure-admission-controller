@@ -55,7 +55,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
-			// Cluster with azure operator label.
+			// AzureCluster with azure operator label.
 			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
