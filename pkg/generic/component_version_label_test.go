@@ -20,72 +20,29 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 	testCases := []struct {
 		name         string
 		meta         metav1.Object
-		patches      []mutator.PatchOperation
+		patch        *mutator.PatchOperation
 		errorMatcher func(error) bool
 	}{
 		{
-			name: "case 0: both operators missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
+			name: "case 0: azure operator label missing",
+			meta: newObjectWithLabels(to.StringPtr("ab123"), nil),
+			patch: &mutator.PatchOperation{
+				Operation: "add",
+				Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+				Value:     "5.0.0",
 			},
 			errorMatcher: nil,
 		},
 		{
-			name: "case 1: cluster operator missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.AzureOperatorVersion: "5.0.0"}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
-			},
+			name:         "case 1: azure operator label present",
+			meta:         newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.AzureOperatorVersion: "5.0.0"}),
+			patch:        nil,
 			errorMatcher: nil,
 		},
 		{
-			name: "case 2: azure operator missing",
-			meta: newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ClusterOperatorVersion: "0.23.18"}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 3: both operators present",
-			meta:         newObjectWithLabels(to.StringPtr("ab123"), map[string]string{label.ReleaseVersion: "v13.0.0", label.AzureOperatorVersion: "5.0.0", label.ClusterOperatorVersion: "0.23.18"}),
-			patches:      nil,
-			errorMatcher: nil,
-		},
-		{
-			name: "case 4: both operators missing, cluster present but lacks one operator's label",
-			meta: newObjectWithLabels(to.StringPtr("cd456"), map[string]string{}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-			},
-			errorMatcher: errors.IsInvalidOperationError,
-		},
-		{
-			name:         "case 5: both operators missing, cluster not present",
+			name:         "case 5: operator label missing, cluster not present",
 			meta:         newObjectWithLabels(to.StringPtr("nf404"), map[string]string{}),
-			patches:      nil,
+			patch:        nil,
 			errorMatcher: errors.IsInvalidOperationError,
 		},
 	}
@@ -98,34 +55,17 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
-			// Cluster with both operator annotations.
+			// Cluster with azure operator label.
 			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						"azure-operator.giantswarm.io/version":   "5.0.0",
-						"cluster-operator.giantswarm.io/version": "0.23.18",
-					},
-				},
-			}
-			err := ctrlClient.Create(ctx, ab123)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			// Cluster lacking cluster-operator annotation.
-			cd456 := &capzv1alpha3.AzureCluster{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "cd456",
-					Namespace: "default",
-					Labels: map[string]string{
-						"release.giantswarm.io/version":        "13.0.0",
 						"azure-operator.giantswarm.io/version": "5.0.0",
 					},
 				},
 			}
-			err = ctrlClient.Create(ctx, cd456)
+			err := ctrlClient.Create(ctx, ab123)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -142,12 +82,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var patches []mutator.PatchOperation
-			var patch1, patch2 *mutator.PatchOperation
-			patch1, err = CopyComponentVersionLabelFromAzureClusterCR(ctx, ctrlClient, tc.meta, label.AzureOperatorVersion)
-			if err == nil {
-				patch2, err = CopyComponentVersionLabelFromAzureClusterCR(ctx, ctrlClient, tc.meta, label.ClusterOperatorVersion)
-			}
+			patch, err := CopyComponentVersionLabelFromAzureClusterCR(ctx, ctrlClient, tc.meta, label.AzureOperatorVersion)
 
 			switch {
 			case err == nil && tc.errorMatcher == nil:
@@ -160,16 +95,9 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 
-			if patch1 != nil {
-				patches = append(patches, *patch1)
-			}
-			if patch2 != nil {
-				patches = append(patches, *patch2)
-			}
-
 			// Check if the validation result is the expected one.
-			if !reflect.DeepEqual(tc.patches, patches) {
-				t.Fatalf("Patch mismatch: expected %v, got %v", tc.patches, patches)
+			if !reflect.DeepEqual(tc.patch, patch) {
+				t.Fatalf("Patch mismatch: expected %v, got %v", tc.patch, patch)
 			}
 		})
 	}

@@ -113,10 +113,6 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 							Name:    "azure-operator",
 							Version: "5.0.0",
 						},
-						{
-							Name:    "cluster-operator",
-							Version: "0.23.18",
-						},
 					},
 				},
 			}
