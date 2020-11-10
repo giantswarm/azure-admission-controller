@@ -70,7 +70,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// Cluster lacking any operator annotation.
+			// AzureCluster lacking any operator annotation.
 			ef789 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
