@@ -2,7 +2,6 @@ package azuremachinepool
 
 import (
 	"encoding/json"
-	"math/rand"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -11,11 +10,11 @@ import (
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+
+	"github.com/giantswarm/azure-admission-controller/internal/test"
 )
 
 type BuilderOption func(azureMachinePool *expcapzv1alpha3.AzureMachinePool) *expcapzv1alpha3.AzureMachinePool
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func AcceleratedNetworking(acceleratedNetworking *bool) BuilderOption {
 	return func(azureMachinePool *expcapzv1alpha3.AzureMachinePool) *expcapzv1alpha3.AzureMachinePool {
@@ -68,17 +67,18 @@ func VMSize(vmsize string) BuilderOption {
 }
 
 func BuildAzureMachinePool(opts ...BuilderOption) *expcapzv1alpha3.AzureMachinePool {
-	nodepoolName := generateName()
+	nodepoolName := test.GenerateName()
 	azureMachinePool := &expcapzv1alpha3.AzureMachinePool{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      nodepoolName,
 			Namespace: "org-giantswarm",
 			Labels: map[string]string{
-				label.AzureOperatorVersion: "5.0.0",
-				label.Cluster:              "ab123",
-				label.MachinePool:          nodepoolName,
-				label.Organization:         "giantswarm",
-				label.ReleaseVersion:       "13.0.0",
+				label.AzureOperatorVersion:    "5.0.0",
+				label.Cluster:                 "ab123",
+				capiv1alpha3.ClusterLabelName: "ab123",
+				label.MachinePool:             nodepoolName,
+				label.Organization:            "giantswarm",
+				label.ReleaseVersion:          "13.0.0",
 			},
 		},
 		Spec: expcapzv1alpha3.AzureMachinePoolSpec{
@@ -120,12 +120,4 @@ func BuildAzureMachinePoolAsJson(opts ...BuilderOption) []byte {
 	byt, _ := json.Marshal(azureMachinePool)
 
 	return byt
-}
-
-func generateName() string {
-	b := make([]rune, 5)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }

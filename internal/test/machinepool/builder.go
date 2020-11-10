@@ -2,18 +2,18 @@ package azuremachinepool
 
 import (
 	"encoding/json"
-	"math/rand"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+
+	"github.com/giantswarm/azure-admission-controller/internal/test"
 )
 
 type BuilderOption func(machinePool *expcapiv1alpha3.MachinePool) *expcapiv1alpha3.MachinePool
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func AzureMachinePool(azureMachinePoolName string) BuilderOption {
 	return func(machinePool *expcapiv1alpha3.MachinePool) *expcapiv1alpha3.MachinePool {
@@ -38,17 +38,18 @@ func Name(name string) BuilderOption {
 }
 
 func BuildMachinePool(opts ...BuilderOption) *expcapiv1alpha3.MachinePool {
-	nodepoolName := generateName()
+	nodepoolName := test.GenerateName()
 	machinePool := &expcapiv1alpha3.MachinePool{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      nodepoolName,
 			Namespace: "org-giantswarm",
 			Labels: map[string]string{
-				label.AzureOperatorVersion: "5.0.0",
-				label.Cluster:              "ab123",
-				label.MachinePool:          nodepoolName,
-				label.Organization:         "giantswarm",
-				label.ReleaseVersion:       "13.0.0",
+				label.AzureOperatorVersion:    "5.0.0",
+				label.Cluster:                 "ab123",
+				capiv1alpha3.ClusterLabelName: "ab123",
+				label.MachinePool:             nodepoolName,
+				label.Organization:            "giantswarm",
+				label.ReleaseVersion:          "13.0.0",
 			},
 		},
 		Spec: expcapiv1alpha3.MachinePoolSpec{
@@ -77,12 +78,4 @@ func BuildMachinePoolAsJson(opts ...BuilderOption) []byte {
 	byt, _ := json.Marshal(machinePool)
 
 	return byt
-}
-
-func generateName() string {
-	b := make([]rune, 5)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }

@@ -2,17 +2,16 @@ package azurecluster
 
 import (
 	"encoding/json"
-	"math/rand"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+
+	"github.com/giantswarm/azure-admission-controller/internal/test"
 )
 
 type BuilderOption func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func Name(name string) BuilderOption {
 	return func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster {
@@ -39,7 +38,7 @@ func ControlPlaneEndpoint(controlPlaneEndpointHost string, controlPlaneEndpointP
 }
 
 func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
-	clusterName := generateName()
+	clusterName := test.GenerateName()
 	azureCluster := &capzv1alpha3.AzureCluster{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AzureCluster",
@@ -79,12 +78,4 @@ func BuildAzureClusterAsJson(opts ...BuilderOption) []byte {
 	byt, _ := json.Marshal(azureCluster)
 
 	return byt
-}
-
-func generateName() string {
-	b := make([]rune, 5)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }
