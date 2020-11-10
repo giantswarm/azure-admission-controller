@@ -13,6 +13,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -30,7 +31,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         fmt.Sprintf("case 0: ControlPlaneEndpoint left empty"),
-			azureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab132"), builder.ControlPlaneEndpoint("", 0)),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.ControlPlaneEndpoint("", 0)),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -65,13 +66,13 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         fmt.Sprintf("case 3: Location has value"),
-			azureCluster: builder.BuildAzureClusterAsJson(builder.Location("westeurope")),
+			azureCluster: builder.BuildAzureClusterAsJson(),
 			patches:      []mutator.PatchOperation{},
 			errorMatcher: nil,
 		},
 		{
 			name:         fmt.Sprintf("case 4: Azure operator label missing"),
-			azureCluster: azureClusterRawObject("ab123", "api.giantswarm.io", 123, "westeurope", map[string]string{label.AzureOperatorVersion: ""}),
+			azureCluster: builder.BuildAzureClusterAsJson(builder.Labels(map[string]string{label.AzureOperatorVersion: ""})),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -120,7 +121,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 			}
 
 			// AzureCluster with both operator annotations.
-			ab123 := &capzv1alpha3.AzureCluster{
+			ab123 := &v1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
