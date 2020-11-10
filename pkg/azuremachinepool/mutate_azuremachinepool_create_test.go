@@ -162,10 +162,6 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 							Name:    "azure-operator",
 							Version: "5.0.0",
 						},
-						{
-							Name:    "cluster-operator",
-							Version: "0.23.18",
-						},
 					},
 				},
 			}
@@ -180,8 +176,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						"azure-operator.giantswarm.io/version":   "5.0.0",
-						"cluster-operator.giantswarm.io/version": "0.23.18",
+						"azure-operator.giantswarm.io/version": "5.0.0",
 					},
 				},
 			}

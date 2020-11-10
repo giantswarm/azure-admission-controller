@@ -76,35 +76,6 @@ func TestClusterCreateMutate(t *testing.T) {
 			},
 			errorMatcher: nil,
 		},
-		{
-			name:    fmt.Sprintf("case 3: Cluster Operator version empty"),
-			cluster: clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: ""}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name:    fmt.Sprintf("case 4: Cluster and Azure Operator versions empty"),
-			cluster: clusterRawObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.ClusterOperatorVersion: "", label.AzureOperatorVersion: ""}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
-					Value:     "0.23.18",
-				},
-			},
-			errorMatcher: nil,
-		},
 	}
 
 	for _, tc := range testCases {
@@ -134,10 +105,6 @@ func TestClusterCreateMutate(t *testing.T) {
 						{
 							Name:    "azure-operator",
 							Version: "5.0.0",
-						},
-						{
-							Name:    "cluster-operator",
-							Version: "0.23.18",
 						},
 					},
 				},
@@ -211,12 +178,11 @@ func getCreateMutateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {
 
 func clusterRawObject(clusterName string, clusterNetwork *v1alpha3.ClusterNetwork, controlPlaneEndpointHost string, controlPlaneEndpointPort int32, labels map[string]string) []byte {
 	mergedLabels := map[string]string{
-		"azure-operator.giantswarm.io/version":   "5.0.0",
-		"cluster-operator.giantswarm.io/version": "0.23.18",
-		"cluster.x-k8s.io/cluster-name":          clusterName,
-		"giantswarm.io/cluster":                  clusterName,
-		"giantswarm.io/organization":             "giantswarm",
-		"release.giantswarm.io/version":          "13.0.0-alpha4",
+		"azure-operator.giantswarm.io/version": "5.0.0",
+		"cluster.x-k8s.io/cluster-name":        clusterName,
+		"giantswarm.io/cluster":                clusterName,
+		"giantswarm.io/organization":           "giantswarm",
+		"release.giantswarm.io/version":        "13.0.0-alpha4",
 	}
 	for k, v := range labels {
 		mergedLabels[k] = v
