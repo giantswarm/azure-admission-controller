@@ -119,7 +119,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// Cluster with both operator annotations.
+			// AzureCluster with both operator annotations.
 			ab123 := &capzv1alpha3.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
