@@ -3,10 +3,12 @@ package azurecluster
 import (
 	"context"
 
+	aeconditions "github.com/giantswarm/apiextensions/v3/pkg/conditions"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capiconditions "sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
@@ -67,18 +69,31 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return microerror.Mask(err)
 	}
 
-	oldClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterOldCR.Labels)
-	if err != nil {
-		return microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (before edit)")
-	}
-	newClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterNewCR.Labels)
-	if err != nil {
-		return microerror.Maskf(errors.ParsingFailedError, "unable to parse version from AzureConfig (after edit)")
-	}
-
-	return releaseversion.Validate(ctx, a.ctrlClient, oldClusterVersion, newClusterVersion)
+	return a.validateRelease(ctx, azureClusterOldCR, azureClusterNewCR)
 }
 
 func (a *UpdateValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
+}
+
+func (a *UpdateValidator) validateRelease(ctx context.Context, azureClusterOldCR *capzv1alpha3.AzureCluster, azureClusterNewCR *capzv1alpha3.AzureCluster) error {
+	oldClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterOldCR.Labels)
+	if err != nil {
+		return microerror.Maskf(errors.ParsingFailedError, "unable to parse version from the AzureCluster being updated")
+	}
+	newClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterNewCR.Labels)
+	if err != nil {
+		return microerror.Maskf(errors.ParsingFailedError, "unable to parse version from applied AzureCluster")
+	}
+
+	if !newClusterVersion.Equals(oldClusterVersion) {
+		// Upgrade is triggered, let's check if we allow it
+		if capiconditions.IsTrue(azureClusterOldCR, aeconditions.CreatingCondition) {
+			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, AzureCluster condition %s is set to True, cluster is currently being created", aeconditions.CreatingCondition)
+		} else if capiconditions.IsTrue(azureClusterOldCR, aeconditions.UpgradingCondition) {
+			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, AzureCluster condition %s is set to True, cluster is already being upgraded", aeconditions.UpgradingCondition)
+		}
+	}
+
+	return releaseversion.Validate(ctx, a.ctrlClient, oldClusterVersion, newClusterVersion)
 }
