@@ -8,6 +8,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capiutil "sigs.k8s.io/cluster-api/util"
 	capiconditions "sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -87,11 +88,16 @@ func (a *UpdateValidator) validateRelease(ctx context.Context, azureClusterOldCR
 	}
 
 	if !newClusterVersion.Equals(oldClusterVersion) {
+		cluster, err := capiutil.GetOwnerCluster(ctx, a.ctrlClient, azureClusterNewCR.ObjectMeta)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
 		// Upgrade is triggered, let's check if we allow it
-		if capiconditions.IsTrue(azureClusterOldCR, aeconditions.CreatingCondition) {
-			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, AzureCluster condition %s is set to True, cluster is currently being created", aeconditions.CreatingCondition)
-		} else if capiconditions.IsTrue(azureClusterOldCR, aeconditions.UpgradingCondition) {
-			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, AzureCluster condition %s is set to True, cluster is already being upgraded", aeconditions.UpgradingCondition)
+		if capiconditions.IsTrue(cluster, aeconditions.CreatingCondition) {
+			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, Cluster condition %s is set to True, cluster is currently being created", aeconditions.CreatingCondition)
+		} else if capiconditions.IsTrue(cluster, aeconditions.UpgradingCondition) {
+			return microerror.Maskf(errors.InvalidOperationError, "upgrade cannot be initiated now, Cluster condition %s is set to True, cluster is already being upgraded", aeconditions.UpgradingCondition)
 		}
 	}
 
