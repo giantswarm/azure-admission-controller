@@ -39,3 +39,30 @@ var parsingFailedError = &microerror.Error{
 func IsParsingFailed(err error) bool {
 	return microerror.Cause(err) == parsingFailedError
 }
+
+var unsupportedFailureDomainError = &microerror.Error{
+	Kind: "unsupportedFailureDomainError",
+}
+
+// IsUnsupportedFailureDomainError asserts unsupportedFailureDomainError.
+func IsUnsupportedFailureDomainError(err error) bool {
+	return microerror.Cause(err) == unsupportedFailureDomainError
+}
+
+var locationWithNoFailureDomainSupportError = &microerror.Error{
+	Kind: "locationWithNoFailureDomainSupportError",
+}
+
+// IsLocationWithNoFailureDomainSupportError asserts locationWithNoFailureDomainSupportError.
+func IsLocationWithNoFailureDomainSupportError(err error) bool {
+	return microerror.Cause(err) == locationWithNoFailureDomainSupportError
+}
+
+var failureDomainWasChangedError = &microerror.Error{
+	Kind: "failureDomainWasChangedError",
+}
+
+// IsFailureDomainWasChangedError asserts failureDomainWasChangedError.
+func IsFailureDomainWasChangedError(err error) bool {
+	return microerror.Cause(err) == failureDomainWasChangedError
+}
