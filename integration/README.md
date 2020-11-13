@@ -20,7 +20,7 @@ Create the `kind` cluster and use `apptestctl` to bootstrap GiantSwarm's App pla
 You can now run the tests.
 
 ```bash
-E2E_KUBECONFIG=~/.kube/config CIRCLE_SHA1=$(git rev-parse HEAD) AZURE_CLIENTID="${AZURE_CLIENTID}" AZURE_CLIENTSECRET="${AZURE_CLIENTSECRET}" AZURE_TENANTID="${AZURE_TENANTID}" AZURE_SUBSCRIPTIONID="${AZURE_SUBSCRIPTIONID}" go test -tags=k8srequired ./integration/test/... -count=1 | luigi
+E2E_KUBECONFIG=~/.kube/config CIRCLE_SHA1=$(git rev-parse HEAD) AZURE_CLIENTID="${AZURE_CLIENTID}" AZURE_CLIENTSECRET="${AZURE_CLIENTSECRET}" AZURE_TENANTID="${AZURE_TENANTID}" AZURE_SUBSCRIPTIONID="${AZURE_SUBSCRIPTIONID}" go test -tags=k8srequired ./integration/test/... -count=1
 ```
 
 You can run the tests several times, but the apps won't be re-deployed. This is useful when editing the CR yaml files.
