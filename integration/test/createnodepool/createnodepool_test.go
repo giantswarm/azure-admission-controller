@@ -94,7 +94,7 @@ func TestCreateCluster(t *testing.T) {
 	}
 
 	{
-		valuesYAML, err := values.YAML(env.AzureClientID(), env.AzureClientSecret(), env.AzureTenantID(), env.AzureSubscriptionID())
+		valuesYAML, err := values.YAML(env.AzureClientID(), env.AzureClientSecret(), env.AzureSubscriptionID(), env.AzureTenantID())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -123,8 +123,8 @@ func TestCreateCluster(t *testing.T) {
 	}
 
 	err = ensureCRsExist(appTest.CtrlClient(), []string{"namespaces.yaml", "organization.yaml", "azurecluster.yaml", "cluster.yaml", "azuremachinepool.yaml", "machinepool.yaml"})
+	deleteCRs(appTest.CtrlClient(), []string{"namespaces.yaml", "organization.yaml", "azurecluster.yaml", "cluster.yaml", "azuremachinepool.yaml", "machinepool.yaml"})
 	if err != nil {
-		deleteCRs(appTest.CtrlClient(), []string{"namespaces.yaml", "organization.yaml", "azurecluster.yaml", "cluster.yaml", "azuremachinepool.yaml", "machinepool.yaml"})
 		t.Fatal(err)
 	}
 }

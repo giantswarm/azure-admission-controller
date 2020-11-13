@@ -1,4 +1,3 @@
----
 apiVersion: exp.cluster.x-k8s.io/v1alpha3
 kind: MachinePool
 metadata:
@@ -18,10 +17,6 @@ spec:
   clusterName: 2mw4b
   failureDomains:
     - "3"
-  providerIDList:
-    - azure:///subscriptions/1be3b2e6-497b-45b9-915f-eb35cae23c6a/resourceGroups/2mw4b/providers/Microsoft.Compute/virtualMachineScaleSets/nodepool-8c7mn/virtualMachines/0
-    - azure:///subscriptions/1be3b2e6-497b-45b9-915f-eb35cae23c6a/resourceGroups/2mw4b/providers/Microsoft.Compute/virtualMachineScaleSets/nodepool-8c7mn/virtualMachines/1
-    - azure:///subscriptions/1be3b2e6-497b-45b9-915f-eb35cae23c6a/resourceGroups/2mw4b/providers/Microsoft.Compute/virtualMachineScaleSets/nodepool-8c7mn/virtualMachines/2
   replicas: 3
   template:
     metadata: {}
