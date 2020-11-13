@@ -4,10 +4,8 @@ package createcluster
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
+	"time"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
@@ -19,21 +17,20 @@ import (
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
+	"github.com/giantswarm/azure-admission-controller/integration/util"
 	"github.com/giantswarm/azure-admission-controller/integration/values"
 )
 
 const (
+	crsFolder       = "testdata"
 	prodCatalogName = "control-plane-catalog"
 	testCatalogName = "control-plane-test-catalog"
 	// API Groups for upstream Cluster API types.
@@ -119,8 +116,11 @@ func TestCreateCluster(t *testing.T) {
 		}
 	}
 
-	err = ensureCRsExist(ctx, appTest.CtrlClient())
-	_ = deleteCRs(ctx, appTest.CtrlClient())
+	// Give time to the admission controller to start.
+	time.Sleep(time.Second * 5)
+
+	err = util.CreateCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
+	_ = util.DeleteCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
 	if err != nil {
 		t.Log(microerror.JSON(err))
 		t.Fatal(err)
@@ -139,96 +139,4 @@ func getRequiredCRDs() []*apiextensionsv1.CustomResourceDefinition {
 		crd.LoadV1(securityAPIGroup, "Organization"),
 		crd.LoadV1(giantswarmCoreAPIGroup, "Spark"),
 	}
-}
-
-func ensureCRsExist(ctx context.Context, client client.Client) error {
-	return filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			bs, err := ioutil.ReadFile(path)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			o, err := loadCR(bs)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			err = client.Create(ctx, o)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-		}
-
-		return nil
-	})
-}
-
-func deleteCRs(ctx context.Context, client client.Client) error {
-	return filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			bs, err := ioutil.ReadFile(path)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			o, err := loadCR(bs)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			err = client.Delete(ctx, o)
-			if apierrors.IsNotFound(err) {
-				// Ok
-			} else if err != nil {
-				return microerror.Mask(err)
-			}
-		}
-
-		return nil
-	})
-}
-
-func loadCR(bs []byte) (runtime.Object, error) {
-	var err error
-	var obj runtime.Object
-
-	// First parse kind.
-	typeMeta := &metav1.TypeMeta{}
-	err = yaml.Unmarshal(bs, typeMeta)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	// Then construct correct CR object.
-	switch typeMeta.Kind {
-	case "Namespace":
-		obj = new(corev1.Namespace)
-	case "NamespaceList":
-		obj = new(corev1.NamespaceList)
-	case "Organization":
-		obj = new(securityv1alpha1.Organization)
-	case "Cluster":
-		obj = new(capiv1alpha3.Cluster)
-	case "MachinePool":
-		obj = new(expcapiv1alpha3.MachinePool)
-	case "AzureCluster":
-		obj = new(capzv1alpha3.AzureCluster)
-	case "AzureMachine":
-		obj = new(capzv1alpha3.AzureMachine)
-	case "AzureMachinePool":
-		obj = new(expcapzv1alpha3.AzureMachinePool)
-	case "Spark":
-		obj = new(corev1alpha1.Spark)
-	default:
-		return nil, microerror.Maskf(unknownKindError, "error while unmarshalling the CR read from file, kind: %s", typeMeta.Kind)
-	}
-
-	// ...and unmarshal the whole object.
-	err = yaml.Unmarshal(bs, obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	return obj, nil
 }

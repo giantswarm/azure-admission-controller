@@ -1,4 +1,4 @@
-package createcluster
+package util
 
 import (
 	"github.com/giantswarm/microerror"
