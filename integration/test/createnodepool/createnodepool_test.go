@@ -117,7 +117,7 @@ func TestCreateCluster(t *testing.T) {
 	}
 
 	// Give time to the admission controller to start.
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 60)
 
 	err = util.CreateCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
 	_ = util.DeleteCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
