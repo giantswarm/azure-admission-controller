@@ -5,6 +5,7 @@ package createcluster
 import (
 	"context"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -36,6 +37,7 @@ const (
 	prodCatalogName = "control-plane-catalog"
 	testCatalogName = "control-plane-test-catalog"
 	// API Groups for upstream Cluster API types.
+	giantswarmCoreAPIGroup             = "core.giantswarm.io"
 	clusterAPIGroup                    = "cluster.x-k8s.io"
 	infrastructureAPIGroup             = "infrastructure.cluster.x-k8s.io"
 	experimentalClusterAPIGroup        = "exp.cluster.x-k8s.io"
@@ -43,23 +45,17 @@ const (
 	securityAPIGroup                   = "security.giantswarm.io"
 )
 
-var (
-	appTest apptest.Interface
-	logger  micrologger.Logger
-)
-
 func TestCreateCluster(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 
-	{
-		logger, err = micrologger.New(micrologger.Config{})
-		if err != nil {
-			t.Fatal(err)
-		}
+	logger, err := micrologger.New(micrologger.Config{})
+	if err != nil {
+		t.Fatal(err)
 	}
 
+	var appTest apptest.Interface
 	{
 		runtimeScheme := runtime.NewScheme()
 		appSchemeBuilder := runtime.SchemeBuilder{
@@ -71,6 +67,7 @@ func TestCreateCluster(t *testing.T) {
 			expcapzv1alpha3.AddToScheme,
 			securityv1alpha1.AddToScheme,
 			corev1.AddToScheme,
+			corev1alpha1.AddToScheme,
 		}
 		err = appSchemeBuilder.AddToScheme(runtimeScheme)
 		if err != nil {
@@ -122,78 +119,79 @@ func TestCreateCluster(t *testing.T) {
 		}
 	}
 
-	err = ensureCRsExist(appTest.CtrlClient(), []string{"namespaces.yaml", "organization.yaml", "azurecluster.yaml", "cluster.yaml", "azuremachinepool.yaml", "machinepool.yaml"})
-	deleteCRs(appTest.CtrlClient(), []string{"namespaces.yaml", "organization.yaml", "azurecluster.yaml", "cluster.yaml", "azuremachinepool.yaml", "machinepool.yaml"})
+	err = ensureCRsExist(ctx, appTest.CtrlClient())
+	_ = deleteCRs(ctx, appTest.CtrlClient())
 	if err != nil {
+		t.Log(microerror.JSON(err))
 		t.Fatal(err)
 	}
 }
 
 func getRequiredCRDs() []*apiextensionsv1.CustomResourceDefinition {
-	clusterCRD := crd.LoadV1(clusterAPIGroup, "Cluster")
-	azureClusterCRD := crd.LoadV1(infrastructureAPIGroup, "AzureCluster")
-	azureMachineCRD := crd.LoadV1(infrastructureAPIGroup, "AzureMachine")
-	machinePoolCRD := crd.LoadV1(experimentalClusterAPIGroup, "MachinePool")
-	azureMachinePoolCRD := crd.LoadV1(experimentalInfrastructureAPIGroup, "AzureMachinePool")
-	organizationCRD := crd.LoadV1(securityAPIGroup, "Organization")
-
 	return []*apiextensionsv1.CustomResourceDefinition{
 		corev1alpha1.NewAzureClusterConfigCRD(),
-		corev1alpha1.NewSparkCRD(),
 		providerv1alpha1.NewAzureConfigCRD(),
-
-		clusterCRD,
-		azureClusterCRD,
-		azureMachineCRD,
-		machinePoolCRD,
-		azureMachinePoolCRD,
-		organizationCRD,
+		crd.LoadV1(infrastructureAPIGroup, "AzureCluster"),
+		crd.LoadV1(infrastructureAPIGroup, "AzureMachine"),
+		crd.LoadV1(experimentalInfrastructureAPIGroup, "AzureMachinePool"),
+		crd.LoadV1(clusterAPIGroup, "Cluster"),
+		crd.LoadV1(experimentalClusterAPIGroup, "MachinePool"),
+		crd.LoadV1(securityAPIGroup, "Organization"),
+		crd.LoadV1(giantswarmCoreAPIGroup, "Spark"),
 	}
 }
 
-func ensureCRsExist(client client.Client, inputFiles []string) error {
-	for _, f := range inputFiles {
-		o, err := loadCR(f)
-		if err != nil {
-			return err
+func ensureCRsExist(ctx context.Context, client client.Client) error {
+	return filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			bs, err := ioutil.ReadFile(path)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			o, err := loadCR(bs)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			err = client.Create(ctx, o)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		err = client.Create(context.Background(), o)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+		return nil
+	})
 }
 
-func deleteCRs(client client.Client, inputFiles []string) {
-	for _, f := range inputFiles {
-		o, err := loadCR(f)
-		if err != nil {
-			panic(err.Error())
+func deleteCRs(ctx context.Context, client client.Client) error {
+	return filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			bs, err := ioutil.ReadFile(path)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			o, err := loadCR(bs)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			err = client.Delete(ctx, o)
+			if apierrors.IsNotFound(err) {
+				// Ok
+			} else if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		err = client.Delete(context.Background(), o)
-		if apierrors.IsNotFound(err) {
-			// Ok
-		} else if err != nil {
-			panic(err.Error())
-		}
-	}
+		return nil
+	})
 }
 
-func loadCR(fName string) (runtime.Object, error) {
+func loadCR(bs []byte) (runtime.Object, error) {
 	var err error
 	var obj runtime.Object
-
-	var bs []byte
-	{
-		bs, err = ioutil.ReadFile(filepath.Join("testdata", fName))
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	// First parse kind.
 	typeMeta := &metav1.TypeMeta{}
@@ -220,8 +218,10 @@ func loadCR(fName string) (runtime.Object, error) {
 		obj = new(capzv1alpha3.AzureMachine)
 	case "AzureMachinePool":
 		obj = new(expcapzv1alpha3.AzureMachinePool)
+	case "Spark":
+		obj = new(corev1alpha1.Spark)
 	default:
-		return nil, microerror.Maskf(unknownKindError, "kind: %s", typeMeta.Kind)
+		return nil, microerror.Maskf(unknownKindError, "error while unmarshalling the CR read from file, kind: %s", typeMeta.Kind)
 	}
 
 	// ...and unmarshal the whole object.
