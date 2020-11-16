@@ -32,7 +32,7 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	}
 
 	// Skip validations for ignored releases.
-	if isNewReleaseIgnored(availableReleases, releaseCRs, newVersion) {
+	if isOldOrNewReleaseIgnored(availableReleases, releaseCRs, oldVersion, newVersion) {
 		return nil
 	}
 
@@ -110,8 +110,15 @@ func filterOutAlphaAndIgnoredReleases(releases []*semver.Version, releaseCRs []v
 	return filteredReleaseVersions, filteredReleaseCRs
 }
 
-func isNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.Release, newVersion semver.Version) bool {
+func isOldOrNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.Release, oldVersion, newVersion semver.Version) bool {
 	for i, release := range releases {
+		if release.EQ(oldVersion) {
+			ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
+			if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+				return true
+			}
+		}
+
 		if release.EQ(newVersion) {
 			ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
 			if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
