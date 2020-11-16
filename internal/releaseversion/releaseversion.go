@@ -98,8 +98,7 @@ func filterOutAlphaAndIgnoredReleases(releases []*semver.Version, releaseCRs []v
 			continue
 		}
 
-		ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
-		if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+		if isIgnoredRelease(&releaseCRs[i]) {
 			continue
 		}
 
@@ -112,16 +111,8 @@ func filterOutAlphaAndIgnoredReleases(releases []*semver.Version, releaseCRs []v
 
 func isOldOrNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.Release, oldVersion, newVersion semver.Version) bool {
 	for i, release := range releases {
-		if release.EQ(oldVersion) {
-			ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
-			if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
-				return true
-			}
-		}
-
-		if release.EQ(newVersion) {
-			ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
-			if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+		if release.EQ(oldVersion) || release.EQ(newVersion) {
+			if isIgnoredRelease(&releaseCRs[i]) {
 				return true
 			}
 		}
@@ -142,4 +133,13 @@ func included(releases []*semver.Version, release semver.Version) bool {
 
 func isAlphaRelease(release string) bool {
 	return strings.Contains(release, "alpha")
+}
+
+func isIgnoredRelease(releaseCR *v1alpha1.Release) bool {
+	ignoreValue, isIgnoreAnnotationSet := releaseCR.Annotations[ignoreReleaseAnnotation]
+	if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+		return true
+	}
+
+	return false
 }
