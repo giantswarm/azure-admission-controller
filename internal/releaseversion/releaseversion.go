@@ -12,19 +12,28 @@ import (
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
 
+const (
+	ignoreReleaseAnnotation = "release.giantswarm.io/ignore"
+)
+
 func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.Version, newVersion semver.Version) error {
 	if oldVersion.Equals(newVersion) {
 		return nil
 	}
 
-	availableReleases, err := availableReleases(ctx, ctrlCLient)
+	availableReleases, releaseCRs, err := availableReleases(ctx, ctrlCLient)
 	if err != nil {
 		return err
 	}
 
-	// Check if old and new versions are valid.
+	// Check if new release exists.
 	if !included(availableReleases, newVersion) {
 		return microerror.Maskf(releaseNotFoundError, "release %s was not found in this installation", newVersion)
+	}
+
+	// Skip validations for ignored releases.
+	if isNewReleaseIgnored(availableReleases, releaseCRs, newVersion) {
+		return nil
 	}
 
 	// Downgrades are not allowed.
@@ -36,6 +45,9 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	if isAlphaRelease(oldVersion.String()) || isAlphaRelease(newVersion.String()) {
 		return microerror.Maskf(upgradingToOrFromAlphaReleaseError, "It is not possible to upgrade to or from an alpha release")
 	}
+
+	// Remove alpha and ignored releases from remaining validations logic.
+	availableReleases, _ = filterOutAlphaAndIgnoredReleases(availableReleases, releaseCRs)
 
 	if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
 		// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
@@ -56,23 +68,59 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	return nil
 }
 
-func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*semver.Version, error) {
+func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*semver.Version, []v1alpha1.Release, error) {
 	releaseList := &v1alpha1.ReleaseList{}
 	err := ctrlClient.List(ctx, releaseList)
 	if err != nil {
-		return []*semver.Version{}, microerror.Mask(err)
+		return []*semver.Version{}, nil, microerror.Mask(err)
 	}
 
 	var ret []*semver.Version
+	var releases []v1alpha1.Release
 	for _, release := range releaseList.Items {
 		parsed, err := semver.ParseTolerant(release.Name)
 		if err != nil {
-			return []*semver.Version{}, microerror.Maskf(errors.InvalidReleaseError, "Unable to parse release %s to a semver.Release", release.Name)
+			return []*semver.Version{}, nil, microerror.Maskf(errors.InvalidReleaseError, "Unable to parse release %s to a semver.Release", release.Name)
 		}
 		ret = append(ret, &parsed)
+		releases = append(releases, release)
 	}
 
-	return ret, nil
+	return ret, releases, nil
+}
+
+func filterOutAlphaAndIgnoredReleases(releases []*semver.Version, releaseCRs []v1alpha1.Release) ([]*semver.Version, []v1alpha1.Release) {
+	var filteredReleaseVersions []*semver.Version
+	var filteredReleaseCRs []v1alpha1.Release
+
+	for i, release := range releases {
+		if isAlphaRelease(release.String()) {
+			continue
+		}
+
+		ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
+		if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+			continue
+		}
+
+		filteredReleaseVersions = append(filteredReleaseVersions, release)
+		filteredReleaseCRs = append(filteredReleaseCRs, releaseCRs[i])
+	}
+
+	return filteredReleaseVersions, filteredReleaseCRs
+}
+
+func isNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.Release, newVersion semver.Version) bool {
+	for i, release := range releases {
+		if release.EQ(newVersion) {
+			ignoreValue, isIgnoreAnnotationSet := releaseCRs[i].Annotations[ignoreReleaseAnnotation]
+			if isIgnoreAnnotationSet && strings.ToLower(ignoreValue) == "true" {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func included(releases []*semver.Version, release semver.Version) bool {
