@@ -14,7 +14,7 @@ You need these tools installed locally:
 Create the `kind` cluster and use `apptestctl` to bootstrap GiantSwarm's App platform.
 
 ```bash
-(kind delete cluster || true) && kind create cluster && apptestctl bootstrap --kubeconfig="$(kind get kubeconfig)"
+kind delete cluster --name kind-admission-test && kind create cluster --name kind-admission-test && apptestctl bootstrap --kubeconfig="$(kind get kubeconfig --name kind-admission-test)"
 ```
 
 You can now run the tests.

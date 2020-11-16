@@ -2,7 +2,7 @@ apiVersion: cluster.x-k8s.io/v1alpha3
 kind: Cluster
 metadata:
   annotations:
-    cluster.giantswarm.io/description: tuomas-testing
+    cluster.giantswarm.io/description: admission-e2e-testing
   labels:
     azure-operator.giantswarm.io/version: 5.0.1
     cluster-operator.giantswarm.io/version: 0.23.18

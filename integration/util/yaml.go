@@ -24,6 +24,10 @@ import (
 func CreateCRsInFolder(ctx context.Context, client client.Client, crsFolder string) error {
 	return filepath.Walk(crsFolder, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
+			if filepath.Ext(path) != ".yaml" && filepath.Ext(path) != ".yml" {
+				return nil
+			}
+
 			bs, err := ioutil.ReadFile(path)
 			if err != nil {
 				return microerror.Mask(err)
@@ -47,6 +51,10 @@ func CreateCRsInFolder(ctx context.Context, client client.Client, crsFolder stri
 func DeleteCRsInFolder(ctx context.Context, client client.Client, crsFolder string) error {
 	return filepath.Walk(crsFolder, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
+			if filepath.Ext(path) != ".yaml" && filepath.Ext(path) != ".yml" {
+				return nil
+			}
+
 			bs, err := ioutil.ReadFile(path)
 			if err != nil {
 				return microerror.Mask(err)

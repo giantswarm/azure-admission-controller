@@ -13,6 +13,7 @@ import (
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/crd"
 	"github.com/giantswarm/apptest"
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
@@ -116,10 +117,20 @@ func TestCreateCluster(t *testing.T) {
 		}
 	}
 
-	// Give time to the admission controller to start.
-	time.Sleep(time.Second * 60)
+	o := func() error {
+		err = util.CreateCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
+		if err != nil {
+			deleteErr := util.DeleteCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
+			t.Log(microerror.JSON(deleteErr))
+			return microerror.Mask(err)
+		}
 
-	err = util.CreateCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
+		return nil
+	}
+	b := backoff.NewConstant(backoff.ShortMaxWait, 10*time.Second)
+	n := backoff.NewNotifier(logger, ctx)
+
+	err = backoff.RetryNotify(o, b, n)
 	_ = util.DeleteCRsInFolder(ctx, appTest.CtrlClient(), crsFolder)
 	if err != nil {
 		t.Log(microerror.JSON(err))
