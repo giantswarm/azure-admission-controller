@@ -21,7 +21,7 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 		return nil
 	}
 
-	availableReleases, releaseCRs, err := availableReleases(ctx, ctrlCLient)
+	availableReleases, err := availableReleases(ctx, ctrlCLient)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	}
 
 	// Skip validations for ignored releases.
-	if isOldOrNewReleaseIgnored(availableReleases, releaseCRs, oldVersion, newVersion) {
+	if isOldOrNewReleaseIgnored(availableReleases, oldVersion, newVersion) {
 		return nil
 	}
 
@@ -47,18 +47,18 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	}
 
 	// Remove alpha and ignored releases from remaining validations logic.
-	availableReleases, _ = filterOutAlphaAndIgnoredReleases(availableReleases, releaseCRs)
+	availableReleases = filterOutAlphaAndIgnoredReleases(availableReleases)
 
 	if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
 		// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
 		for _, release := range availableReleases {
-			if release.EQ(oldVersion) || release.EQ(newVersion) {
+			if release.Version.EQ(oldVersion) || release.Version.EQ(newVersion) {
 				continue
 			}
 			// Look for a release with higher major or higher minor than the oldVersion and is LT the newVersion
-			if release.GT(oldVersion) && release.LT(newVersion) &&
-				(oldVersion.Major != release.Major || oldVersion.Minor != release.Minor) &&
-				(newVersion.Major != release.Major || newVersion.Minor != release.Minor) {
+			if release.Version.GT(oldVersion) && release.Version.LT(newVersion) &&
+				(oldVersion.Major != release.Version.Major || oldVersion.Minor != release.Version.Minor) &&
+				(newVersion.Major != release.Version.Major || newVersion.Minor != release.Version.Minor) {
 				// Skipped one major or minor release.
 				return microerror.Maskf(skippingReleaseError, "Upgrading from %s to %s is not allowed (skipped %s)", oldVersion, newVersion, release)
 			}
@@ -68,51 +68,54 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	return nil
 }
 
-func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*semver.Version, []v1alpha1.Release, error) {
+func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*release, error) {
+	var releases []*release
 	releaseList := &v1alpha1.ReleaseList{}
 	err := ctrlClient.List(ctx, releaseList)
 	if err != nil {
-		return []*semver.Version{}, nil, microerror.Mask(err)
+		return []*release{}, microerror.Mask(err)
 	}
 
-	var ret []*semver.Version
-	var releases []v1alpha1.Release
-	for _, release := range releaseList.Items {
-		parsed, err := semver.ParseTolerant(release.Name)
+	for _, releaseCR := range releaseList.Items {
+		parsed, err := semver.ParseTolerant(releaseCR.Name)
 		if err != nil {
-			return []*semver.Version{}, nil, microerror.Maskf(errors.InvalidReleaseError, "Unable to parse release %s to a semver.Release", release.Name)
+			return []*release{}, microerror.Maskf(errors.InvalidReleaseError, "Unable to parse release %s to a semver.Release", releaseCR.Name)
 		}
-		ret = append(ret, &parsed)
-		releases = append(releases, release)
+
+		releaseObject := releaseCR
+		release := release{
+			Version: &parsed,
+			CR:      &releaseObject,
+		}
+
+		releases = append(releases, &release)
 	}
 
-	return ret, releases, nil
+	return releases, nil
 }
 
-func filterOutAlphaAndIgnoredReleases(releases []*semver.Version, releaseCRs []v1alpha1.Release) ([]*semver.Version, []v1alpha1.Release) {
-	var filteredReleaseVersions []*semver.Version
-	var filteredReleaseCRs []v1alpha1.Release
+func filterOutAlphaAndIgnoredReleases(releases []*release) []*release {
+	var result []*release
 
-	for i, release := range releases {
-		if isAlphaRelease(release.String()) {
+	for _, release := range releases {
+		if isAlphaRelease(release.Version.String()) {
 			continue
 		}
 
-		if isIgnoredRelease(&releaseCRs[i]) {
+		if isIgnoredRelease(release.CR) {
 			continue
 		}
 
-		filteredReleaseVersions = append(filteredReleaseVersions, release)
-		filteredReleaseCRs = append(filteredReleaseCRs, releaseCRs[i])
+		result = append(result, release)
 	}
 
-	return filteredReleaseVersions, filteredReleaseCRs
+	return result
 }
 
-func isOldOrNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.Release, oldVersion, newVersion semver.Version) bool {
-	for i, release := range releases {
-		if release.EQ(oldVersion) || release.EQ(newVersion) {
-			if isIgnoredRelease(&releaseCRs[i]) {
+func isOldOrNewReleaseIgnored(releases []*release, oldVersion, newVersion semver.Version) bool {
+	for _, release := range releases {
+		if release.Version.EQ(oldVersion) || release.Version.EQ(newVersion) {
+			if isIgnoredRelease(release.CR) {
 				return true
 			}
 		}
@@ -121,9 +124,9 @@ func isOldOrNewReleaseIgnored(releases []*semver.Version, releaseCRs []v1alpha1.
 	return false
 }
 
-func included(releases []*semver.Version, release semver.Version) bool {
+func included(releases []*release, releaseVersion semver.Version) bool {
 	for _, r := range releases {
-		if r.EQ(release) {
+		if r.Version.EQ(releaseVersion) {
 			return true
 		}
 	}
