@@ -60,7 +60,7 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 				(oldVersion.Major != release.Version.Major || oldVersion.Minor != release.Version.Minor) &&
 				(newVersion.Major != release.Version.Major || newVersion.Minor != release.Version.Minor) {
 				// Skipped one major or minor release.
-				return microerror.Maskf(skippingReleaseError, "Upgrading from %s to %s is not allowed (skipped %s)", oldVersion, newVersion, release)
+				return microerror.Maskf(skippingReleaseError, "Upgrading from %s to %s is not allowed (skipped %s)", oldVersion, newVersion, release.Version)
 			}
 		}
 	}
