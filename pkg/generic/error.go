@@ -13,13 +13,13 @@ func IsClusterNotFoundError(err error) bool {
 	return microerror.Cause(err) == clusterNotFoundError
 }
 
-var invalidOrganizationError = &microerror.Error{
-	Kind: "invalidOrganizationError",
+var nodepoolOrgDoesNotMatchClusterOrgError = &microerror.Error{
+	Kind: "nodepoolOrgDoesNotMatchClusterOrgError",
 }
 
-// IsClusterNotFoundError asserts invalidOrganizationError.
-func IsInvalidOrganization(err error) bool {
-	return microerror.Cause(err) == invalidOrganizationError
+// IsNodepoolOrgDoesNotMatchClusterOrg asserts nodepoolOrgDoesNotMatchClusterOrgError.
+func IsNodepoolOrgDoesNotMatchClusterOrg(err error) bool {
+	return microerror.Cause(err) == nodepoolOrgDoesNotMatchClusterOrgError
 }
 
 var organizationLabelNotFoundError = &microerror.Error{

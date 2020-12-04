@@ -80,7 +80,7 @@ func ValidateOrganizationLabelMatchesCluster(ctx context.Context, ctrlClient cli
 	}
 
 	if clusterOrg != organizationName {
-		return microerror.Maskf(invalidOrganizationError, "Organization label %#q (%#q) does not match Cluster's (%#q)", label.Organization, organizationName, clusterOrg)
+		return microerror.Maskf(nodepoolOrgDoesNotMatchClusterOrgError, "Organization label %#q (%#q) does not match Cluster's (%#q)", label.Organization, organizationName, clusterOrg)
 	}
 
 	return nil

@@ -76,7 +76,7 @@ func TestMachinePoolCreateValidate(t *testing.T) {
 			name:         "case 6: Wrong Organization",
 			machinePool:  builder.BuildMachinePoolAsJson(builder.AzureMachinePool(machinePoolName), builder.Organization("wrongorg")),
 			vmType:       "",
-			errorMatcher: generic.IsInvalidOrganization,
+			errorMatcher: generic.IsNodepoolOrgDoesNotMatchClusterOrg,
 		},
 	}
 

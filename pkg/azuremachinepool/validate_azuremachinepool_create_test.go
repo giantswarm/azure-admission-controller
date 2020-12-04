@@ -97,7 +97,7 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 	testCases = append(testCases, testCase{
 		name:         fmt.Sprintf("case %d: invalid organization", len(testCases)-1),
 		nodePool:     builder.BuildAzureMachinePoolAsJson(builder.VMSize("Standard_D4_v3"), builder.Organization("wrongorg")),
-		errorMatcher: generic.IsInvalidOrganization,
+		errorMatcher: generic.IsNodepoolOrgDoesNotMatchClusterOrg,
 	})
 
 	for _, tc := range testCases {
