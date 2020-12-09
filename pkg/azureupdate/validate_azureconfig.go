@@ -64,9 +64,23 @@ func (a *AzureConfigValidator) Validate(ctx context.Context, request *v1beta1.Ad
 		return releaseversion.Validate(ctx, a.ctrlClient, oldVersion, newVersion)
 	}
 
+	// Don't allow change of Master CIDR.
+	err = validateMasterCIDRUnchanged(azureConfigOldCR, azureConfigNewCR)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
 	return nil
 }
 
 func (a *AzureConfigValidator) Log(keyVals ...interface{}) {
 	a.logger.Log(keyVals...)
+}
+
+func validateMasterCIDRUnchanged(old *v1alpha1.AzureConfig, new *v1alpha1.AzureConfig) error {
+	if old.Spec.Azure.VirtualNetwork.MasterSubnetCIDR != new.Spec.Azure.VirtualNetwork.MasterSubnetCIDR {
+		return microerror.Maskf(cantChangeMasterCIDRError, "Spec.Azure.VirtualNetwork.MasterSubnetCIDR field can't be changed")
+	}
+
+	return nil
 }
