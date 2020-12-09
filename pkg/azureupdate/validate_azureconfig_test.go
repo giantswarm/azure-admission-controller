@@ -45,6 +45,22 @@ func TestMasterCIDR(t *testing.T) {
 			newCIDR:      "10.0.1.0/24",
 			errorMatcher: nil,
 		},
+		{
+			name: "case 2: CIDR was unset, being set",
+			ctx:  context.Background(),
+
+			oldCIDR:      "",
+			newCIDR:      "10.0.1.0/24",
+			errorMatcher: nil,
+		},
+		{
+			name: "case 3: CIDR was set, being unset",
+			ctx:  context.Background(),
+
+			oldCIDR:      "10.0.1.0/24",
+			newCIDR:      "",
+			errorMatcher: IsCantChangeMasterCIDR,
+		},
 	}
 
 	for _, tc := range testCases {
