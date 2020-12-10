@@ -13,11 +13,11 @@ func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
 
-var cantChangeMasterCIDRError = &microerror.Error{
-	Kind: "cantChangeMasterCIDRError",
+var masterCIDRChangeError = &microerror.Error{
+	Kind: "masterCIDRChangeError",
 }
 
-// IsCantChangeMasterCIDR asserts cantChangeMasterCIDRError.
-func IsCantChangeMasterCIDR(err error) bool {
-	return microerror.Cause(err) == cantChangeMasterCIDRError
+// IsMasterCIDRChange asserts masterCIDRChangeError.
+func IsMasterCIDRChange(err error) bool {
+	return microerror.Cause(err) == masterCIDRChangeError
 }

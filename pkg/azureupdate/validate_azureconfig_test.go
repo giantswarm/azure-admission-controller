@@ -35,7 +35,7 @@ func TestMasterCIDR(t *testing.T) {
 
 			oldCIDR:      "10.0.1.0/24",
 			newCIDR:      "10.0.2.0/24",
-			errorMatcher: IsCantChangeMasterCIDR,
+			errorMatcher: IsMasterCIDRChange,
 		},
 		{
 			name: "case 1: CIDR unchanged",
@@ -59,7 +59,7 @@ func TestMasterCIDR(t *testing.T) {
 
 			oldCIDR:      "10.0.1.0/24",
 			newCIDR:      "",
-			errorMatcher: IsCantChangeMasterCIDR,
+			errorMatcher: IsMasterCIDRChange,
 		},
 	}
 
