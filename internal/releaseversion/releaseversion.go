@@ -50,8 +50,6 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 			if release.Version.EQ(oldVersion) || release.Version.EQ(newVersion) {
 				continue
 			}
-			// Special case: we allow jumping to the next Major release from the very latest patch release of the previous major.
-
 			// Look for a release with higher major or higher minor than the oldVersion and is LT the newVersion
 			if release.Version.GT(oldVersion) && release.Version.LT(newVersion) &&
 				(oldVersion.Major != release.Version.Major || oldVersion.Minor != release.Version.Minor) &&
