@@ -2,6 +2,7 @@ package releaseversion
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/blang/semver"
@@ -31,11 +32,6 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 		return microerror.Maskf(releaseNotFoundError, "release %s was not found in this installation", newVersion)
 	}
 
-	// Skip validations for ignored releases.
-	if isOldOrNewReleaseIgnored(availableReleases, oldVersion, newVersion) {
-		return nil
-	}
-
 	// Downgrades are not allowed.
 	if newVersion.LT(oldVersion) {
 		return microerror.Maskf(downgradingIsNotAllowedError, "downgrading is not allowed (attempted to downgrade from %s to %s)", oldVersion, newVersion)
@@ -47,7 +43,11 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 	}
 
 	// Remove alpha and ignored releases from remaining validations logic.
-	availableReleases = filterOutAlphaAndIgnoredReleases(availableReleases)
+	availableReleases = filterOutAlphaAndIgnoredAndDeprecatedReleases(availableReleases)
+
+	for _, r := range availableReleases {
+		fmt.Println(r.Version)
+	}
 
 	if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
 		// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
@@ -55,6 +55,8 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 			if release.Version.EQ(oldVersion) || release.Version.EQ(newVersion) {
 				continue
 			}
+			// Special case: we allow jumping to the next Major release from the very latest patch release of the previous major.
+
 			// Look for a release with higher major or higher minor than the oldVersion and is LT the newVersion
 			if release.Version.GT(oldVersion) && release.Version.LT(newVersion) &&
 				(oldVersion.Major != release.Version.Major || oldVersion.Minor != release.Version.Minor) &&
@@ -94,7 +96,7 @@ func availableReleases(ctx context.Context, ctrlClient client.Client) ([]*releas
 	return releases, nil
 }
 
-func filterOutAlphaAndIgnoredReleases(releases []*release) []*release {
+func filterOutAlphaAndIgnoredAndDeprecatedReleases(releases []*release) []*release {
 	var result []*release
 
 	for _, release := range releases {
@@ -103,6 +105,10 @@ func filterOutAlphaAndIgnoredReleases(releases []*release) []*release {
 		}
 
 		if isIgnoredRelease(release.CR) {
+			continue
+		}
+
+		if isDeprecatedRelease(release.CR) {
 			continue
 		}
 
@@ -145,4 +151,8 @@ func isIgnoredRelease(releaseCR *v1alpha1.Release) bool {
 	}
 
 	return false
+}
+
+func isDeprecatedRelease(releaseCR *v1alpha1.Release) bool {
+	return releaseCR.Spec.State == v1alpha1.StateDeprecated
 }
