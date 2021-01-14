@@ -2,7 +2,6 @@ package releaseversion
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/blang/semver"
@@ -44,10 +43,6 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 
 	// Remove alpha and ignored releases from remaining validations logic.
 	availableReleases = filterOutAlphaAndIgnoredAndDeprecatedReleases(availableReleases)
-
-	for _, r := range availableReleases {
-		fmt.Println(r.Version)
-	}
 
 	if oldVersion.Major != newVersion.Major || oldVersion.Minor != newVersion.Minor {
 		// The major or minor version is changed. We support this only for sequential minor releases (no skip allowed).
