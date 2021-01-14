@@ -31,6 +31,11 @@ func Validate(ctx context.Context, ctrlCLient client.Client, oldVersion semver.V
 		return microerror.Maskf(releaseNotFoundError, "release %s was not found in this installation", newVersion)
 	}
 
+	// Skip validations for ignored releases.
+	if isOldOrNewReleaseIgnored(availableReleases, oldVersion, newVersion) {
+		return nil
+	}
+
 	// Downgrades are not allowed.
 	if newVersion.LT(oldVersion) {
 		return microerror.Maskf(downgradingIsNotAllowedError, "downgrading is not allowed (attempted to downgrade from %s to %s)", oldVersion, newVersion)
