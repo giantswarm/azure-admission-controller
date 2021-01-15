@@ -2,6 +2,7 @@ package machinepool
 
 import (
 	"context"
+
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"

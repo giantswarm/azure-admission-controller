@@ -2,10 +2,12 @@ package machinepool
 
 import (
 	"fmt"
-	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"strings"
+
+	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 // Ensure the needed escapes are in place. See https://tools.ietf.org/html/rfc6901#section-3 .
