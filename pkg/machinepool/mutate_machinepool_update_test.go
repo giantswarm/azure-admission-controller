@@ -104,6 +104,40 @@ func TestMachinePoolUpdateMutate(t *testing.T) {
 			},
 			errorMatcher: nil,
 		},
+		{
+			name:     fmt.Sprintf("case 5: set max replicas annotation when invalid"),
+			nodePool: builder.BuildMachinePoolAsJson(builder.Annotation(annotation.NodePoolMaxSize, "INVALID")),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/spec/replicas",
+					Value:     int64(1),
+				},
+				{
+					Operation: "replace",
+					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-max-size",
+					Value:     int32(1),
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:     fmt.Sprintf("case 5: set min replicas annotation when invalid"),
+			nodePool: builder.BuildMachinePoolAsJson(builder.Annotation(annotation.NodePoolMinSize, "INVALID")),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/spec/replicas",
+					Value:     int64(1),
+				},
+				{
+					Operation: "replace",
+					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-min-size",
+					Value:     int32(1),
+				},
+			},
+			errorMatcher: nil,
+		},
 	}
 
 	for _, tc := range testCases {

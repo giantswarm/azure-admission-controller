@@ -3,6 +3,7 @@ package azuremachinepool
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	v1 "k8s.io/api/core/v1"
@@ -49,6 +50,8 @@ func Organization(org string) BuilderOption {
 func Replicas(replicas int32) BuilderOption {
 	return func(machinePool *expcapiv1alpha3.MachinePool) *expcapiv1alpha3.MachinePool {
 		machinePool.Spec.Replicas = &replicas
+		machinePool.Annotations[annotation.NodePoolMinSize] = fmt.Sprintf("%d", replicas)
+		machinePool.Annotations[annotation.NodePoolMaxSize] = fmt.Sprintf("%d", replicas)
 		return machinePool
 	}
 }

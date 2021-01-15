@@ -2,6 +2,7 @@ package machinepool
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
@@ -29,14 +30,34 @@ func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.Machin
 		clusterReplicas = *machinePool.Spec.Replicas
 	}
 
+	currentMin := clusterReplicas
 	if machinePool.Annotations[annotation.NodePoolMinSize] == "" {
 		m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMinSize, clusterReplicas))
 		patches = append(patches, *mutator.PatchAdd(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMinSize)), clusterReplicas))
+	} else {
+		// Parse current value of min Size.
+		min, err := strconv.Atoi(machinePool.Annotations[annotation.NodePoolMinSize])
+		if err != nil || min < 1 {
+			// Invalid annotation value, set it to the default.
+			m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMinSize, clusterReplicas))
+			patches = append(patches, mutator.PatchReplace(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMinSize)), clusterReplicas))
+			currentMin = clusterReplicas
+		} else {
+			currentMin = int32(min)
+		}
 	}
 
 	if machinePool.Annotations[annotation.NodePoolMaxSize] == "" {
-		m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMaxSize, clusterReplicas))
-		patches = append(patches, *mutator.PatchAdd(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMaxSize)), clusterReplicas))
+		// By default set the max same value as the min.
+		m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMaxSize, currentMin))
+		patches = append(patches, *mutator.PatchAdd(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMaxSize)), currentMin))
+	} else {
+		// Check current value is valid.
+		max, err := strconv.Atoi(machinePool.Annotations[annotation.NodePoolMaxSize])
+		if err != nil || int32(max) < currentMin {
+			m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMaxSize, currentMin))
+			patches = append(patches, mutator.PatchReplace(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMaxSize)), currentMin))
+		}
 	}
 
 	return patches
