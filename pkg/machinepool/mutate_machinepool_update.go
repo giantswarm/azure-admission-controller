@@ -2,7 +2,6 @@ package machinepool
 
 import (
 	"context"
-
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/api/admission/v1beta1"
@@ -49,6 +48,12 @@ func (m *UpdateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	defaultSpecValues := setDefaultSpecValues(m, machinePoolCR)
 	if defaultSpecValues != nil {
 		result = append(result, defaultSpecValues...)
+	}
+
+	// Ensure autoscaling annotations are set.
+	patch := ensureAutoscalingAnnotations(m, machinePoolCR)
+	if patch != nil {
+		result = append(result, patch...)
 	}
 
 	return result, nil

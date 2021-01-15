@@ -1,0 +1,41 @@
+package machinepool
+
+import (
+	"fmt"
+	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	"strings"
+)
+
+// Ensure the needed escapes are in place. See https://tools.ietf.org/html/rfc6901#section-3 .
+func escapeJSONPatchString(input string) string {
+	input = strings.ReplaceAll(input, "~", "~0")
+	input = strings.ReplaceAll(input, "/", "~1")
+
+	return input
+}
+
+// setDefaultSpecValues checks if some optional field is not set, and sets
+// default values defined by upstream Cluster API.
+func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.MachinePool) []mutator.PatchOperation {
+	var patches []mutator.PatchOperation
+
+	// The replicas field could not be set, we default to 1.
+	clusterReplicas := int32(1)
+	if machinePool.Spec.Replicas != nil {
+		clusterReplicas = *machinePool.Spec.Replicas
+	}
+
+	if machinePool.Annotations[annotation.NodePoolMinSize] == "" {
+		m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMinSize, clusterReplicas))
+		patches = append(patches, *mutator.PatchAdd(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMinSize)), clusterReplicas))
+	}
+
+	if machinePool.Annotations[annotation.NodePoolMaxSize] == "" {
+		m.Log("level", "debug", "message", fmt.Sprintf("setting MachinePool Annotation %s to %d", annotation.NodePoolMaxSize, clusterReplicas))
+		patches = append(patches, *mutator.PatchAdd(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMaxSize)), clusterReplicas))
+	}
+
+	return patches
+}
