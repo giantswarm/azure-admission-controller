@@ -18,8 +18,8 @@ func escapeJSONPatchString(input string) string {
 	return input
 }
 
-// setDefaultSpecValues checks if some optional field is not set, and sets
-// default values defined by upstream Cluster API.
+// ensureAutoscalingAnnotations ensures the custom annotations used to determine the min and max replicas for
+// the cluster autoscaler are set in the Machinepool CR.
 func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.MachinePool) []mutator.PatchOperation {
 	var patches []mutator.PatchOperation
 
