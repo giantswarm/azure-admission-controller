@@ -24,7 +24,7 @@ func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.Machin
 	var patches []mutator.PatchOperation
 
 	// The replicas field could not be set, we default to 1.
-	clusterReplicas := int32(1)
+	clusterReplicas := int32(defaultReplicas)
 	if machinePool.Spec.Replicas != nil {
 		clusterReplicas = *machinePool.Spec.Replicas
 	}
