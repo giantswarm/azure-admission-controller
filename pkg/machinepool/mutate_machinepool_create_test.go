@@ -48,7 +48,7 @@ func TestMachinePoolCreateMutate(t *testing.T) {
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-min-size",
-					Value:     int32(7),
+					Value:     "7",
 				},
 			},
 			errorMatcher: nil,
@@ -60,7 +60,7 @@ func TestMachinePoolCreateMutate(t *testing.T) {
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-max-size",
-					Value:     int32(7),
+					Value:     "7",
 				},
 			},
 			errorMatcher: nil,
@@ -72,12 +72,12 @@ func TestMachinePoolCreateMutate(t *testing.T) {
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-min-size",
-					Value:     int32(7),
+					Value:     "7",
 				},
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-max-size",
-					Value:     int32(7),
+					Value:     "7",
 				},
 			},
 			errorMatcher: nil,
@@ -94,12 +94,12 @@ func TestMachinePoolCreateMutate(t *testing.T) {
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-min-size",
-					Value:     int32(1),
+					Value:     "1",
 				},
 				{
 					Operation: "add",
 					Path:      "/metadata/annotations/cluster.k8s.io~1cluster-api-autoscaler-node-group-max-size",
-					Value:     int32(1),
+					Value:     "1",
 				},
 			},
 			errorMatcher: nil,
