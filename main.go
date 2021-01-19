@@ -273,6 +273,18 @@ func mainError() error {
 		}
 	}
 
+	var clusterUpdateMutator *cluster.UpdateMutator
+	{
+		conf := cluster.UpdateMutatorConfig{
+			CtrlClient: ctrlClient,
+			Logger:     newLogger,
+		}
+		clusterUpdateMutator, err = cluster.NewUpdateMutator(conf)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	var clusterCreateValidator *cluster.CreateValidator
 	{
 		c := cluster.CreateValidatorConfig{
@@ -364,6 +376,7 @@ func mainError() error {
 	handler.Handle("/mutate/azuremachinepool/create", mutator.Handler(azureMachinePoolCreateMutator))
 	handler.Handle("/mutate/azurecluster/create", mutator.Handler(azureClusterCreateMutator))
 	handler.Handle("/mutate/cluster/create", mutator.Handler(clusterCreateMutator))
+	handler.Handle("/mutate/cluster/update", mutator.Handler(clusterUpdateMutator))
 	handler.Handle("/mutate/machinepool/create", mutator.Handler(machinePoolCreateMutator))
 	handler.Handle("/mutate/machinepool/update", mutator.Handler(machinePoolUpdateMutator))
 	handler.Handle("/mutate/spark/create", mutator.Handler(sparkCreateMutator))
