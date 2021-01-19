@@ -1,10 +1,6 @@
 apiVersion: release.giantswarm.io/v1alpha1
 kind: Release
 metadata:
-  annotations:
-    release.giantswarm.io/ignore: "true"
-  finalizers:
-  - operatorkit.giantswarm.io/release-operator-release
   name: v13.0.1
 spec:
   apps:
