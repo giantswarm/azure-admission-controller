@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/crd"
 	"github.com/giantswarm/apptest"
@@ -68,7 +68,7 @@ func TestCreateCluster(t *testing.T) {
 			securityv1alpha1.AddToScheme,
 			corev1.AddToScheme,
 			corev1alpha1.AddToScheme,
-			v1alpha1.AddToScheme,
+			releasev1alpha1.AddToScheme,
 		}
 		err = appSchemeBuilder.AddToScheme(runtimeScheme)
 		if err != nil {
