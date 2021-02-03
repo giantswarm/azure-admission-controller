@@ -245,8 +245,8 @@ github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdF
 github.com/giantswarm/backoff v0.2.0/go.mod h1:Z3WRsFilSJ5H5VlFa4XhraoPr+9pmZgYasoY2OSfNOk=
 github.com/giantswarm/cluster-api v0.3.13-gs h1:ZgOMYkSuM1KnRmdDkPTfYj8G+Bdn6K1+sI0RnsPoBSc=
 github.com/giantswarm/cluster-api v0.3.13-gs/go.mod h1:BCtzLFd2R77eDAvZGd5P1OlG38exdHlQietjFA/7u+0=
-github.com/giantswarm/cluster-api-provider-azure v0.4.11-gs h1:CjAv3bpkiGGKYUBPKZaBco88cCMhPJESJtWbxio5wjw=
-github.com/giantswarm/cluster-api-provider-azure v0.4.11-gs/go.mod h1:v/WBSPW45C0QHslLmrmg7YGGmaN70kT2XxjDKby8Yh4=
+github.com/giantswarm/cluster-api-provider-azure v0.4.12-gsalpha1 h1:7Zu+/EKeexLnIrmoCQM9hGbbDC1FvwaCpKB+WAQqQ54=
+github.com/giantswarm/cluster-api-provider-azure v0.4.12-gsalpha1/go.mod h1:v/WBSPW45C0QHslLmrmg7YGGmaN70kT2XxjDKby8Yh4=
 github.com/giantswarm/k8sclient/v4 v4.1.0 h1:kquaq+qAQ/x4voocbOrn3WfskojANpvg0B7srhL3YSM=
 github.com/giantswarm/k8sclient/v4 v4.1.0/go.mod h1:jTwQ8q0YbJJu3ZxbjoI6hkXeuvKm15xyI/c+zwxnUH0=
 github.com/giantswarm/microerror v0.2.0/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e5wctV2OoE9n34=
