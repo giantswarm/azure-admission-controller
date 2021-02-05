@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Add cluster mutate webhook definition in the Helm chart.
+
 ## [2.1.0] - 2021-02-03
 
 ### Added
