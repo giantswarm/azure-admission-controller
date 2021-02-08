@@ -12,7 +12,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/apiextensions/v2 v2.6.2
 	github.com/giantswarm/apiextensions/v3 v3.17.0
-	github.com/giantswarm/apptest v0.9.0
+	github.com/giantswarm/apptest v0.10.0
 	github.com/giantswarm/backoff v0.2.0
 	github.com/giantswarm/k8sclient/v4 v4.1.0
 	github.com/giantswarm/microerror v0.3.0
@@ -20,13 +20,13 @@ require (
 	github.com/google/go-cmp v0.5.4
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	k8s.io/api v0.18.9
-	k8s.io/apiextensions-apiserver v0.18.9
-	k8s.io/apimachinery v0.18.9
-	k8s.io/client-go v0.18.9
+	k8s.io/api v0.19.2
+	k8s.io/apiextensions-apiserver v0.19.2
+	k8s.io/apimachinery v0.19.2
+	k8s.io/client-go v0.19.2
 	sigs.k8s.io/cluster-api v0.3.13
 	sigs.k8s.io/cluster-api-provider-azure v0.4.11
-	sigs.k8s.io/controller-runtime v0.6.4
+	sigs.k8s.io/controller-runtime v0.6.5
 	sigs.k8s.io/yaml v1.2.0
 )
 
