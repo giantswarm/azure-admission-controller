@@ -65,16 +65,6 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return microerror.Mask(err)
 	}
 
-	err = validateControlPlaneEndpointUnchanged(*azureClusterOldCR, *azureClusterNewCR)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	err = validateLocationUnchanged(*azureClusterOldCR, *azureClusterNewCR)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
 	return a.validateRelease(ctx, azureClusterOldCR, azureClusterNewCR)
 }
 
