@@ -52,7 +52,14 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 		return microerror.Maskf(errors.ParsingFailedError, "unable to parse AzureMachine CR: %v", err)
 	}
 
-	err := checkSSHKeyIsEmpty(ctx, azureMachineNewCR)
+	err := azureMachineNewCR.ValidateUpdate(azureMachineOldCR)
+	if CAPZIsSSHFieldValidationError(err) {
+		// Ignore this type of error for now.
+	} else if err != nil {
+		return microerror.Mask(err)
+	}
+
+	err = checkSSHKeyIsEmpty(ctx, azureMachineNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}
