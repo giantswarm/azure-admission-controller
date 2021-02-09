@@ -17,6 +17,7 @@ type BuilderOption func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.A
 func Name(name string) BuilderOption {
 	return func(azureCluster *capzv1alpha3.AzureCluster) *capzv1alpha3.AzureCluster {
 		azureCluster.ObjectMeta.Name = name
+		azureCluster.Spec.ResourceGroup = name
 		azureCluster.Labels[capiv1alpha3.ClusterLabelName] = name
 		azureCluster.Labels[label.Cluster] = name
 		azureCluster.Spec.ControlPlaneEndpoint.Host = fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", name)
@@ -72,6 +73,16 @@ func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
 			ControlPlaneEndpoint: capiv1alpha3.APIEndpoint{
 				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
 				Port: 443,
+			},
+			NetworkSpec: capzv1alpha3.NetworkSpec{
+				APIServerLB: capzv1alpha3.LoadBalancerSpec{
+					Name: "LB",
+					SKU:  "Standard",
+					Type: "Public",
+					FrontendIPs: []capzv1alpha3.FrontendIP{
+						{},
+					},
+				},
 			},
 		},
 	}

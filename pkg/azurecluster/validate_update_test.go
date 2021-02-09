@@ -29,22 +29,10 @@ func TestAzureClusterUpdateValidate(t *testing.T) {
 			errorMatcher:    nil,
 		},
 		{
-			name:            "case 1: host changed",
-			oldAzureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
-			newAzureCluster: builder.BuildAzureClusterAsJson(builder.ControlPlaneEndpoint("api.azure.gigantic.io", 443)),
-			errorMatcher:    IsControlPlaneEndpointWasChangedError,
-		},
-		{
-			name:            "case 2: port changed",
+			name:            "case 1: port changed",
 			oldAzureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
 			newAzureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 80)),
 			errorMatcher:    IsControlPlaneEndpointWasChangedError,
-		},
-		{
-			name:            "case 3: location changed",
-			oldAzureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.Location("westeurope")),
-			newAzureCluster: builder.BuildAzureClusterAsJson(builder.Name("ab123"), builder.Location("westpoland")),
-			errorMatcher:    IsLocationWasChangedError,
 		},
 	}
 
