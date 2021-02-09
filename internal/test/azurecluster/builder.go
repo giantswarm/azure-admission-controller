@@ -80,7 +80,9 @@ func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
 					SKU:  "Standard",
 					Type: "Public",
 					FrontendIPs: []capzv1alpha3.FrontendIP{
-						{},
+						{
+							Name: "LB",
+						},
 					},
 				},
 			},
