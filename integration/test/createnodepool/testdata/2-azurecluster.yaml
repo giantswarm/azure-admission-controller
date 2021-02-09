@@ -28,4 +28,10 @@ spec:
         - 10.11.0.0/16
       name: 2mw4b-VirtualNetwork
       resourceGroup: 2mw4b
+    apiServerLB:
+      frontendIPs:
+      - name: Frontend
+      name: LB
+      sku: Standard
+      type: Public
   resourceGroup: 2mw4b

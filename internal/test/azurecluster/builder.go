@@ -21,6 +21,12 @@ func Name(name string) BuilderOption {
 		azureCluster.Labels[label.Cluster] = name
 		azureCluster.Spec.ResourceGroup = name
 		azureCluster.Spec.ControlPlaneEndpoint.Host = fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", name)
+		azureCluster.Spec.NetworkSpec.APIServerLB.Name = fmt.Sprintf("%s-%s", name, "public-lb")
+		azureCluster.Spec.NetworkSpec.APIServerLB.FrontendIPs = []capzv1alpha3.FrontendIP{
+			{
+				Name: fmt.Sprintf("%s-%s-%s", name, "public-lb", "frontEnd"),
+			},
+		}
 		return azureCluster
 	}
 }
@@ -76,12 +82,12 @@ func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
 			},
 			NetworkSpec: capzv1alpha3.NetworkSpec{
 				APIServerLB: capzv1alpha3.LoadBalancerSpec{
-					Name: "LB",
+					Name: fmt.Sprintf("%s-%s", clusterName, "public-lb"),
 					SKU:  "Standard",
 					Type: "Public",
 					FrontendIPs: []capzv1alpha3.FrontendIP{
 						{
-							Name: "LB",
+							Name: fmt.Sprintf("%s-%s-%s", clusterName, "public-lb", "frontEnd"),
 						},
 					},
 				},
