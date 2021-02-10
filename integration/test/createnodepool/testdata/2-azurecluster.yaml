@@ -17,7 +17,7 @@ spec:
   networkSpec:
     subnets:
       - cidrBlocks:
-          - 10.11.3.0/24
+        - 10.11.3.0/24
         id: /subscriptions/1be3b2e6-497b-45b9-915f-eb35cae23c6a/resourceGroups/m2w4b/providers/Microsoft.Network/virtualNetworks/m2w4b-VirtualNetwork/subnets/m2w4b
         name: m2w4b
         role: node
@@ -25,7 +25,7 @@ spec:
         securityGroup: {}
     vnet:
       cidrBlocks:
-        - 10.11.0.0/16
+      - 10.11.0.0/16
       name: m2w4b-VirtualNetwork
       resourceGroup: m2w4b
     apiServerLB:
