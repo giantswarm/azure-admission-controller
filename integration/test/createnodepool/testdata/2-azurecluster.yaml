@@ -15,14 +15,6 @@ spec:
     port: 443
   location: westeurope
   networkSpec:
-    subnets:
-      - cidrBlocks:
-          - 10.11.3.0/24
-        id: /subscriptions/1be3b2e6-497b-45b9-915f-eb35cae23c6a/resourceGroups/2mw4b/providers/Microsoft.Network/virtualNetworks/2mw4b-VirtualNetwork/subnets/tia3i
-        name: tia3i
-        role: node
-        routeTable: {}
-        securityGroup: {}
     vnet:
       cidrBlocks:
         - 10.11.0.0/16
@@ -30,8 +22,8 @@ spec:
       resourceGroup: 2mw4b
     apiServerLB:
       frontendIPs:
-      - name: Frontend
-      name: LB
+      - name: 2mw4b-API-PublicLoadBalancer-Frontend
+      name: 2mw4b-API-PublicLoadBalancer
       sku: Standard
       type: Public
   resourceGroup: 2mw4b
