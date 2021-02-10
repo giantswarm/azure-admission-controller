@@ -6,11 +6,11 @@ metadata:
   labels:
     azure-operator.giantswarm.io/version: 5.0.1
     cluster-operator.giantswarm.io/version: 0.23.18
-    cluster.x-k8s.io/cluster-name: m2w4b
-    giantswarm.io/cluster: m2w4b
+    cluster.x-k8s.io/cluster-name: 2mw4b
+    giantswarm.io/cluster: 2mw4b
     giantswarm.io/organization: giantswarm
     release.giantswarm.io/version: 13.0.1
-  name: m2w4b
+  name: 2mw4b
   namespace: org-giantswarm
 spec:
   clusterNetwork:
@@ -22,5 +22,5 @@ spec:
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: AzureCluster
-    name: m2w4b
+    name: 2mw4b
     namespace: org-giantswarm
