@@ -6,15 +6,15 @@ metadata:
   labels:
     azure-operator.giantswarm.io/version: 5.0.1
     cluster-operator.giantswarm.io/version: 0.23.18
-    cluster.x-k8s.io/cluster-name: 2mw4b
-    giantswarm.io/cluster: 2mw4b
+    cluster.x-k8s.io/cluster-name: m2w4b
+    giantswarm.io/cluster: m2w4b
     giantswarm.io/machine-pool: 8c7mn
     giantswarm.io/organization: giantswarm
     release.giantswarm.io/version: 13.0.1
   name: 8c7mn
   namespace: org-giantswarm
 spec:
-  clusterName: 2mw4b
+  clusterName: m2w4b
   failureDomains:
     - "3"
   replicas: 3
@@ -27,7 +27,7 @@ spec:
           kind: Spark
           name: 8c7mn
           namespace: org-giantswarm
-      clusterName: 2mw4b
+      clusterName: m2w4b
       infrastructureRef:
         apiVersion: exp.infrastructure.cluster.x-k8s.io/v1alpha3
         kind: AzureMachinePool
