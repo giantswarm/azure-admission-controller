@@ -1,10 +1,7 @@
 package azurecluster
 
 import (
-	"errors"
-
 	"github.com/giantswarm/microerror"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 var invalidConfigError = &microerror.Error{
@@ -68,15 +65,4 @@ var unexpectedLocationError = &microerror.Error{
 // IsUnexpectedLocationError asserts unexpectedLocationError.
 func IsUnexpectedLocationError(err error) bool {
 	return microerror.Cause(err) == unexpectedLocationError
-}
-
-// CAPZIsNameFieldValidationError asserts the CAPZ Name field validation error.
-func CAPZIsNameFieldValidationError(err error) bool {
-	if status := apierrors.APIStatus(nil); errors.As(err, &status) {
-		causes := status.Status().Details.Causes
-
-		return len(causes) > 0 && causes[0].Field == "metadata.Name"
-	}
-
-	return false
 }
