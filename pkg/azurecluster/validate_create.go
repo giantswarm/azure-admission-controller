@@ -59,7 +59,9 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	}
 
 	err := azureClusterCR.ValidateCreate()
-	if err != nil {
+	if CAPZIsNameFieldValidationError(err) {
+		// Ignore this type of error for now.
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 

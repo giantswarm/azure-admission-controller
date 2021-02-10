@@ -54,7 +54,9 @@ func (a *UpdateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	}
 
 	err := azureClusterNewCR.ValidateUpdate(azureClusterOldCR)
-	if err != nil {
+	if CAPZIsNameFieldValidationError(err) {
+		// Ignore this type of error for now.
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 
