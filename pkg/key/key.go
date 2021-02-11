@@ -60,7 +60,6 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 			messageBuilder.WriteString("[")
 
 			for i, cause := range causes {
-				messageBuilder.WriteString("")
 				messageBuilder.WriteString(cause.Field)
 				messageBuilder.WriteString(": ")
 				messageBuilder.WriteString(cause.Message)
