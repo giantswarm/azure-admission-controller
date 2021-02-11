@@ -127,7 +127,28 @@ func TestIgnoreCAPIErrorForField(t *testing.T) {
 			expectedCausesCount: 2,
 		},
 		{
-			name:  "case 5 asserts that multiple errors of the same type can be ignored",
+			name:  "case 5 asserts that multiple errors can be ignored",
+			field: "metadata.Name",
+			inputError: apierrors.NewInvalid(
+				schema.GroupKind{Group: "testing.x-k8s.io", Kind: "Test"},
+				"test", field.ErrorList{
+					field.Invalid(
+						field.NewPath("metadata").Child("Name"),
+						"testing",
+						"Resource name is very wrong",
+					),
+					field.Invalid(
+						field.NewPath("template").Child("SomeOtherThing"),
+						"testing",
+						"Boom",
+					),
+				}),
+			expectedToBeError:   true,
+			expectedMessage:     `Test.testing.x-k8s.io "test" is invalid: [template.SomeOtherThing: Invalid value: "testing": Boom]`,
+			expectedCausesCount: 1,
+		},
+		{
+			name:  "case 6 asserts that multiple errors of the same type can be ignored",
 			field: "metadata.Name",
 			inputError: apierrors.NewInvalid(
 				schema.GroupKind{Group: "testing.x-k8s.io", Kind: "Test"},
@@ -151,7 +172,28 @@ func TestIgnoreCAPIErrorForField(t *testing.T) {
 			expectedToBeError: false,
 		},
 		{
-			name:              "case 6 asserts that nothing blows up if a regular error is used",
+			name:  "case 7 asserts that multiple errors with special characters in the message can be ignored",
+			field: "metadata.Name",
+			inputError: apierrors.NewInvalid(
+				schema.GroupKind{Group: "testing.x-k8s.io", Kind: "Test"},
+				"test", field.ErrorList{
+					field.Invalid(
+						field.NewPath("metadata").Child("Name"),
+						"testing",
+						"Resource name doesn't match regex ^[a-z][a-z0-9-]{0,44}[a-z0-9]$, can contain only lowercase alphanumeric characters and '-', must start/end with an alphanumeric character",
+					),
+					field.Invalid(
+						field.NewPath("template").Child("SomeOtherThing"),
+						"testing",
+						"Some other thing is completely wrong",
+					),
+				}),
+			expectedMessage:     `Test.testing.x-k8s.io "test" is invalid: [template.SomeOtherThing: Invalid value: "testing": Some other thing is completely wrong]`,
+			expectedCausesCount: 1,
+			expectedToBeError:   true,
+		},
+		{
+			name:              "case 8 asserts that nothing blows up if a regular error is used",
 			field:             "metadata.Name",
 			inputError:        errors.New("gotcha"),
 			expectedToBeError: true,

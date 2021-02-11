@@ -40,33 +40,41 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 
 		// Remove any errors for the given field.
 		var causes []metav1.StatusCause
-		for _, cause := range errStatus.Details.Causes {
-			if cause.Field != field {
-				causes = append(causes, cause)
+		{
+			for _, cause := range errStatus.Details.Causes {
+				if cause.Field != field {
+					causes = append(causes, cause)
+				}
+			}
+
+			if len(causes) < 1 {
+				// No errors left, all clear.
+				return nil
 			}
 		}
 
-		if len(causes) < 1 {
-			// No errors left, all clear.
-			return nil
+		matches := capiErrorMessageRegexp.FindAllStringSubmatch(errStatus.Message, 1)
+		var messageBuilder strings.Builder
+		{
+			messageBuilder.WriteString(matches[0][1])
+			messageBuilder.WriteString("[")
+
+			for i, cause := range causes {
+				messageBuilder.WriteString("")
+				messageBuilder.WriteString(cause.Field)
+				messageBuilder.WriteString(": ")
+				messageBuilder.WriteString(cause.Message)
+
+				if len(causes)-i > 1 {
+					messageBuilder.WriteString(", ")
+				}
+			}
+
+			messageBuilder.WriteString("]")
 		}
 
 		errStatus.Details.Causes = causes
-
-		// Remove any errors for this field from the
-		// aggregated message.
-		errorMessageParts := capiErrorMessageRegexp.FindAllStringSubmatch(errStatus.Message, 3)[0]
-		fieldPrefix := fmt.Sprintf("%s: ", field)
-
-		var messageParts []string
-		for _, part := range strings.Split(errorMessageParts[3], ", ") {
-			if !strings.HasPrefix(part, fieldPrefix) {
-				messageParts = append(messageParts, part)
-			}
-		}
-
-		errStatus.Message = strings.Join(messageParts, ", ")
-		errStatus.Message = fmt.Sprintf("%s[%s]", errorMessageParts[1], errStatus.Message)
+		errStatus.Message = messageBuilder.String()
 
 		return apierrors.FromObject(&errStatus)
 	}
