@@ -1,10 +1,7 @@
 package azuremachine
 
 import (
-	"errors"
-
 	"github.com/giantswarm/microerror"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 var invalidConfigError = &microerror.Error{
@@ -77,15 +74,4 @@ var sshFieldIsSetError = &microerror.Error{
 // IsSSHFieldIsSetError asserts sshFieldIsSetError.
 func IsSSHFieldIsSetError(err error) bool {
 	return microerror.Cause(err) == sshFieldIsSetError
-}
-
-// CAPZIsSSHFieldValidationError asserts the CAPZ SSH field validation error.
-func CAPZIsSSHFieldValidationError(err error) bool {
-	if status := apierrors.APIStatus(nil); errors.As(err, &status) {
-		causes := status.Status().Details.Causes
-
-		return len(causes) > 0 && causes[0].Field == "sshPublicKey"
-	}
-
-	return false
 }
