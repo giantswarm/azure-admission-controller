@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 )
 
 var (
-	capiErrorMessageRegexp = regexp.MustCompile(`(.*)\[(.*?)\](.*)`)
+	capiErrorMessageRegexp = regexp.MustCompile(`(.*is invalid:\s)(\[)?(.*?)(\]|$)`)
 )
 
 func GetControlPlaneEndpointHost(clusterName string, baseDomain string) string {
@@ -29,17 +30,19 @@ func ServiceDomain() string {
 func IgnoreCAPIErrorForField(field string, err error) error {
 	if status := apierrors.APIStatus(nil); errors.As(err, &status) {
 		errStatus := status.Status()
+		if errStatus.Reason != "Invalid" {
+			return err
+		}
 
 		if errStatus.Details == nil {
 			return err
 		}
 
 		// Remove any errors for the given field.
-		causes := errStatus.Details.Causes
-		for i, cause := range causes {
-			if cause.Field == field {
-				causes[i] = causes[len(causes)-1]
-				causes = causes[:len(causes)-1]
+		var causes []metav1.StatusCause
+		for _, cause := range errStatus.Details.Causes {
+			if cause.Field != field {
+				causes = append(causes, cause)
 			}
 		}
 
@@ -53,18 +56,17 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 		// Remove any errors for this field from the
 		// aggregated message.
 		errorMessageParts := capiErrorMessageRegexp.FindAllStringSubmatch(errStatus.Message, 3)[0]
-		messageParts := strings.Split(errorMessageParts[2], ", ")
 		fieldPrefix := fmt.Sprintf("%s: ", field)
 
-		for i, part := range messageParts {
-			if strings.HasPrefix(part, fieldPrefix) {
-				messageParts[i] = messageParts[len(messageParts)-1]
-				messageParts = messageParts[:len(messageParts)-1]
+		var messageParts []string
+		for _, part := range strings.Split(errorMessageParts[3], ", ") {
+			if !strings.HasPrefix(part, fieldPrefix) {
+				messageParts = append(messageParts, part)
 			}
 		}
 
 		errStatus.Message = strings.Join(messageParts, ", ")
-		errStatus.Message = fmt.Sprintf("%s[%s]%s", errorMessageParts[1], errStatus.Message, errorMessageParts[3])
+		errStatus.Message = fmt.Sprintf("%s[%s]", errorMessageParts[1], errStatus.Message)
 
 		return apierrors.FromObject(&errStatus)
 	}
