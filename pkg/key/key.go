@@ -52,8 +52,8 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 
 		// Remove any errors for this field from the
 		// aggregated message.
-		errorMessageParts := capiErrorMessageRegexp.Split(errStatus.Message, 3)
-		messageParts := strings.Split(errorMessageParts[1], ", ")
+		errorMessageParts := capiErrorMessageRegexp.FindAllStringSubmatch(errStatus.Message, 3)[0]
+		messageParts := strings.Split(errorMessageParts[2], ", ")
 		fieldPrefix := fmt.Sprintf("%s: ", field)
 
 		for i, part := range messageParts {
@@ -64,7 +64,7 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 		}
 
 		errStatus.Message = strings.Join(messageParts, ", ")
-		errStatus.Message = fmt.Sprintf("%s[%s]%s", errorMessageParts[0], errStatus.Message, errorMessageParts[2])
+		errStatus.Message = fmt.Sprintf("%s[%s]%s", errorMessageParts[1], errStatus.Message, errorMessageParts[3])
 
 		return apierrors.FromObject(&errStatus)
 	}
