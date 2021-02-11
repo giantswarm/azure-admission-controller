@@ -3,6 +3,7 @@ package key
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -11,6 +12,10 @@ import (
 const (
 	ControlPlaneEndpointPort  = 443
 	ClusterNetworkServiceCIDR = "172.31.0.0/16"
+)
+
+var (
+	capiErrorMessageRegexp = regexp.MustCompile(`(.*)\[(.*?)\](.*)`)
 )
 
 func GetControlPlaneEndpointHost(clusterName string, baseDomain string) string {
@@ -47,7 +52,8 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 
 		// Remove any errors for this field from the
 		// aggregated message.
-		messageParts := strings.Split(errStatus.Message, ", ")
+		errorMessageParts := capiErrorMessageRegexp.Split(errStatus.Message, 3)
+		messageParts := strings.Split(errorMessageParts[1], ", ")
 		fieldPrefix := fmt.Sprintf("%s: ", field)
 
 		for i, part := range messageParts {
@@ -58,6 +64,7 @@ func IgnoreCAPIErrorForField(field string, err error) error {
 		}
 
 		errStatus.Message = strings.Join(messageParts, ", ")
+		errStatus.Message = fmt.Sprintf("%s[%s]%s", errorMessageParts[0], errStatus.Message, errorMessageParts[2])
 
 		return apierrors.FromObject(&errStatus)
 	}
