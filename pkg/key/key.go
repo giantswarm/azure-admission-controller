@@ -16,3 +16,19 @@ func GetControlPlaneEndpointHost(clusterName string, baseDomain string) string {
 func ServiceDomain() string {
 	return "cluster.local"
 }
+
+func APIServerLBName(clusterName string) string {
+	return fmt.Sprintf("%s-%s-%s", clusterName, "API", "PublicLoadBalancer")
+}
+
+func APIServerLBSKU() string {
+	return "Standard"
+}
+
+func APIServerLBType() string {
+	return "Public"
+}
+
+func APIServerLBFrontendIPName(clusterName string) string {
+	return fmt.Sprintf("%s-%s", APIServerLBName(clusterName), "Frontend")
+}
