@@ -32,3 +32,7 @@ func APIServerLBType() string {
 func APIServerLBFrontendIPName(clusterName string) string {
 	return fmt.Sprintf("%s-%s", APIServerLBName(clusterName), "Frontend")
 }
+
+func OSDiskCachingType() string {
+	return "ReadWrite"
+}
