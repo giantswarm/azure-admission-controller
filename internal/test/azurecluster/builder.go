@@ -82,6 +82,16 @@ func BuildAzureCluster(opts ...BuilderOption) *capzv1alpha3.AzureCluster {
 				Port: 443,
 			},
 			NetworkSpec: capzv1alpha3.NetworkSpec{
+				Subnets: capzv1alpha3.Subnets{
+					&capzv1alpha3.SubnetSpec{
+						Role: "control-plane",
+						Name: key.MasterSubnetName(clusterName),
+					},
+					&capzv1alpha3.SubnetSpec{
+						Role: "node",
+						Name: clusterName,
+					},
+				},
 				APIServerLB: capzv1alpha3.LoadBalancerSpec{
 					Name: key.APIServerLBName(clusterName),
 					SKU:  capzv1alpha3.SKU(key.APIServerLBSKU()),

@@ -36,3 +36,7 @@ func APIServerLBFrontendIPName(clusterName string) string {
 func OSDiskCachingType() string {
 	return "ReadWrite"
 }
+
+func MasterSubnetName(clusterName string) string {
+	return fmt.Sprintf("%s-%s-%s", clusterName, "VirtualNetwork", "MasterSubnet")
+}
