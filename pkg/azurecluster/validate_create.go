@@ -11,7 +11,6 @@ import (
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
@@ -60,7 +59,7 @@ func (a *CreateValidator) Validate(ctx context.Context, request *v1beta1.Admissi
 	}
 
 	err := azureClusterCR.ValidateCreate()
-	err = key.IgnoreCAPIErrorForField("metadata.Name", err)
+	err = errors.IgnoreCAPIErrorForField("metadata.Name", err)
 	if err != nil {
 		return microerror.Mask(err)
 	}
