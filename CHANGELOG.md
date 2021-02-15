@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Execute CAPZ validation for all resources.
+- Execute CAPI/CAPZ validation for all resources.
+- Execute CAPI/CAPZ defaulting on all resources.
 
 ## [2.2.0] - 2021-02-05
 
