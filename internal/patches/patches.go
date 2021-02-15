@@ -2,6 +2,7 @@ package patches
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -28,6 +29,10 @@ func GeneratePatchesFrom(originalJSON []byte, current runtime.Object) ([]mutator
 		for _, patch := range jsonPatches {
 			patches = append(patches, mutator.PatchOperation(patch))
 		}
+
+		sort.SliceStable(patches, func(i, j int) bool {
+			return patches[i].Path < patches[j].Path
+		})
 	}
 
 	return patches, nil
