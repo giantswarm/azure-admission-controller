@@ -5,10 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/giantswarm/microerror"
 	jsonpatch "gomodules.xyz/jsonpatch/v2"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 func GeneratePatchesFrom(originalJSON []byte, current runtime.Object) ([]mutator.PatchOperation, error) {
