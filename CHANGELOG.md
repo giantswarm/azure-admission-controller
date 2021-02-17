@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Execute CAPI/CAPZ validation for all resources.
 - Execute CAPI/CAPZ defaulting on all resources.
 
+### Remove
+
+- Don't execute CAPI/CAPZ validation for the `subnet` fields of the `AzureCluster` resource.
+
 ## [2.2.0] - 2021-02-05
 
 ### Fixed
