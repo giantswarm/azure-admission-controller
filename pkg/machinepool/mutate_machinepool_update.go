@@ -62,7 +62,7 @@ func (m *UpdateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	machinePoolCR.Default()
 	{
 		var capiPatches []mutator.PatchOperation
-		capiPatches, err = patches.GeneratePatchesFrom(request.Object.Raw, machinePoolCR)
+		capiPatches, err = patches.GenerateFrom(request.Object.Raw, machinePoolCR)
 		if err != nil {
 			return []mutator.PatchOperation{}, microerror.Mask(err)
 		}

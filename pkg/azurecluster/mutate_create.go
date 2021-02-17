@@ -143,13 +143,13 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	azureClusterCR.Default()
 	{
 		var capiPatches []mutator.PatchOperation
-		capiPatches, err = patches.GeneratePatchesFrom(request.Object.Raw, azureClusterCR)
+		capiPatches, err = patches.GenerateFrom(request.Object.Raw, azureClusterCR)
 		if err != nil {
 			return []mutator.PatchOperation{}, microerror.Mask(err)
 		}
 
-		capiPatches = patches.SkipPatchesForPath("/spec/networkSpec/vnet", capiPatches)
-		capiPatches = patches.SkipPatchesForPath("/spec/networkSpec/subnets", capiPatches)
+		capiPatches = patches.SkipForPath("/spec/networkSpec/vnet", capiPatches)
+		capiPatches = patches.SkipForPath("/spec/networkSpec/subnets", capiPatches)
 
 		result = append(result, capiPatches...)
 	}

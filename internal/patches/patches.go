@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
-func GeneratePatchesFrom(originalJSON []byte, current runtime.Object) ([]mutator.PatchOperation, error) {
+func GenerateFrom(originalJSON []byte, current runtime.Object) ([]mutator.PatchOperation, error) {
 	currentJSON, err := json.Marshal(current)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -39,7 +39,7 @@ func GeneratePatchesFrom(originalJSON []byte, current runtime.Object) ([]mutator
 	return patches, nil
 }
 
-func SkipPatchesForPath(path string, patches []mutator.PatchOperation) []mutator.PatchOperation {
+func SkipForPath(path string, patches []mutator.PatchOperation) []mutator.PatchOperation {
 	var modifiedPatches []mutator.PatchOperation
 	{
 		for _, patch := range patches {

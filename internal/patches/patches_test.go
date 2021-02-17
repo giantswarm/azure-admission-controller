@@ -12,7 +12,7 @@ import (
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 )
 
-func TestGeneratePatchesFrom(t *testing.T) {
+func TestGenerateFrom(t *testing.T) {
 	testCases := []struct {
 		name            string
 		originalObject  runtime.Object
@@ -54,7 +54,7 @@ func TestGeneratePatchesFrom(t *testing.T) {
 				t.Fatalf("unexpected error: %s", err.Error())
 			}
 
-			patches, err := GeneratePatchesFrom(originalObjectJSON, tc.currentObject)
+			patches, err := GenerateFrom(originalObjectJSON, tc.currentObject)
 			if err != nil {
 				t.Fatalf("unexpected error: %s", err.Error())
 			}
@@ -70,7 +70,7 @@ func TestGeneratePatchesFrom(t *testing.T) {
 	}
 }
 
-func TestSkipPatchesForPath(t *testing.T) {
+func TestSkipForPath(t *testing.T) {
 	patches := []mutator.PatchOperation{
 		{
 			Operation: "add",
@@ -104,7 +104,7 @@ func TestSkipPatchesForPath(t *testing.T) {
 		},
 	}
 
-	filteredPatches := SkipPatchesForPath("/spec/test", patches)
+	filteredPatches := SkipForPath("/spec/test", patches)
 
 	if !reflect.DeepEqual(expectedPatches, filteredPatches) {
 		t.Fatalf("patches mismatch: expected %v, got %v", expectedPatches, filteredPatches)

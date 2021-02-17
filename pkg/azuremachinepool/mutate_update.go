@@ -56,12 +56,12 @@ func (m *UpdateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 	azureMPCR.Default()
 	{
 		var capiPatches []mutator.PatchOperation
-		capiPatches, err = patches.GeneratePatchesFrom(request.Object.Raw, azureMPCR)
+		capiPatches, err = patches.GenerateFrom(request.Object.Raw, azureMPCR)
 		if err != nil {
 			return []mutator.PatchOperation{}, microerror.Mask(err)
 		}
 
-		capiPatches = patches.SkipPatchesForPath("/spec/template/sshPublicKey", capiPatches)
+		capiPatches = patches.SkipForPath("/spec/template/sshPublicKey", capiPatches)
 
 		result = append(result, capiPatches...)
 	}
