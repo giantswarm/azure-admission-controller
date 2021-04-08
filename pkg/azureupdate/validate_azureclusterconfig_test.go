@@ -25,6 +25,11 @@ import (
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
 )
 
+// about '//nolint:staticcheck' for "sigs.k8s.io/controller-runtime/pkg/client/fake":
+// staticcheck SA1019 is failing because fake module is getting deprecated, but
+// it's not still sure if that will happen, see
+// https://github.com/kubernetes-sigs/controller-runtime/issues/768#issuecomment-642335552
+
 func TestAzureClusterConfigValidate(t *testing.T) {
 	releases := []ReleaseWithState{
 		{

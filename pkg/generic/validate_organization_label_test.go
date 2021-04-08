@@ -12,6 +12,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
 
+// about '//nolint:staticcheck' for "sigs.k8s.io/controller-runtime/pkg/client/fake":
+// staticcheck SA1019 is failing because fake module is getting deprecated, but
+// it's not still sure if that will happen, see
+// https://github.com/kubernetes-sigs/controller-runtime/issues/768#issuecomment-642335552
+
 func Test_ValidateOrganizationLabelUnchanged(t *testing.T) {
 	testCases := []struct {
 		name         string
