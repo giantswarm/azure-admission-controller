@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Skipping all validation and defaulting for resources with CAPI release label.
-- Skipping all validation and defaulting for resources with CAPI watch filter label.
+- Skipping all validation and defaulting for resources with the release label containing a release `>=` than the first GiantSwarm release with CAPI controllers.
+- Skipping all validation and defaulting for resources with the CAPI watch filter label.
 - Refactor code to make new linter happy.
 
 ## [2.3.2] - 2021-02-23
