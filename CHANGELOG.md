@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Skipping all validation and defaulting for resources with CAPI release label
-- Skipping all validation and defaulting for resources with CAPI watch filter label
+- Skipping all validation and defaulting for resources with CAPI release label.
+- Skipping all validation and defaulting for resources with CAPI watch filter label.
+- Update architect version to 2.7.0.
 
 ## [2.3.2] - 2021-02-23
 
