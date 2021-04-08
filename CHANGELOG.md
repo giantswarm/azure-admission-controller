@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Skipping all validation and defaulting for resources with CAPI release label
 
+### Fixed
+
+- Allow updates to `AzureMachinePool` with empty `DataDisks`.
+
 ## [2.3.2] - 2021-02-23
 
 ### Changed
