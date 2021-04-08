@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Skipping all validation and defaulting for resources with CAPI release label.
 - Skipping all validation and defaulting for resources with CAPI watch filter label.
-- Update architect version to 2.7.0.
+- Refactor code to make new linter happy.
 
 ## [2.3.2] - 2021-02-23
 

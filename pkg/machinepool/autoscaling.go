@@ -25,9 +25,9 @@ func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.Machin
 	var patches []mutator.PatchOperation
 
 	// The replicas field could not be set, we default to 1.
-	clusterReplicas := int32(defaultReplicas)
+	clusterReplicas := defaultReplicas
 	if machinePool.Spec.Replicas != nil {
-		clusterReplicas = *machinePool.Spec.Replicas
+		clusterReplicas = int64(*machinePool.Spec.Replicas)
 	}
 
 	currentMin := clusterReplicas
@@ -43,7 +43,7 @@ func ensureAutoscalingAnnotations(m mutator.Mutator, machinePool *capiexp.Machin
 			patches = append(patches, mutator.PatchReplace(fmt.Sprintf("/metadata/annotations/%s", escapeJSONPatchString(annotation.NodePoolMinSize)), fmt.Sprintf("%d", clusterReplicas)))
 			currentMin = clusterReplicas
 		} else {
-			currentMin = int32(min)
+			currentMin = int64(min)
 		}
 	}
 
