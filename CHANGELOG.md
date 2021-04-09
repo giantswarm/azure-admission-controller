@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Skipping all validation and defaulting for resources with the release label containing a release `>=` than the first GiantSwarm release with CAPI controllers.
 - Skipping all validation and defaulting for resources with the CAPI watch filter label.
+- Skipping all validation and defaulting for resources with the CAPI `cluster.x-k8s.io/cloned-from-name` annotation.
 - Refactor code to make new linter happy.
 
 ## [2.3.2] - 2021-02-23
