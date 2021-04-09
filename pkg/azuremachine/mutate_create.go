@@ -60,6 +60,8 @@ func (m *CreateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		return []mutator.PatchOperation{}, microerror.Maskf(parsingFailedError, "unable to parse AzureMachine CR: %v", err)
 	}
 
+	m.logger.LogCtx(ctx, "level", "debug", "message", "trying to create AzureMachine", "cr", *azureMachineCR)
+
 	capi, err := generic.IsCAPIRelease(azureMachineCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
