@@ -14,10 +14,15 @@ const (
 	// FirstCAPIRelease is the first GS release that runs on CAPI controllers
 	FirstCAPIRelease = "20.0.0-v1alpha3"
 
-	CAPIWatchFilterLabel = "cluster.x-k8s.io/watch-filter"
+	CAPIWatchFilterLabel         = "cluster.x-k8s.io/watch-filter"
+	CAPIClonedFromNameAnnotation = "cluster.x-k8s.io/cloned-from-name"
 )
 
 func IsCAPIRelease(meta metav1.Object) (bool, error) {
+	if meta.GetAnnotations()[CAPIClonedFromNameAnnotation] != "" {
+		return true, nil
+	}
+
 	if meta.GetLabels()[CAPIWatchFilterLabel] != "" {
 		return true, nil
 	}
