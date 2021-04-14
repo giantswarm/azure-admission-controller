@@ -1,8 +1,7 @@
 package test
 
 import (
-	"crypto/rand"
-	"math/big"
+	"math/rand"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyz")
@@ -10,8 +9,7 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyz")
 func GenerateName() string {
 	b := make([]rune, 5)
 	for i := range b {
-		r, _ := rand.Int(rand.Reader, new(big.Int).SetInt64(int64(len(letters))))
-		b[i] = letters[r.Int64()]
+		b[i] = letters[rand.Intn(len(letters))] //nolint:gosec
 	}
 	return string(b)
 }
