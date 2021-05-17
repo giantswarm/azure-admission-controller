@@ -84,12 +84,12 @@ func BuildMachinePool(opts ...BuilderOption) *capiexp.MachinePool {
 				annotation.NodePoolMaxSize: "1",
 			},
 			Labels: map[string]string{
-				label.AzureOperatorVersion:    "5.0.0",
-				label.Cluster:                 "ab123",
-				capi.ClusterLabelName: "ab123",
-				label.MachinePool:             nodepoolName,
-				label.Organization:            "giantswarm",
-				label.ReleaseVersion:          "13.0.0",
+				label.AzureOperatorVersion: "5.0.0",
+				label.Cluster:              "ab123",
+				capi.ClusterLabelName:      "ab123",
+				label.MachinePool:          nodepoolName,
+				label.Organization:         "giantswarm",
+				label.ReleaseVersion:       "13.0.0",
 			},
 		},
 		Spec: capiexp.MachinePoolSpec{
