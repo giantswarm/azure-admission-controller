@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
@@ -64,7 +64,7 @@ func TestCreateCluster(t *testing.T) {
 			capi.AddToScheme,
 			capzv1alpha3.AddToScheme,
 			expcapiv1alpha3.AddToScheme,
-			expcapzv1alpha3.AddToScheme,
+			capzexp.AddToScheme,
 			securityv1alpha1.AddToScheme,
 			corev1.AddToScheme,
 			corev1alpha1.AddToScheme,

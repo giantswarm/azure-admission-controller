@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -106,7 +106,7 @@ func unmarshal(bs []byte) (runtime.Object, error) {
 	case "AzureMachine":
 		obj = new(capzv1alpha3.AzureMachine)
 	case "AzureMachinePool":
-		obj = new(expcapzv1alpha3.AzureMachinePool)
+		obj = new(capzexp.AzureMachinePool)
 	case "Release":
 		obj = new(releasev1alpha1.Release)
 	case "Spark":
