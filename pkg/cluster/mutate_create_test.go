@@ -14,7 +14,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -114,7 +114,7 @@ func TestClusterCreateMutate(t *testing.T) {
 			}
 
 			// Cluster with both operator annotations.
-			ab123 := &capzv1alpha3.AzureCluster{
+			ab123 := &capz.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",

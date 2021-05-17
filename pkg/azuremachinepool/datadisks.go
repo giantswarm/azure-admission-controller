@@ -6,11 +6,11 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/microerror"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 )
 
-var desiredDataDisks = []capzv1alpha3.DataDisk{
+var desiredDataDisks = []capz.DataDisk{
 	{
 		NameSuffix: "docker",
 		DiskSizeGB: 100,

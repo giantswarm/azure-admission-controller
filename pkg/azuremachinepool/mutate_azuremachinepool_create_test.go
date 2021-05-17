@@ -13,7 +13,7 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
@@ -57,7 +57,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 		},
 		{
 			name:     "case 2: set data disks",
-			nodePool: builder.BuildAzureMachinePoolAsJson(builder.DataDisks([]capzv1alpha3.DataDisk{})),
+			nodePool: builder.BuildAzureMachinePoolAsJson(builder.DataDisks([]capz.DataDisk{})),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",

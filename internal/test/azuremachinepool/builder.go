@@ -8,7 +8,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
@@ -31,7 +31,7 @@ func Cluster(clusterName string) BuilderOption {
 	}
 }
 
-func DataDisks(dataDisks []capzv1alpha3.DataDisk) BuilderOption {
+func DataDisks(dataDisks []capz.DataDisk) BuilderOption {
 	return func(azureMachinePool *capzexp.AzureMachinePool) *capzexp.AzureMachinePool {
 		azureMachinePool.Spec.Template.DataDisks = dataDisks
 		return azureMachinePool
@@ -61,7 +61,7 @@ func Name(name string) BuilderOption {
 	}
 }
 
-func SpotVMOptions(opts *capzv1alpha3.SpotVMOptions) BuilderOption {
+func SpotVMOptions(opts *capz.SpotVMOptions) BuilderOption {
 	return func(azureMachinePool *capzexp.AzureMachinePool) *capzexp.AzureMachinePool {
 		azureMachinePool.Spec.Template.SpotVMOptions = opts
 		return azureMachinePool
@@ -109,13 +109,13 @@ func BuildAzureMachinePool(opts ...BuilderOption) *capzexp.AzureMachinePool {
 			Location: "westeurope",
 			Template: capzexp.AzureMachineTemplate{
 				VMSize: "Standard_D4_v3",
-				OSDisk: capzv1alpha3.OSDisk{
-					ManagedDisk: capzv1alpha3.ManagedDisk{
+				OSDisk: capz.OSDisk{
+					ManagedDisk: capz.ManagedDisk{
 						StorageAccountType: "Standard_LRS",
 					},
 				},
 				AcceleratedNetworking: to.BoolPtr(true),
-				DataDisks: []capzv1alpha3.DataDisk{
+				DataDisks: []capz.DataDisk{
 					{
 						NameSuffix: "docker",
 						DiskSizeGB: 100,

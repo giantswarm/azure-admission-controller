@@ -20,7 +20,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	restclient "k8s.io/client-go/rest"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -72,7 +72,7 @@ func mainError() error {
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				capi.AddToScheme,
-				capzv1alpha3.AddToScheme,
+				capz.AddToScheme,
 				providerv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
 				releasev1alpha1.AddToScheme,

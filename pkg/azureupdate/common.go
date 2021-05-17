@@ -4,7 +4,7 @@ import (
 	corev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/core/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
@@ -37,7 +37,7 @@ func getFakeCtrlClient() (client.Client, error) {
 	if err != nil {
 		panic(err)
 	}
-	err = capzv1alpha3.AddToScheme(scheme)
+	err = capz.AddToScheme(scheme)
 	if err != nil {
 		panic(err)
 	}
