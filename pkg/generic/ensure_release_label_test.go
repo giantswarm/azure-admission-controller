@@ -10,8 +10,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
@@ -94,7 +93,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			ef789 := &v1alpha3.Cluster{
+			ef789 := &capi.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
 					Namespace: "default",

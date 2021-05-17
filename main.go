@@ -22,7 +22,7 @@ import (
 	restclient "k8s.io/client-go/rest"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/config"
@@ -71,7 +71,7 @@ func mainError() error {
 
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				capiv1alpha3.AddToScheme,
+				capi.AddToScheme,
 				capzv1alpha3.AddToScheme,
 				providerv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,

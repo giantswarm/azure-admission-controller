@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
@@ -61,7 +61,7 @@ func TestCreateCluster(t *testing.T) {
 		appSchemeBuilder := runtime.SchemeBuilder{
 			applicationv1alpha1.AddToScheme,
 			apiextensionsv1.AddToScheme,
-			capiv1alpha3.AddToScheme,
+			capi.AddToScheme,
 			capzv1alpha3.AddToScheme,
 			expcapiv1alpha3.AddToScheme,
 			expcapzv1alpha3.AddToScheme,

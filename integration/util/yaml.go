@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
@@ -98,7 +98,7 @@ func unmarshal(bs []byte) (runtime.Object, error) {
 	case "Organization":
 		obj = new(securityv1alpha1.Organization)
 	case "Cluster":
-		obj = new(capiv1alpha3.Cluster)
+		obj = new(capi.Cluster)
 	case "MachinePool":
 		obj = new(expcapiv1alpha3.MachinePool)
 	case "AzureCluster":

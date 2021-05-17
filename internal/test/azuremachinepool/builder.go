@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	expcapzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/test"
 )
@@ -26,7 +26,7 @@ func AcceleratedNetworking(acceleratedNetworking *bool) BuilderOption {
 
 func Cluster(clusterName string) BuilderOption {
 	return func(azureMachinePool *expcapzv1alpha3.AzureMachinePool) *expcapzv1alpha3.AzureMachinePool {
-		azureMachinePool.Labels[capiv1alpha3.ClusterLabelName] = clusterName
+		azureMachinePool.Labels[capi.ClusterLabelName] = clusterName
 		return azureMachinePool
 	}
 }
@@ -97,12 +97,12 @@ func BuildAzureMachinePool(opts ...BuilderOption) *expcapzv1alpha3.AzureMachineP
 			Name:      nodepoolName,
 			Namespace: "org-giantswarm",
 			Labels: map[string]string{
-				label.AzureOperatorVersion:    "5.0.0",
-				label.Cluster:                 "ab123",
-				capiv1alpha3.ClusterLabelName: "ab123",
-				label.MachinePool:             nodepoolName,
-				label.Organization:            "giantswarm",
-				label.ReleaseVersion:          "13.0.0",
+				label.AzureOperatorVersion: "5.0.0",
+				label.Cluster:              "ab123",
+				capi.ClusterLabelName:      "ab123",
+				label.MachinePool:          nodepoolName,
+				label.Organization:         "giantswarm",
+				label.ReleaseVersion:       "13.0.0",
 			},
 		},
 		Spec: expcapzv1alpha3.AzureMachinePoolSpec{

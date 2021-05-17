@@ -8,8 +8,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/test"
@@ -87,7 +86,7 @@ func BuildMachinePool(opts ...BuilderOption) *expcapiv1alpha3.MachinePool {
 			Labels: map[string]string{
 				label.AzureOperatorVersion:    "5.0.0",
 				label.Cluster:                 "ab123",
-				capiv1alpha3.ClusterLabelName: "ab123",
+				capi.ClusterLabelName: "ab123",
 				label.MachinePool:             nodepoolName,
 				label.Organization:            "giantswarm",
 				label.ReleaseVersion:          "13.0.0",
@@ -95,9 +94,9 @@ func BuildMachinePool(opts ...BuilderOption) *expcapiv1alpha3.MachinePool {
 		},
 		Spec: expcapiv1alpha3.MachinePoolSpec{
 			FailureDomains: []string{},
-			Template: v1alpha3.MachineTemplateSpec{
-				Spec: v1alpha3.MachineSpec{
-					Bootstrap: capiv1alpha3.Bootstrap{
+			Template: capi.MachineTemplateSpec{
+				Spec: capi.MachineSpec{
+					Bootstrap: capi.Bootstrap{
 						ConfigRef: &v1.ObjectReference{
 							Namespace: "org-giantswarm",
 							Name:      "ab123",
