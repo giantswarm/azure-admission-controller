@@ -24,7 +24,7 @@ import (
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
-	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
 	"github.com/giantswarm/azure-admission-controller/integration/util"
@@ -63,7 +63,7 @@ func TestCreateCluster(t *testing.T) {
 			apiextensionsv1.AddToScheme,
 			capi.AddToScheme,
 			capzv1alpha3.AddToScheme,
-			expcapiv1alpha3.AddToScheme,
+			capiexp.AddToScheme,
 			capzexp.AddToScheme,
 			securityv1alpha1.AddToScheme,
 			corev1.AddToScheme,

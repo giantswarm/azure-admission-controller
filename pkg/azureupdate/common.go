@@ -7,7 +7,7 @@ import (
 	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
-	expcapiv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 
@@ -25,7 +25,7 @@ func getFakeCtrlClient() (client.Client, error) {
 	if err != nil {
 		panic(err)
 	}
-	err = expcapiv1alpha3.AddToScheme(scheme)
+	err = capiexp.AddToScheme(scheme)
 	if err != nil {
 		panic(err)
 	}
