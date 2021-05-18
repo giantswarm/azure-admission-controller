@@ -12,11 +12,11 @@ azure:
 azureOperatorSecret:
   service:
     azure:
-      clientid: ""
-      clientsecret: ""
-      sptenantid: ""
-      subscriptionid: ""
-      tenantid: ""
+      clientID: ""
+      clientSecret: ""
+      sptenantID: ""
+      subscriptionID: ""
+      tenantID: ""
 
 cluster:
   baseDomain: ""
