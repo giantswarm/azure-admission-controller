@@ -15,6 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When importing `sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3` use `capzexp` as package alias.
 - Remove package names from some file names.
 
+## [2.7.0] - 2021-05-19
+
+### Fixed
+
+- Add missing config annotation to Helm Chart.
+
+## [2.6.0] - 2021-05-19
+
+### Changed
+
+- Revert changes for new config system.
+
+## [2.5.0] - 2021-05-19
+
+### Changed
+
+- Use new config system.
+
 ## [2.4.1] - 2021-05-14
 
 ### Fixed
@@ -286,7 +304,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v2.4.1...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/giantswarm/azure-admission-controller/compare/v2.6.0...v2.7.0
+[2.6.0]: https://github.com/giantswarm/azure-admission-controller/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/giantswarm/azure-admission-controller/compare/v2.4.1...v2.5.0
 [2.4.1]: https://github.com/giantswarm/azure-admission-controller/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/giantswarm/azure-admission-controller/compare/v2.3.2...v2.4.0
 [2.3.2]: https://github.com/giantswarm/azure-admission-controller/compare/v2.3.1...v2.3.2
