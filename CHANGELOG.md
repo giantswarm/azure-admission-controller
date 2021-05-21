@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `pkg/filter` package with function which checks if the CR belongs to a cluster from a legacy non-CAPI release.
+  Release is considered to be "legacy" if it contains azure-operator.
+- Caching release components for 24 hours, as this will be used in all admission controller requests.
+
 ### Changed
 
 - When importing `sigs.k8s.io/cluster-api/api/v1alpha3` use `capi` as package alias.
