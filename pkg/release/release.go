@@ -46,6 +46,12 @@ func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient clie
 	return ret, nil
 }
 
+// GetComponentVersionsFromRelease returns a map that contains all release components mapped to
+// their respective versions which are included in that release.
+//
+// Since this function is called very often and it is calling Kubernetes API Server in the
+// management cluster, the release components are cached in memory for 24h. This should not be a
+// problem because versions of components in a release are idempotent, i.e. they do not change.
 func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Client, releaseVersion string) (map[string]string, error) {
 	// Release CR always starts with a "v".
 	if !strings.HasPrefix(releaseVersion, "v") {
@@ -74,6 +80,11 @@ func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Clie
 	return components, nil
 }
 
+// ContainsAzureOperator checks if the specified release contains azure-operator.
+//
+// In order to perform the check, this function is calling GetComponentVersionsFromRelease function,
+// which is caching obtained components in memory. See GetComponentVersionsFromRelease docs for
+// more info about the caching.
 func ContainsAzureOperator(ctx context.Context, ctrlClient client.Client, releaseVersion string) (bool, error) {
 	componentVersions, err := GetComponentVersionsFromRelease(ctx, ctrlClient, releaseVersion)
 	if err != nil {
