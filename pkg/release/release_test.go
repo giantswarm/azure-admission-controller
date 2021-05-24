@@ -98,6 +98,53 @@ func Test_GetComponentVersionsFromRelease(t *testing.T) {
 	}
 }
 
+func Test_ContainsAzureOperator(t *testing.T) {
+	testCases := []struct {
+		name           string
+		inputRelease   string
+		expectedResult bool
+	}{
+		{
+			name:           "Release v14.1.4",
+			inputRelease:   "14.1.4",
+			expectedResult: true,
+		},
+		{
+			name:           "Release v20.0.0-v1alpha3",
+			inputRelease:   "20.0.0-v1alpha3",
+			expectedResult: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Log(tc.name)
+			ctx := context.Background()
+			ctrlClient := newFakeClient()
+			loadReleases(t, ctrlClient, tc.inputRelease)
+
+			result, err := ContainsAzureOperator(ctx, ctrlClient, tc.inputRelease)
+			if err != nil {
+				t.Fatalf("Error while calling ContainsAzureOperator: %#v", err)
+			}
+
+			if result != tc.expectedResult {
+				var expectedMsg string
+				var gotMsg string
+				if tc.expectedResult == true {
+					expectedMsg = "release contains azure-operator"
+					gotMsg = "release doesn't contain azure-operator"
+				} else {
+					expectedMsg = "release doesn't contain azure-operator"
+					gotMsg = "release contains azure-operator"
+				}
+
+				t.Errorf("Expected %t (%s), got %t instead (%s)", tc.expectedResult, expectedMsg, result, gotMsg)
+			}
+		})
+	}
+}
+
 func loadReleases(t *testing.T, client client.Client, testReleasesToLoad ...string) {
 	for _, releaseVersion := range testReleasesToLoad {
 		var err error
