@@ -8,16 +8,19 @@ import (
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	gocache "github.com/patrickmn/go-cache"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 var (
+	cacheExpiry = 24 * time.Hour
+
 	// Cache of release components
 	// key: release version
 	// value: map "component name": "component version"
-	releaseComponentsCache = gocache.New(24*time.Hour, 24*time.Hour)
+	releaseComponentsCache = gocache.New(cacheExpiry, 24*time.Hour)
 )
 
 func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient client.Client, releaseVersion string) (map[string]string, error) {
@@ -52,7 +55,7 @@ func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient clie
 // Since this function is called very often and it is calling Kubernetes API Server in the
 // management cluster, the release components are cached in memory for 24h. This should not be a
 // problem because versions of components in a release are idempotent, i.e. they do not change.
-func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Client, releaseVersion string) (map[string]string, error) {
+func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, releaseVersion string) (map[string]string, error) {
 	// Release CR always starts with a "v".
 	if !strings.HasPrefix(releaseVersion, "v") {
 		releaseVersion = fmt.Sprintf("v%s", releaseVersion)
@@ -74,6 +77,7 @@ func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Clie
 
 			// Save in cache
 			releaseComponentsCache.Set(releaseVersion, components, gocache.DefaultExpiration)
+			logger.Debugf(ctx, "Release %s components saved in cache for a duration of %s", releaseVersion, cacheExpiry)
 		}
 	}
 
@@ -85,8 +89,8 @@ func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Clie
 // In order to perform the check, this function is calling GetComponentVersionsFromRelease function,
 // which is caching obtained components in memory. See GetComponentVersionsFromRelease docs for
 // more info about the caching.
-func ContainsAzureOperator(ctx context.Context, ctrlClient client.Client, releaseVersion string) (bool, error) {
-	componentVersions, err := GetComponentVersionsFromRelease(ctx, ctrlClient, releaseVersion)
+func ContainsAzureOperator(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, releaseVersion string) (bool, error) {
+	componentVersions, err := GetComponentVersionsFromRelease(ctx, ctrlClient, logger, releaseVersion)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
