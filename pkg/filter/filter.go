@@ -14,7 +14,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/release"
 )
 
-func IsCRProcessed(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, objectMeta metav1.Object) (bool, error) {
+func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, objectMeta metav1.Object) (bool, error) {
 	// Try to get release label from the CR
 	releaseVersionLabel := objectMeta.GetLabels()[label.ReleaseVersion]
 	if releaseVersionLabel == "" {

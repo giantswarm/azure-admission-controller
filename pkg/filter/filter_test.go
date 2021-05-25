@@ -257,9 +257,9 @@ func Test_IsCRProcessed_ReturnsTrue(t *testing.T) {
 				}
 			}
 
-			result, err := IsCRProcessed(ctx, ctrlClient, logger, tc.inputCR)
+			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, logger, tc.inputCR)
 			if err != nil {
-				t.Fatalf("Error when calling IsCRProcessed: %#v", err)
+				t.Fatalf("Error when calling IsObjectReconciledByLegacyRelease: %#v", err)
 			}
 
 			if result != tc.expectedResult {
