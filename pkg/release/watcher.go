@@ -42,8 +42,8 @@ func WatchGetter(cfg *rest.Config) (Getter, error) {
 	var mgr manager.Manager
 	{
 		o := manager.Options{
-			// MetricsBindAddress is set to 0 in order to disable it. We do this
-			// ourselves.
+			// Disable metrics. No need for them in this implementation. This
+			// ain't no operator.
 			MetricsBindAddress: DisableMetricsServing,
 			Namespace:          metav1.NamespaceAll,
 			SyncPeriod:         to.DurationP(defaultResyncPeriod),
