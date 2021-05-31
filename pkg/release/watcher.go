@@ -36,7 +36,7 @@ func WatchGetter(cfg *rest.Config) (Getter, error) {
 	var err error
 
 	wg := &watchGetter{
-		releases: make(map[string]releasev1alpha1.Release, 0),
+		releases: make(map[string]releasev1alpha1.Release),
 	}
 
 	var mgr manager.Manager
