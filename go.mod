@@ -19,14 +19,14 @@ require (
 	github.com/giantswarm/micrologger v0.5.0
 	github.com/google/go-cmp v0.5.6
 	github.com/stretchr/testify v1.7.0
-	gomodules.xyz/jsonpatch/v2 v2.1.0
+	gomodules.xyz/jsonpatch/v2 v2.2.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	k8s.io/api v0.18.18
-	k8s.io/apiextensions-apiserver v0.18.18
+	k8s.io/api v0.18.19
+	k8s.io/apiextensions-apiserver v0.18.19
 	k8s.io/apimachinery v0.18.19
-	k8s.io/client-go v0.18.18
+	k8s.io/client-go v0.18.19
 	sigs.k8s.io/cluster-api v0.3.17
-	sigs.k8s.io/cluster-api-provider-azure v0.4.14
+	sigs.k8s.io/cluster-api-provider-azure v0.4.15
 	sigs.k8s.io/controller-runtime v0.6.4
 	sigs.k8s.io/yaml v1.2.0
 )
