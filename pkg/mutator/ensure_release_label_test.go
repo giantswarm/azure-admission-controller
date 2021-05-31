@@ -1,4 +1,4 @@
-package generic
+package mutator
 
 import (
 	"context"
@@ -9,12 +9,10 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -22,7 +20,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 	testCases := []struct {
 		name         string
 		meta         metav1.Object
-		patch        *mutator.PatchOperation
+		patch        *PatchOperation
 		errorMatcher func(error) bool
 	}{
 		{
@@ -52,7 +50,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 		{
 			name: "case 4: release wasn't set, cluster CR found, release label present",
 			meta: newObjectWithRelease(to.StringPtr("ab123"), nil),
-			patch: &mutator.PatchOperation{
+			patch: &PatchOperation{
 				Operation: "add",
 				Path:      "/metadata/labels/release.giantswarm.io~1version",
 				Value:     "13.0.0",
@@ -69,7 +67,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
-			ab123 := &capzv1alpha3.AzureCluster{
+			ab123 := &capz.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
@@ -83,7 +81,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			azureClusterWithoutReleaseLabel := &capzv1alpha3.AzureCluster{
+			azureClusterWithoutReleaseLabel := &capz.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "cd456",
 					Namespace: "default",
@@ -94,7 +92,7 @@ func Test_EnsureReleaseLabel(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			ef789 := &v1alpha3.Cluster{
+			ef789 := &capi.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
 					Namespace: "default",

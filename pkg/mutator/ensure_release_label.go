@@ -1,23 +1,21 @@
-package generic
+package mutator
 
 import (
 	"context"
 	"fmt"
 	"strings"
 
+	"github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-
-	"github.com/giantswarm/apiextensions/v2/pkg/label"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
-func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (*mutator.PatchOperation, error) {
+func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (*PatchOperation, error) {
 	if meta.GetLabels()[label.ReleaseVersion] == "" {
 		release, err := getReleaseLabelValueFromAzureCluster(ctx, ctrlClient, meta)
 		if err != nil {
@@ -27,7 +25,7 @@ func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, me
 			return nil, microerror.Maskf(releaseLabelNotFoundError, "AzureCluster did not have the %#q label set. Can't continue.", label.ReleaseVersion)
 		}
 
-		return mutator.PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(label.ReleaseVersion)), release), nil
+		return PatchAdd(fmt.Sprintf("/metadata/labels/%s", escapeJSONPatchString(label.ReleaseVersion)), release), nil
 	}
 
 	return nil, nil
@@ -44,7 +42,7 @@ func getLabelValueFromAzureCluster(ctx context.Context, ctrlClient client.Client
 	}
 
 	// Retrieve the `AzureCluster` CR related to this object.
-	cluster := &v1alpha3.AzureCluster{}
+	cluster := &capz.AzureCluster{}
 	{
 		err := ctrlClient.Get(ctx, client.ObjectKey{Name: clusterID, Namespace: meta.GetNamespace()}, cluster)
 		if apierrors.IsNotFound(err) {

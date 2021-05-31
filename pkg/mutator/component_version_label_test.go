@@ -1,4 +1,4 @@
-package generic
+package mutator
 
 import (
 	"context"
@@ -9,10 +9,9 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -20,13 +19,13 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 	testCases := []struct {
 		name         string
 		meta         metav1.Object
-		patch        *mutator.PatchOperation
+		patch        *PatchOperation
 		errorMatcher func(error) bool
 	}{
 		{
 			name: "case 0: azure operator label missing",
 			meta: newObjectWithLabels(to.StringPtr("ab123"), nil),
-			patch: &mutator.PatchOperation{
+			patch: &PatchOperation{
 				Operation: "add",
 				Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
 				Value:     "5.0.0",
@@ -56,7 +55,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			ctrlClient := fakeK8sClient.CtrlClient()
 
 			// AzureCluster with azure operator label.
-			ab123 := &capzv1alpha3.AzureCluster{
+			ab123 := &capz.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ab123",
 					Namespace: "default",
@@ -71,7 +70,7 @@ func Test_EnsureComponentVersionLabel(t *testing.T) {
 			}
 
 			// AzureCluster lacking any operator annotation.
-			ef789 := &capzv1alpha3.AzureCluster{
+			ef789 := &capz.AzureCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ef789",
 					Namespace: "default",
