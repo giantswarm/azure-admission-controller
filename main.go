@@ -16,7 +16,7 @@ import (
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/security/v1alpha1"
-	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	restclient "k8s.io/client-go/rest"
@@ -60,6 +60,7 @@ func mainError() error {
 		}
 	}
 
+	var ctrlCache client.Reader
 	var ctrlClient client.Client
 	{
 		restConfig, err := restclient.InClusterConfig()
@@ -89,6 +90,7 @@ func mainError() error {
 			return microerror.Mask(err)
 		}
 
+		ctrlCache = k8sClient.CtrlCache()
 		ctrlClient = k8sClient.CtrlClient()
 	}
 
@@ -133,6 +135,7 @@ func mainError() error {
 	{
 		conf := azurecluster.CreateMutatorConfig{
 			BaseDomain: cfg.BaseDomain,
+			CtrlCache:  ctrlCache,
 			CtrlClient: ctrlClient,
 			Location:   cfg.Location,
 			Logger:     newLogger,
@@ -146,6 +149,7 @@ func mainError() error {
 	var azureClusterUpdateMutator *azurecluster.UpdateMutator
 	{
 		conf := azurecluster.UpdateMutatorConfig{
+			CtrlCache:  ctrlCache,
 			CtrlClient: ctrlClient,
 			Logger:     newLogger,
 		}
@@ -312,6 +316,7 @@ func mainError() error {
 	var clusterUpdateMutator *cluster.UpdateMutator
 	{
 		conf := cluster.UpdateMutatorConfig{
+			CtrlCache:  ctrlCache,
 			CtrlClient: ctrlClient,
 			Logger:     newLogger,
 		}
