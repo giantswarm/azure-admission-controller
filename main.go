@@ -88,7 +88,7 @@ func mainError() error {
 			RestConfig: restConfig,
 		}
 
-		k8sClient, err := k8sclient.NewClients(c)
+		k8sClient, err = k8sclient.NewClients(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
