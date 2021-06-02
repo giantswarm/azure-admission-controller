@@ -19,11 +19,14 @@ import (
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"k8s.io/client-go/rest"
 	restclient "k8s.io/client-go/rest"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
 	"github.com/giantswarm/azure-admission-controller/config"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
@@ -60,8 +63,8 @@ func mainError() error {
 		}
 	}
 
-	var ctrlCache client.Reader
 	var ctrlClient client.Client
+	var k8sClient k8sclient.Interface
 	{
 		restConfig, err := restclient.InClusterConfig()
 		if err != nil {
@@ -90,8 +93,32 @@ func mainError() error {
 			return microerror.Mask(err)
 		}
 
-		ctrlCache = k8sClient.CtrlCache()
 		ctrlClient = k8sClient.CtrlClient()
+	}
+
+	var ctrlCache cache.Cache
+	{
+		mapper, err := apiutil.NewDynamicRESTMapper(rest.CopyConfig(k8sClient.RESTConfig()))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		ctrlCache, err = cache.New(k8sClient.RESTConfig(), cache.Options{
+			Scheme: k8sClient.Scheme(),
+			Mapper: mapper,
+		})
+
+		go func() {
+			// XXX: This orphaned throw-away stop channel is very ugly, but
+			// will go away once `controller-runtime` library is updated. In
+			// 0.8.x it's `context.Context` instead of channel.
+			err := ctrlCache.Start(make(<-chan struct{}))
+			if err != nil {
+				// XXX: Due to asynchronous nature, there's no reasonable way
+				// to return error from here, hence panic().
+				panic(err)
+			}
+		}()
 	}
 
 	var resourceSkusClient compute.ResourceSkusClient
