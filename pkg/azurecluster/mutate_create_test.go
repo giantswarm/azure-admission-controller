@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -136,6 +136,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 
 			admit := &CreateMutator{
 				baseDomain: "k8s.test.westeurope.azure.gigantic.io",
+				ctrlCache:  ctrlClient,
 				ctrlClient: ctrlClient,
 				location:   "westeurope",
 				logger:     newLogger,
