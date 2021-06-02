@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -130,6 +131,17 @@ func mainError() error {
 				panic(err)
 			}
 		}()
+
+		time.Sleep(5 * time.Second)
+		rs := &releasev1alpha1.ReleaseList{}
+		err = ctrlCache.List(context.Background(), rs)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		for _, r := range rs.Items {
+			fmt.Printf("release: %q\n", r.Name)
+		}
 	}
 
 	var resourceSkusClient compute.ResourceSkusClient
