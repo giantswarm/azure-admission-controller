@@ -114,10 +114,16 @@ func mainError() error {
 		}
 
 		go func() {
+			// Construct informer for Releases.
+			_, err := ctrlCache.GetInformer(context.Background(), &releasev1alpha1.Release{})
+			if err != nil {
+				panic(err)
+			}
+
 			// XXX: This orphaned throw-away stop channel is very ugly, but
 			// will go away once `controller-runtime` library is updated. In
 			// 0.8.x it's `context.Context` instead of channel.
-			err := ctrlCache.Start(make(<-chan struct{}))
+			err = ctrlCache.Start(make(<-chan struct{}))
 			if err != nil {
 				// XXX: Due to asynchronous nature, there's no reasonable way
 				// to return error from here, hence panic().
