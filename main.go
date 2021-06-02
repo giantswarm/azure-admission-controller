@@ -103,10 +103,15 @@ func mainError() error {
 			return microerror.Mask(err)
 		}
 
-		ctrlCache, err = cache.New(k8sClient.RESTConfig(), cache.Options{
+		o := cache.Options{
 			Scheme: k8sClient.Scheme(),
 			Mapper: mapper,
-		})
+		}
+
+		ctrlCache, err = cache.New(k8sClient.RESTConfig(), o)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 
 		go func() {
 			// XXX: This orphaned throw-away stop channel is very ugly, but
