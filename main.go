@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -115,12 +114,6 @@ func mainError() error {
 		}
 
 		go func() {
-			// Construct informer for Releases.
-			_, err := ctrlCache.GetInformer(context.Background(), &releasev1alpha1.Release{})
-			if err != nil {
-				panic(err)
-			}
-
 			// XXX: This orphaned throw-away stop channel is very ugly, but
 			// will go away once `controller-runtime` library is updated. In
 			// 0.8.x it's `context.Context` instead of channel.
@@ -131,17 +124,6 @@ func mainError() error {
 				panic(err)
 			}
 		}()
-
-		time.Sleep(5 * time.Second)
-		rs := &releasev1alpha1.ReleaseList{}
-		err = ctrlCache.List(context.Background(), rs)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		for _, r := range rs.Items {
-			fmt.Printf("release: %q\n", r.Name)
-		}
 	}
 
 	var resourceSkusClient compute.ResourceSkusClient
