@@ -20,7 +20,7 @@ func GetComponentVersionsFromRelease(ctx context.Context, ctrlReader client.Read
 	// Retrieve the `Release` CR.
 	release := &releasev1alpha1.Release{}
 	{
-		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion, Namespace: "default"}, release)
+		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion}, release)
 		if apierrors.IsNotFound(err) {
 			return nil, microerror.Maskf(releaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
 		} else if err != nil {
