@@ -126,7 +126,7 @@ func mainError() error {
 			}
 		}()
 
-		ok := cache.WaitForCacheSync(make(<-chan struct{}))
+		ok := ctrlCache.WaitForCacheSync(make(<-chan struct{}))
 		if !ok {
 			return microerror.Mask(errors.New("couldn't wait for cache sync"))
 		}
