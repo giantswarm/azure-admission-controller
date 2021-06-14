@@ -2,7 +2,6 @@ apiVersion: release.giantswarm.io/v1alpha1
 kind: Release
 metadata:
   name: v20.0.0-v1alpha3
-  namespace: default
 spec:
   apps:
   - name: cert-exporter

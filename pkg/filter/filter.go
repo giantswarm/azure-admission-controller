@@ -5,7 +5,6 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiutil "sigs.k8s.io/cluster-api/util"
@@ -14,7 +13,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/release"
 )
 
-func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, objectMeta metav1.Object) (bool, error) {
+func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Client, objectMeta metav1.Object) (bool, error) {
 	// Try to get release label from the CR
 	releaseVersionLabel := objectMeta.GetLabels()[label.ReleaseVersion]
 	if releaseVersionLabel == "" {
@@ -52,5 +51,5 @@ func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Cl
 
 	// Now when we have release version for the CR, let's check if the release
 	// contains azure-operator.
-	return release.ContainsAzureOperator(ctx, ctrlClient, logger, releaseVersionLabel)
+	return release.ContainsAzureOperator(ctx, ctrlClient, releaseVersionLabel)
 }

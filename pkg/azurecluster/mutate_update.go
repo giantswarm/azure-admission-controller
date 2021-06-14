@@ -76,11 +76,7 @@ func (m *UpdateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		result = append(result, *patch)
 	}
 
-<<<<<<< HEAD
-	patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, m.ctrlClient, m.logger, azureClusterCR.GetObjectMeta(), "azure-operator", label.AzureOperatorVersion)
-=======
 	patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, m.ctrlCache, azureClusterCR.GetObjectMeta(), "azure-operator", label.AzureOperatorVersion)
->>>>>>> master
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}
@@ -88,11 +84,7 @@ func (m *UpdateMutator) Mutate(ctx context.Context, request *v1beta1.AdmissionRe
 		result = append(result, *patch)
 	}
 
-<<<<<<< HEAD
-	patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, m.ctrlClient, m.logger, azureClusterCR.GetObjectMeta(), "cluster-operator", label.ClusterOperatorVersion)
-=======
 	patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, m.ctrlCache, azureClusterCR.GetObjectMeta(), "cluster-operator", label.ClusterOperatorVersion)
->>>>>>> master
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}

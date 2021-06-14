@@ -3,7 +3,6 @@ kind: Release
 metadata:
   creationTimestamp: null
   name: v14.1.4
-  namespace: default
 spec:
   apps:
   - name: cert-exporter

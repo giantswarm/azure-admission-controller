@@ -7,9 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/micrologger"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -62,13 +61,9 @@ func Test_GetComponentVersionsFromRelease(t *testing.T) {
 			t.Log(tc.name)
 			ctx := context.Background()
 			ctrlClient := newFakeClient()
-			logger, err := micrologger.New(micrologger.Config{})
-			if err != nil {
-				t.Fatalf("Error while creating new logger: %#v", err)
-			}
 			loadReleases(t, ctrlClient, tc.inputRelease)
 
-			result, err := GetComponentVersionsFromRelease(ctx, ctrlClient, logger, tc.inputRelease)
+			result, err := GetComponentVersionsFromRelease(ctx, ctrlClient, tc.inputRelease)
 			if err != nil {
 				t.Fatalf("Error while calling GetComponentVersionsFromRelease: %#v", err)
 			}
@@ -126,13 +121,9 @@ func Test_ContainsAzureOperator(t *testing.T) {
 			t.Log(tc.name)
 			ctx := context.Background()
 			ctrlClient := newFakeClient()
-			logger, err := micrologger.New(micrologger.Config{})
-			if err != nil {
-				t.Fatalf("Error while creating new logger: %#v", err)
-			}
 			loadReleases(t, ctrlClient, tc.inputRelease)
 
-			result, err := ContainsAzureOperator(ctx, ctrlClient, logger, tc.inputRelease)
+			result, err := ContainsAzureOperator(ctx, ctrlClient, tc.inputRelease)
 			if err != nil {
 				t.Fatalf("Error while calling ContainsAzureOperator: %#v", err)
 			}
@@ -156,6 +147,7 @@ func Test_ContainsAzureOperator(t *testing.T) {
 
 func loadReleases(t *testing.T, client client.Client, testReleasesToLoad ...string) {
 	for _, releaseVersion := range testReleasesToLoad {
+		t.Logf("Loading release %s to fake client...", releaseVersion)
 		var err error
 		fileName := fmt.Sprintf("release-v%s.yaml", releaseVersion)
 

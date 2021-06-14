@@ -7,10 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
-	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -244,10 +243,6 @@ func Test_IsCRProcessed_ReturnsTrue(t *testing.T) {
 			t.Log(tc.name)
 			ctx := context.Background()
 			ctrlClient := newFakeClient()
-			logger, err := micrologger.New(micrologger.Config{})
-			if err != nil {
-				t.Fatalf("Error while creating new logger: %#v", err)
-			}
 			loadReleases(t, ctrlClient)
 
 			if tc.ownerCluster != nil {
@@ -257,7 +252,7 @@ func Test_IsCRProcessed_ReturnsTrue(t *testing.T) {
 				}
 			}
 
-			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, logger, tc.inputCR)
+			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, tc.inputCR)
 			if err != nil {
 				t.Fatalf("Error when calling IsObjectReconciledByLegacyRelease: %#v", err)
 			}
@@ -295,7 +290,7 @@ func loadReleases(t *testing.T, client client.Client) {
 			t.Fatalf("failed to create object from input file %s, the file does not contain Release CR", fileName)
 		}
 
-		var release v1alpha1.Release
+		var release releasev1alpha1.Release
 		err = yaml.Unmarshal(bs, &release)
 		if err != nil {
 			t.Fatalf("failed to create object from input file %s: %#v", fileName, err)
@@ -331,7 +326,7 @@ func newFakeClient() client.Client {
 		panic(err)
 	}
 
-	err = v1alpha1.AddToScheme(scheme)
+	err = releasev1alpha1.AddToScheme(scheme)
 	if err != nil {
 		panic(err)
 	}
