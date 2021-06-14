@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -102,8 +102,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 
 			release13 := &v1alpha1.Release{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "v13.0.0-alpha4",
-					Namespace: "default",
+					Name: "v13.0.0-alpha4",
 				},
 				Spec: v1alpha1.ReleaseSpec{
 					Components: []v1alpha1.ReleaseSpecComponent{
@@ -136,6 +135,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 
 			admit := &CreateMutator{
 				baseDomain: "k8s.test.westeurope.azure.gigantic.io",
+				ctrlCache:  ctrlClient,
 				ctrlClient: ctrlClient,
 				location:   "westeurope",
 				logger:     newLogger,

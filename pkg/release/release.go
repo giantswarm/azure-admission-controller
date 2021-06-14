@@ -4,26 +4,15 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	gocache "github.com/patrickmn/go-cache"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var (
-	cacheExpiry = 24 * time.Hour
-
-	// Cache of release components
-	// key: release version
-	// value: map "component name": "component version"
-	releaseComponentsCache = gocache.New(cacheExpiry, 24*time.Hour)
-)
-
-func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient client.Client, releaseVersion string) (map[string]string, error) {
+func GetComponentVersionsFromRelease(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (map[string]string, error) {
 	// Release CR always starts with a "v".
 	if !strings.HasPrefix(releaseVersion, "v") {
 		releaseVersion = fmt.Sprintf("v%s", releaseVersion)
@@ -32,7 +21,7 @@ func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient clie
 	// Retrieve the `Release` CR.
 	release := &releasev1alpha1.Release{}
 	{
-		err := ctrlClient.Get(ctx, client.ObjectKey{Name: releaseVersion, Namespace: "default"}, release)
+		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion}, release)
 		if apierrors.IsNotFound(err) {
 			return nil, microerror.Maskf(releaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
 		} else if err != nil {
@@ -47,41 +36,6 @@ func getComponentVersionsFromReleaseFromAPI(ctx context.Context, ctrlClient clie
 	}
 
 	return ret, nil
-}
-
-// GetComponentVersionsFromRelease returns a map that contains all release components mapped to
-// their respective versions which are included in that release.
-//
-// Since this function is called very often and it is calling Kubernetes API Server in the
-// management cluster, the release components are cached in memory for 24h. This should not be a
-// problem because versions of components in a release are idempotent, i.e. they do not change.
-func GetComponentVersionsFromRelease(ctx context.Context, ctrlClient client.Client, logger micrologger.Logger, releaseVersion string) (map[string]string, error) {
-	// Release CR always starts with a "v".
-	if !strings.HasPrefix(releaseVersion, "v") {
-		releaseVersion = fmt.Sprintf("v%s", releaseVersion)
-	}
-	var err error
-
-	var components map[string]string
-	{
-		cachedComponents, ok := releaseComponentsCache.Get(releaseVersion)
-
-		if ok {
-			// Release components are found in cache
-			components = cachedComponents.(map[string]string)
-		} else {
-			components, err = getComponentVersionsFromReleaseFromAPI(ctx, ctrlClient, releaseVersion)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			// Save in cache
-			releaseComponentsCache.Set(releaseVersion, components, gocache.DefaultExpiration)
-			logger.Debugf(ctx, "Release %s components saved in cache for a duration of %s", releaseVersion, cacheExpiry)
-		}
-	}
-
-	return components, nil
 }
 
 // ContainsAzureOperator checks if the specified release contains azure-operator.
