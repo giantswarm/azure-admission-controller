@@ -15,6 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 )
 
 type Mutator interface {
@@ -97,7 +99,7 @@ func extractName(request *v1beta1.AdmissionRequest) string {
 	return "<unknown>"
 }
 
-func writeResponse(mutator Mutator, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
+func writeResponse(mutator generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
 	resp, err := json.Marshal(v1beta1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",

@@ -13,6 +13,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 )
 
 type Validator interface {
@@ -61,7 +63,7 @@ func Handler(validator Validator) http.HandlerFunc {
 	}
 }
 
-func writeResponse(validator Validator, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
+func writeResponse(validator generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
 	resp, err := json.Marshal(v1beta1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",
