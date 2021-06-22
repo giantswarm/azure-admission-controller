@@ -338,52 +338,14 @@ func mainError() error {
 		}
 	}
 
-	var clusterCreateMutator *cluster.CreateMutator
+	var clusterWebhookHandler *cluster.WebhookHandler
 	{
-		conf := cluster.CreateMutatorConfig{
+		c := cluster.WebhookHandlerConfig{
 			BaseDomain: cfg.BaseDomain,
 			CtrlClient: ctrlClient,
 			Logger:     newLogger,
 		}
-		clusterCreateMutator, err = cluster.NewCreateMutator(conf)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var clusterUpdateMutator *cluster.UpdateMutator
-	{
-		conf := cluster.UpdateMutatorConfig{
-			CtrlCache:  ctrlCache,
-			CtrlClient: ctrlClient,
-			Logger:     newLogger,
-		}
-		clusterUpdateMutator, err = cluster.NewUpdateMutator(conf)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var clusterCreateValidator *cluster.CreateValidator
-	{
-		c := cluster.CreateValidatorConfig{
-			BaseDomain: cfg.BaseDomain,
-			CtrlClient: ctrlClient,
-			Logger:     newLogger,
-		}
-		clusterCreateValidator, err = cluster.NewCreateValidator(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var clusterUpdateValidator *cluster.UpdateValidator
-	{
-		c := cluster.UpdateValidatorConfig{
-			CtrlClient: ctrlClient,
-			Logger:     newLogger,
-		}
-		clusterUpdateValidator, err = cluster.NewUpdateValidator(c)
+		clusterWebhookHandler, err = cluster.NewWebhookHandler(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -448,6 +410,28 @@ func mainError() error {
 		}
 	}
 
+	var validatorHttpHandlerFactory *validator.HttpHandlerFactory
+	{
+		c := validator.HttpHandlerFactoryConfig{
+			CtrlClient: ctrlClient,
+		}
+		validatorHttpHandlerFactory, err = validator.NewHttpHandlerFactory(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var mutatorHttpHandlerFactory *mutator.HttpHandlerFactory
+	{
+		c := mutator.HttpHandlerFactoryConfig{
+			CtrlClient: ctrlClient,
+		}
+		mutatorHttpHandlerFactory, err = mutator.NewHttpHandlerFactory(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
 	// Mutators.
@@ -457,8 +441,8 @@ func mainError() error {
 	handler.Handle("/mutate/azuremachinepool/update", mutator.Handler(azureMachinePoolUpdateMutator))
 	handler.Handle("/mutate/azurecluster/create", mutator.Handler(azureClusterCreateMutator))
 	handler.Handle("/mutate/azurecluster/update", mutator.Handler(azureClusterUpdateMutator))
-	handler.Handle("/mutate/cluster/create", mutator.Handler(clusterCreateMutator))
-	handler.Handle("/mutate/cluster/update", mutator.Handler(clusterUpdateMutator))
+	handler.Handle("/mutate/cluster/create", mutatorHttpHandlerFactory.NewCreateHandler(clusterWebhookHandler))
+	handler.Handle("/mutate/cluster/update", mutatorHttpHandlerFactory.NewUpdateHandler(clusterWebhookHandler))
 	handler.Handle("/mutate/machinepool/create", mutator.Handler(machinePoolCreateMutator))
 	handler.Handle("/mutate/machinepool/update", mutator.Handler(machinePoolUpdateMutator))
 	handler.Handle("/mutate/spark/create", mutator.Handler(sparkCreateMutator))
@@ -472,8 +456,8 @@ func mainError() error {
 	handler.Handle("/validate/azuremachine/update", validator.Handler(azureMachineUpdateValidator))
 	handler.Handle("/validate/azuremachinepool/create", validator.Handler(azureMachinePoolCreateValidator))
 	handler.Handle("/validate/azuremachinepool/update", validator.Handler(azureMachinePoolUpdateValidator))
-	handler.Handle("/validate/cluster/create", validator.Handler(clusterCreateValidator))
-	handler.Handle("/validate/cluster/update", validator.Handler(clusterUpdateValidator))
+	handler.Handle("/validate/cluster/create", validatorHttpHandlerFactory.NewCreateHandler(clusterWebhookHandler))
+	handler.Handle("/validate/cluster/update", validatorHttpHandlerFactory.NewUpdateHandler(clusterWebhookHandler))
 	handler.Handle("/validate/machinepool/create", validator.Handler(machinePoolCreateValidator))
 	handler.Handle("/validate/machinepool/update", validator.Handler(machinePoolUpdateValidator))
 	handler.HandleFunc("/healthz", healthCheck)
