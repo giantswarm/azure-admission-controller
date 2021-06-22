@@ -38,10 +38,6 @@ func GetComponentVersionsFromRelease(ctx context.Context, ctrlReader client.Read
 }
 
 // ContainsAzureOperator checks if the specified release contains azure-operator.
-//
-// In order to perform the check, this function is calling GetComponentVersionsFromRelease function,
-// which is caching obtained components in memory. See GetComponentVersionsFromRelease docs for
-// more info about the caching.
 func ContainsAzureOperator(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (bool, error) {
 	componentVersions, err := GetComponentVersionsFromRelease(ctx, ctrlReader, releaseVersion)
 	if err != nil {
