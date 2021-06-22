@@ -13,7 +13,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/release"
 )
 
-func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Client, objectMeta metav1.Object) (bool, error) {
+func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Client, ctrlCache client.Reader, objectMeta metav1.Object) (bool, error) {
 	// Try to get release label from the CR
 	releaseVersionLabel := objectMeta.GetLabels()[label.ReleaseVersion]
 	if releaseVersionLabel == "" {
@@ -51,5 +51,5 @@ func IsObjectReconciledByLegacyRelease(ctx context.Context, ctrlClient client.Cl
 
 	// Now when we have release version for the CR, let's check if the release
 	// contains azure-operator.
-	return release.ContainsAzureOperator(ctx, ctrlClient, releaseVersionLabel)
+	return release.ContainsAzureOperator(ctx, ctrlCache, releaseVersionLabel)
 }

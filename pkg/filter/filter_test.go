@@ -39,7 +39,7 @@ const (
 	defaultTestCRNamespace = "org-test"
 )
 
-func Test_IsCRProcessed_ReturnsTrue(t *testing.T) {
+func Test_IsObjectReconciledByLegacyRelease(t *testing.T) {
 	testCases := []struct {
 		name           string
 		inputCR        object
@@ -252,7 +252,7 @@ func Test_IsCRProcessed_ReturnsTrue(t *testing.T) {
 				}
 			}
 
-			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, tc.inputCR)
+			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, ctrlClient, tc.inputCR)
 			if err != nil {
 				t.Fatalf("Error when calling IsObjectReconciledByLegacyRelease: %#v", err)
 			}
