@@ -65,7 +65,7 @@ func FindRelease(ctx context.Context, ctrlReader client.Reader, releaseVersion s
 	{
 		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion}, &release)
 		if apierrors.IsNotFound(err) {
-			return releasev1alpha1.Release{}, microerror.Maskf(releaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
+			return releasev1alpha1.Release{}, microerror.Maskf(ReleaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
 		} else if err != nil {
 			return releasev1alpha1.Release{}, microerror.Mask(err)
 		}
