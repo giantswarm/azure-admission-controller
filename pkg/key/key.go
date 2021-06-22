@@ -4,10 +4,14 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
+<<<<<<< HEAD
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+=======
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+>>>>>>> 97b924b... Replace Cluster mutators and validators with a webhook handler
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )
