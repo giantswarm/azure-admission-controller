@@ -252,7 +252,7 @@ func Test_IsObjectReconciledByLegacyRelease(t *testing.T) {
 				}
 			}
 
-			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, ctrlClient, tc.inputCR)
+			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, tc.inputCR)
 			if err != nil {
 				t.Fatalf("Error when calling IsObjectReconciledByLegacyRelease: %#v", err)
 			}
