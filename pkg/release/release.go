@@ -14,97 +14,97 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// GetReleaseVersionLabel gets release version string for the specified object.
+const (
+	azureOperatorComponentName = "azure-operator"
+)
+
+// TryFindReleaseForObject tries to find a Release CR for the specified object.
 //
-// If the object itself does not have the release version label, the function will look for cluster
-// name in the object labels, and then get the Cluster CR from which it will try to get the release
-// version label.
-func GetReleaseVersionLabel(ctx context.Context, ctrlCache client.Reader, objectMeta metav1.Object) (string, error) {
+// In order to get the release it needs a release name which is set in the CR label
+// release.giantswarm.io/version, so it first tries to get that label from the object. If the label
+// is not set, it uses the specified clusterGetter to get Cluster to which the CR belongs to, and
+// then it tries to get release.giantswarm.io/version label from the Cluster CR.
+//
+// Finally, it fetches the release CR by the release name.
+func TryFindReleaseForObject(ctx context.Context, ctrlReader client.Reader, objectMeta metav1.Object, ownerClusterGetter func(metav1.Object) capi.Cluster) (releasev1alpha1.Release, bool, error) {
 	// Try to get release label from the CR
-	releaseVersionLabel := objectMeta.GetLabels()[label.ReleaseVersion]
-	if releaseVersionLabel != "" {
-		return releaseVersionLabel, nil
-	}
-
-	// Release label is not found on the CR, let's try to get it from owner Cluster CR.
-
-	// First let's try to get CAPI cluster name label.
-	clusterName := objectMeta.GetLabels()[capi.ClusterLabelName]
-	if clusterName == "" {
-		// CAPI cluster name label not found, now let's try GS cluster ID label, which is basically
-		// the same thing.
-		clusterID := objectMeta.GetLabels()[label.Cluster]
-		if clusterID == "" {
-			// We can't find out which cluster and release this CR belongs to.
-			return "", nil
+	var releaseVersionLabel string
+	if objectMeta.GetLabels() != nil && objectMeta.GetLabels()[label.ReleaseVersion] != "" {
+		// Get release label from the object itself
+		releaseVersionLabel = objectMeta.GetLabels()[label.ReleaseVersion]
+	} else {
+		// Get release label from the Cluster CR
+		cluster := ownerClusterGetter(objectMeta)
+		if cluster.Labels != nil && cluster.Labels[label.ReleaseVersion] != "" {
+			releaseVersionLabel = cluster.Labels[label.ReleaseVersion]
 		}
-
-		// We found GS cluster ID, this is our cluster name.
-		clusterName = clusterID
 	}
 
-	// Now get the owner cluster by name, we will try to check if it has release label.
-	cluster := &capi.Cluster{}
-	key := client.ObjectKey{
-		Namespace: objectMeta.GetNamespace(),
-		Name:      clusterName,
+	// check if we have found the release label
+	if releaseVersionLabel == "" {
+		return releasev1alpha1.Release{}, false, nil
 	}
-	err := ctrlCache.Get(ctx, key, cluster)
+
+	release, err := FindRelease(ctx, ctrlReader, releaseVersionLabel)
 	if err != nil {
-		return "", microerror.Mask(err)
+		return releasev1alpha1.Release{}, false, microerror.Mask(err)
 	}
 
-	releaseVersionLabel = cluster.Labels[label.ReleaseVersion]
-	return releaseVersionLabel, nil
+	return release, true, nil
 }
 
-// IsLegacyRelease checks if the specified release is a legacy release, i.e. a release without
-// Cluster API controllers.
-func IsLegacyRelease(ctx context.Context, ctrlCache client.Reader, releaseVersion string) (bool, error) {
-	releaseContainsAzureOperator, err := ContainsAzureOperator(ctx, ctrlCache, releaseVersion)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	return releaseContainsAzureOperator, nil
-}
-
-func GetComponentVersionsFromRelease(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (map[string]string, error) {
+// FindRelease gets Release CR with the specified name.
+func FindRelease(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (releasev1alpha1.Release, error) {
 	// Release CR always starts with a "v".
 	if !strings.HasPrefix(releaseVersion, "v") {
 		releaseVersion = fmt.Sprintf("v%s", releaseVersion)
 	}
 
 	// Retrieve the `Release` CR.
-	release := &releasev1alpha1.Release{}
+	release := releasev1alpha1.Release{}
 	{
-		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion}, release)
+		err := ctrlReader.Get(ctx, client.ObjectKey{Name: releaseVersion}, &release)
 		if apierrors.IsNotFound(err) {
-			return nil, microerror.Maskf(releaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
+			return releasev1alpha1.Release{}, microerror.Maskf(releaseNotFoundError, "Looking for Release %s but it was not found. Can't continue.", releaseVersion)
 		} else if err != nil {
-			return nil, microerror.Mask(err)
+			return releasev1alpha1.Release{}, microerror.Mask(err)
 		}
 	}
 
-	ret := map[string]string{}
-	// Search the desired component.
-	for _, component := range release.Spec.Components {
-		ret[component.Name] = component.Version
+	return release, nil
+}
+
+// GetComponentVersionsFromRelease gets all release components from the release with the specified name.
+func GetComponentVersionsFromRelease(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (map[string]string, error) {
+	release, err := FindRelease(ctx, ctrlReader, releaseVersion)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
+	ret := GetComponentVersionsFromReleaseCR(release)
 	return ret, nil
 }
 
+// GetComponentVersionsFromReleaseCR gets all release components from the specified Release CR.
+func GetComponentVersionsFromReleaseCR(release releasev1alpha1.Release) map[string]string {
+	componentVersions := map[string]string{}
+	// Search the desired component.
+	for _, component := range release.Spec.Components {
+		componentVersions[component.Name] = component.Version
+	}
+
+	return componentVersions
+}
+
 // ContainsAzureOperator checks if the specified release contains azure-operator.
-func ContainsAzureOperator(ctx context.Context, ctrlReader client.Reader, releaseVersion string) (bool, error) {
-	componentVersions, err := GetComponentVersionsFromRelease(ctx, ctrlReader, releaseVersion)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
+func ContainsAzureOperator(release releasev1alpha1.Release) bool {
+	componentVersions := GetComponentVersionsFromReleaseCR(release)
+	return componentVersions[azureOperatorComponentName] != ""
+}
 
-	if componentVersions["azure-operator"] == "" {
-		return false, nil
-	}
-
-	return true, nil
+// IsLegacy checks if the specified release is a legacy release, i.e. a release without
+// Cluster API controllers.
+// If the release has azure-operator, it is considered to be a legacy release.
+func IsLegacy(release releasev1alpha1.Release) bool {
+	return ContainsAzureOperator(release)
 }

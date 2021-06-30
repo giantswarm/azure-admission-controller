@@ -245,14 +245,20 @@ func Test_IsObjectReconciledByLegacyRelease(t *testing.T) {
 			ctrlClient := newFakeClient()
 			loadReleases(t, ctrlClient)
 
-			if tc.ownerCluster != nil {
-				err := ctrlClient.Create(ctx, tc.ownerCluster)
-				if err != nil {
-					t.Fatalf("Error when setting up test data: %#v", err)
+			clusterGetter := func(metav1.Object) capi.Cluster {
+				if tc.ownerCluster == nil {
+					return capi.Cluster{}
 				}
+
+				cluster, ok := tc.ownerCluster.(*capi.Cluster)
+				if !ok {
+					t.Fatalf("Owner cluster is not a Cluster CR, check test inputs, got %T, expected *Cluster.", tc.ownerCluster)
+				}
+
+				return *cluster
 			}
 
-			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, tc.inputCR)
+			result, err := IsObjectReconciledByLegacyRelease(ctx, ctrlClient, tc.inputCR, clusterGetter)
 			if err != nil {
 				t.Fatalf("Error when calling IsObjectReconciledByLegacyRelease: %#v", err)
 			}

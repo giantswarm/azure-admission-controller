@@ -9,6 +9,7 @@ import (
 
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -98,7 +99,7 @@ func Test_GetComponentVersionsFromRelease(t *testing.T) {
 	}
 }
 
-func Test_ContainsAzureOperator(t *testing.T) {
+func Test_IsLegacy(t *testing.T) {
 	testCases := []struct {
 		name           string
 		inputRelease   string
@@ -123,23 +124,118 @@ func Test_ContainsAzureOperator(t *testing.T) {
 			ctrlClient := newFakeClient()
 			loadReleases(t, ctrlClient, tc.inputRelease)
 
-			result, err := ContainsAzureOperator(ctx, ctrlClient, tc.inputRelease)
+			release, err := FindRelease(ctx, ctrlClient, tc.inputRelease)
 			if err != nil {
-				t.Fatalf("Error while calling ContainsAzureOperator: %#v", err)
+				t.Fatalf("Error while calling FindRelease: %#v", err)
 			}
+
+			result := IsLegacy(release)
 
 			if result != tc.expectedResult {
 				var expectedMsg string
 				var gotMsg string
 				if tc.expectedResult == true {
-					expectedMsg = "release contains azure-operator"
-					gotMsg = "release doesn't contain azure-operator"
+					expectedMsg = "release is legacy"
+					gotMsg = "release is not legacy"
 				} else {
-					expectedMsg = "release doesn't contain azure-operator"
-					gotMsg = "release contains azure-operator"
+					expectedMsg = "release is not legacy"
+					gotMsg = "release is legacy"
 				}
 
 				t.Errorf("Expected %t (%s), got %t instead (%s)", tc.expectedResult, expectedMsg, result, gotMsg)
+			}
+		})
+	}
+}
+
+func Test_TryFindReleaseForObject(t *testing.T) {
+	testCases := []struct {
+		name           string
+		inputRelease   string
+		object         metav1.Object
+		ownerCluster   capi.Cluster
+		expectedResult bool
+	}{
+		{
+			name:         "Cluster with release label",
+			inputRelease: "14.1.4",
+			object: &capi.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "14.1.4",
+					},
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			name:           "Cluster without release label",
+			inputRelease:   "14.1.4",
+			object:         &capi.Cluster{},
+			expectedResult: false,
+		},
+		{
+			name:         "AzureCluster with release label",
+			inputRelease: "14.1.4",
+			object: &capz.AzureCluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "14.1.4",
+					},
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			name:         "AzureCluster without release label, Cluster with release label",
+			inputRelease: "14.1.4",
+			object:       &capz.AzureCluster{},
+			ownerCluster: capi.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "14.1.4",
+					},
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			name:           "AzureCluster without release label, Cluster without release label",
+			inputRelease:   "14.1.4",
+			object:         &capz.AzureCluster{},
+			ownerCluster:   capi.Cluster{},
+			expectedResult: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Log(tc.name)
+			ctx := context.Background()
+			ctrlClient := newFakeClient()
+			loadReleases(t, ctrlClient, tc.inputRelease)
+
+			clusterGetter := func(metav1.Object) capi.Cluster {
+				return tc.ownerCluster
+			}
+
+			_, ok, err := TryFindReleaseForObject(ctx, ctrlClient, tc.object, clusterGetter)
+			if err != nil {
+				t.Fatalf("Error while calling TryFindReleaseForObject: %#v", err)
+			}
+
+			if ok != tc.expectedResult {
+				var expectedMsg string
+				var gotMsg string
+				if tc.expectedResult == true {
+					expectedMsg = "release found"
+					gotMsg = "release is not found"
+				} else {
+					expectedMsg = "release is not found"
+					gotMsg = "release is found"
+				}
+
+				t.Errorf("Expected %t (%s), got %t instead (%s)", tc.expectedResult, expectedMsg, ok, gotMsg)
 			}
 		})
 	}
