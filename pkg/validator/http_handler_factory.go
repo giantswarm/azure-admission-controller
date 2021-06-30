@@ -8,9 +8,12 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"k8s.io/api/admission/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 )
 
 type HttpHandlerFactoryConfig struct {
@@ -43,8 +46,17 @@ func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreate
 			return microerror.Mask(err)
 		}
 
+		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
+			ownerCluster, ok, err := generic.GetOwnerCluster(ctx, h.ctrlClient, object)
+			if err != nil {
+				return capi.Cluster{}, false, microerror.Mask(err)
+			}
+
+			return ownerCluster, ok, nil
+		}
+
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object.GetObjectMeta())
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -72,8 +84,17 @@ func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdate
 			return microerror.Mask(err)
 		}
 
+		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
+			ownerCluster, ok, err := generic.GetOwnerCluster(ctx, h.ctrlClient, object)
+			if err != nil {
+				return capi.Cluster{}, false, microerror.Mask(err)
+			}
+
+			return ownerCluster, ok, nil
+		}
+
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object.GetObjectMeta())
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}

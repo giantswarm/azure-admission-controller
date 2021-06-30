@@ -275,13 +275,13 @@ func loadReleases(t *testing.T, ctx context.Context, client client.Client) {
 			t.Fatalf("failed to create object from input file %s, the file does not contain Release CR", fileName)
 		}
 
-		var release releasev1alpha1.Release
-		err = yaml.Unmarshal(bs, &release)
+		var r releasev1alpha1.Release
+		err = yaml.Unmarshal(bs, &r)
 		if err != nil {
 			t.Fatalf("failed to create object from input file %s: %#v", fileName, err)
 		}
 
-		err = client.Create(ctx, &release)
+		err = client.Create(ctx, &r)
 		if err != nil {
 			t.Fatalf("failed to create object from input file %s: %#v", fileName, err)
 		}
