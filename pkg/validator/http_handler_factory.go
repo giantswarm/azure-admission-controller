@@ -17,20 +17,26 @@ import (
 )
 
 type HttpHandlerFactoryConfig struct {
+	CtrlCache  client.Reader
 	CtrlClient client.Client
 }
 
 // HttpHandlerFactory creates HTTP handlers for validating create and update requests.
 type HttpHandlerFactory struct {
+	ctrlCache  client.Reader
 	ctrlClient client.Client
 }
 
 func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory, error) {
+	if config.CtrlCache == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlCache must not be empty", config)
+	}
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
 
 	h := &HttpHandlerFactory{
+		ctrlCache:  config.CtrlCache,
 		ctrlClient: config.CtrlClient,
 	}
 
@@ -56,7 +62,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreate
 		}
 
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlCache, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -94,7 +100,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdate
 		}
 
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlClient, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.ctrlCache, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}
