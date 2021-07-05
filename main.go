@@ -338,6 +338,7 @@ func mainError() error {
 	{
 		c := validator.HttpHandlerFactoryConfig{
 			CtrlClient: ctrlClient,
+			CtrlCache: ctrlCache,
 		}
 		validatorHttpHandlerFactory, err = validator.NewHttpHandlerFactory(c)
 		if err != nil {
