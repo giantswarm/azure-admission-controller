@@ -22,6 +22,11 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 	if err != nil {
 		return microerror.Mask(err)
 	}
+	if !clusterNewCR.GetDeletionTimestamp().IsZero() {
+		h.logger.LogCtx(ctx, "level", "debug", "message", "The object is being deleted so we don't validate it")
+		return nil
+	}
+
 	clusterOldCR, err := key.ToClusterPtr(oldObject)
 	if err != nil {
 		return microerror.Mask(err)

@@ -14,7 +14,7 @@ import (
 type WebhookHandler struct {
 	baseDomain string
 	decoder    runtime.Decoder
-	ctrlCache  client.Reader
+	ctrlReader client.Reader
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
@@ -22,7 +22,7 @@ type WebhookHandler struct {
 type WebhookHandlerConfig struct {
 	BaseDomain string
 	Decoder    runtime.Decoder
-	CtrlCache  client.Reader
+	CtrlReader client.Reader
 	CtrlClient client.Client
 	Logger     micrologger.Logger
 }
@@ -34,8 +34,8 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	if config.Decoder == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Decoder must not be empty", config)
 	}
-	if config.CtrlCache == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlCache must not be empty", config)
+	if config.CtrlReader == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlReader must not be empty", config)
 	}
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
@@ -47,7 +47,7 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	v := &WebhookHandler{
 		baseDomain: config.BaseDomain,
 		decoder:    config.Decoder,
-		ctrlCache:  config.CtrlCache,
+		ctrlReader: config.CtrlReader,
 		ctrlClient: config.CtrlClient,
 		logger:     config.Logger,
 	}
