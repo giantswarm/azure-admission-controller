@@ -54,7 +54,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
-			ownerCluster, ok, err := generic.GetOwnerCluster(ctx, h.ctrlClient, object)
+			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}
@@ -94,7 +94,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
-			ownerCluster, ok, err := generic.GetOwnerCluster(ctx, h.ctrlClient, object)
+			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}

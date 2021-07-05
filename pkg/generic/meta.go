@@ -38,9 +38,9 @@ func TryGetClusterName(object metav1.ObjectMetaAccessor) (string, bool) {
 	return clusterName, clusterName != ""
 }
 
-// GetOwnerCluster gets owner Cluster CR for the specified object. It first gets the cluster name
+// TryGetOwnerCluster gets owner Cluster CR for the specified object. It first gets the cluster name
 // with TryGetClusterName, and then it fetches the Cluster CR with the specified client.Reader.
-func GetOwnerCluster(ctx context.Context, ctrlReader client.Reader, object metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
+func TryGetOwnerCluster(ctx context.Context, ctrlReader client.Reader, object metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 	clusterName, ok := TryGetClusterName(object)
 	if !ok {
 		return capi.Cluster{}, false, nil
