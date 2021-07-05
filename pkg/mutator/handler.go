@@ -99,7 +99,7 @@ func extractName(request *v1beta1.AdmissionRequest) string {
 	return "<unknown>"
 }
 
-func writeResponse(mutator generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
+func writeResponse(logger generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
 	resp, err := json.Marshal(v1beta1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",
@@ -108,11 +108,11 @@ func writeResponse(mutator generic.Logger, writer http.ResponseWriter, response 
 		Response: response,
 	})
 	if err != nil {
-		mutator.Log("level", "error", "message", "unable to serialize response", "stack", microerror.JSON(err))
+		logger.Log("level", "error", "message", "unable to serialize response", "stack", microerror.JSON(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 	if _, err := writer.Write(resp); err != nil {
-		mutator.Log("level", "error", "message", "unable to write response", "stack", microerror.JSON(err))
+		logger.Log("level", "error", "message", "unable to write response", "stack", microerror.JSON(err))
 	}
 }
 

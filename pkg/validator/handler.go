@@ -63,7 +63,7 @@ func Handler(validator Validator) http.HandlerFunc {
 	}
 }
 
-func writeResponse(validator generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
+func writeResponse(logger generic.Logger, writer http.ResponseWriter, response *v1beta1.AdmissionResponse) {
 	resp, err := json.Marshal(v1beta1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",
@@ -72,15 +72,15 @@ func writeResponse(validator generic.Logger, writer http.ResponseWriter, respons
 		Response: response,
 	})
 	if err != nil {
-		validator.Log("level", "error", "message", "unable to serialize response", "stack", microerror.JSON(err))
+		logger.Log("level", "error", "message", "unable to serialize response", "stack", microerror.JSON(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 
 	if _, err := writer.Write(resp); err != nil {
-		validator.Log("level", "error", "message", "unable to write response", "stack", microerror.JSON(err))
+		logger.Log("level", "error", "message", "unable to write response", "stack", microerror.JSON(err))
 	}
 
-	validator.Log("level", "info", "message", fmt.Sprintf("Validated request responded with result: %t", response.Allowed))
+	logger.Log("level", "info", "message", fmt.Sprintf("Validated request responded with result: %t", response.Allowed))
 }
 
 func errorResponse(uid types.UID, err error) *v1beta1.AdmissionResponse {

@@ -13,6 +13,10 @@ import (
 
 type OwnerClusterGetter func(metav1.ObjectMetaAccessor) (capi.Cluster, bool, error)
 
+// TryGetClusterName tries to get Cluster CR name. The cluster name is obtained from specified
+// object's cluster.x-k8s.io/cluster-name or giantswarm.io/cluster label, by trying in that order.
+// If the name is found in one of those two labels, it returns that name and true, otherwise it
+// returns empty string and false.
 func TryGetClusterName(object metav1.ObjectMetaAccessor) (string, bool) {
 	if object.GetObjectMeta() == nil || object.GetObjectMeta().GetLabels() == nil {
 		return "", false
@@ -34,7 +38,9 @@ func TryGetClusterName(object metav1.ObjectMetaAccessor) (string, bool) {
 	return clusterName, clusterName != ""
 }
 
-func GetOwnerCluster(ctx context.Context, ctrlClient client.Client, object metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
+// GetOwnerCluster gets owner Cluster CR for the specified object. It first gets the cluster name
+// with TryGetClusterName, and then it fetches the Cluster CR with the specified client.Reader.
+func GetOwnerCluster(ctx context.Context, ctrlReader client.Reader, object metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 	clusterName, ok := TryGetClusterName(object)
 	if !ok {
 		return capi.Cluster{}, false, nil
@@ -49,7 +55,7 @@ func GetOwnerCluster(ctx context.Context, ctrlClient client.Client, object metav
 		Namespace: object.GetObjectMeta().GetNamespace(),
 		Name:      clusterName,
 	}
-	err := ctrlClient.Get(ctx, key, &cluster)
+	err := ctrlReader.Get(ctx, key, &cluster)
 	if apierrors.IsNotFound(err) {
 		return capi.Cluster{}, false, nil
 	} else if err != nil {
