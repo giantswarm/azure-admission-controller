@@ -434,6 +434,7 @@ func mainError() error {
 	{
 		c := mutator.HttpHandlerFactoryConfig{
 			CtrlClient: ctrlClient,
+			CtrlCache:  ctrlCache,
 		}
 		mutatorHttpHandlerFactory, err = mutator.NewHttpHandlerFactory(c)
 		if err != nil {
