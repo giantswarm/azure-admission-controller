@@ -7,7 +7,10 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+<<<<<<< HEAD
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+=======
+>>>>>>> 24c7d66... Replace AzureCluster mutators and validators with a webhook handler
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
