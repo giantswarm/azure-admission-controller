@@ -56,6 +56,7 @@ func TestMachinePoolUpdateValidate(t *testing.T) {
 				}
 			}
 
+			ctx := context.Background()
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
@@ -79,7 +80,7 @@ func TestMachinePoolUpdateValidate(t *testing.T) {
 			}
 
 			// Run validating webhook handler on MachinePool update.
-			err = handler.OnUpdateValidate(context.Background(), tc.oldNodePool, tc.newNodePool)
+			err = handler.OnUpdateValidate(ctx, tc.oldNodePool, tc.newNodePool)
 
 			// Check if the error is the expected one.
 			switch {

@@ -281,7 +281,7 @@ func TestMachinePoolUpdateMutate(t *testing.T) {
 			}
 
 			// Run mutating webhook handler on MachinePool update.
-			patches, err := handler.OnUpdateMutate(context.Background(), nil, tc.nodePool)
+			patches, err := handler.OnUpdateMutate(ctx, nil, tc.nodePool)
 
 			// Check if the error is the expected one.
 			switch {
