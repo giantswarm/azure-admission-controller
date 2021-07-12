@@ -9,9 +9,7 @@ import (
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
@@ -157,22 +155,6 @@ func TestAzureMachineCreateValidate(t *testing.T) {
 			}
 		})
 	}
-}
-
-func getCreateAdmissionRequest(newMP []byte) *v1beta1.AdmissionRequest {
-	req := &v1beta1.AdmissionRequest{
-		Resource: metav1.GroupVersionResource{
-			Version:  "exp.infrastructure.cluster.x-k8s.io/v1alpha3",
-			Resource: "azuremachinepool",
-		},
-		Operation: v1beta1.Create,
-		Object: runtime.RawExtension{
-			Raw:    newMP,
-			Object: nil,
-		},
-	}
-
-	return req
 }
 
 type StubAPI struct {
