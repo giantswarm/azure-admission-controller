@@ -262,13 +262,13 @@ func mainError() error {
 		}
 	}
 
-	var sparkCreateMutator *spark.CreateMutator
+	var sparkWebhookHandler *spark.WebhookHandler
 	{
-		c := spark.CreateMutatorConfig{
+		c := spark.WebhookHandlerConfig{
 			CtrlClient: ctrlClient,
 			Logger:     newLogger,
 		}
-		sparkCreateMutator, err = spark.NewCreateMutator(c)
+		sparkWebhookHandler, err = spark.NewWebhookHandler(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -311,7 +311,7 @@ func mainError() error {
 	handler.Handle("/mutate/cluster/update", mutatorHttpHandlerFactory.NewUpdateHandler(clusterWebhookHandler))
 	handler.Handle("/mutate/machinepool/create", mutatorHttpHandlerFactory.NewCreateHandler(machinePoolWebhookHandler))
 	handler.Handle("/mutate/machinepool/update", mutatorHttpHandlerFactory.NewUpdateHandler(machinePoolWebhookHandler))
-	handler.Handle("/mutate/spark/create", mutator.Handler(sparkCreateMutator))
+	handler.Handle("/mutate/spark/create", mutatorHttpHandlerFactory.NewCreateHandler(sparkWebhookHandler))
 
 	// Validators.
 	handler.Handle("/validate/azureconfig/update", validator.Handler(azureConfigValidator))
