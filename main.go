@@ -207,6 +207,7 @@ func mainError() error {
 	{
 		c := azuremachine.WebhookHandlerConfig{
 			CtrlClient: ctrlClient,
+			Decoder:    universalDeserializer,
 			Location:   cfg.Location,
 			Logger:     newLogger,
 			VMcaps:     vmcaps,

@@ -19,6 +19,7 @@ import (
 
 type WebhookHandler struct {
 	ctrlClient client.Client
+	decoder    runtime.Decoder
 	location   string
 	logger     micrologger.Logger
 	vmcaps     *vmcapabilities.VMSKU
@@ -26,6 +27,7 @@ type WebhookHandler struct {
 
 type WebhookHandlerConfig struct {
 	CtrlClient client.Client
+	Decoder    runtime.Decoder
 	Location   string
 	Logger     micrologger.Logger
 	VMcaps     *vmcapabilities.VMSKU
@@ -34,6 +36,9 @@ type WebhookHandlerConfig struct {
 func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
+	}
+	if config.Decoder == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Decoder must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
@@ -47,6 +52,7 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 
 	v := &WebhookHandler{
 		ctrlClient: config.CtrlClient,
+		decoder:    config.Decoder,
 		location:   config.Location,
 		logger:     config.Logger,
 		vmcaps:     config.VMcaps,
