@@ -266,6 +266,7 @@ func mainError() error {
 	{
 		c := spark.WebhookHandlerConfig{
 			CtrlClient: ctrlClient,
+			Decoder:    universalDeserializer,
 			Logger:     newLogger,
 		}
 		sparkWebhookHandler, err = spark.NewWebhookHandler(c)

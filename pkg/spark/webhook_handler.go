@@ -14,11 +14,13 @@ import (
 
 type WebhookHandler struct {
 	ctrlClient client.Client
+	decoder    runtime.Decoder
 	logger     micrologger.Logger
 }
 
 type WebhookHandlerConfig struct {
 	CtrlClient client.Client
+	Decoder    runtime.Decoder
 	Logger     micrologger.Logger
 }
 
@@ -26,12 +28,16 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
+	if config.Decoder == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Decoder must not be empty", config)
+	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	m := &WebhookHandler{
 		ctrlClient: config.CtrlClient,
+		decoder:    config.Decoder,
 		logger:     config.Logger,
 	}
 
