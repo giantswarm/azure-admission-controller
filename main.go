@@ -325,6 +325,7 @@ func mainError() error {
 	{
 		c := machinepool.WebhookHandlerConfig{
 			CtrlClient: ctrlClient,
+			Decoder:    universalDeserializer,
 			Logger:     newLogger,
 			VMcaps:     vmcaps,
 		}
