@@ -10,17 +10,18 @@ import (
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
 type WebhookHandler struct {
 	ctrlClient client.Client
+	decoder    runtime.Decoder
 	logger     micrologger.Logger
 	vmcaps     *vmcapabilities.VMSKU
 }
 
 type WebhookHandlerConfig struct {
 	CtrlClient client.Client
+	Decoder    runtime.Decoder
 	Logger     micrologger.Logger
 	VMcaps     *vmcapabilities.VMSKU
 }
@@ -28,6 +29,9 @@ type WebhookHandlerConfig struct {
 func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
+	}
+	if config.Decoder == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Decoder must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
@@ -38,6 +42,7 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 
 	handler := &WebhookHandler{
 		ctrlClient: config.CtrlClient,
+		decoder:    config.Decoder,
 		logger:     config.Logger,
 		vmcaps:     config.VMcaps,
 	}
@@ -55,7 +60,7 @@ func (h *WebhookHandler) Resource() string {
 
 func (h *WebhookHandler) Decode(rawObject runtime.RawExtension) (metav1.ObjectMetaAccessor, error) {
 	cr := &capiexp.MachinePool{}
-	if _, _, err := validator.Deserializer.Decode(rawObject.Raw, nil, cr); err != nil {
+	if _, _, err := h.decoder.Decode(rawObject.Raw, nil, cr); err != nil {
 		return nil, microerror.Maskf(errors.ParsingFailedError, "unable to parse MachinePool CR: %v", err)
 	}
 
