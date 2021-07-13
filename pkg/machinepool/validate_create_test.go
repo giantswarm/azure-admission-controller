@@ -224,6 +224,7 @@ func TestMachinePoolCreateValidate(t *testing.T) {
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
 				CtrlClient: ctrlClient,
+				Decoder:    unittest.NewFakeDecoder(),
 				Logger:     newLogger,
 				VMcaps:     vmcaps,
 			})
