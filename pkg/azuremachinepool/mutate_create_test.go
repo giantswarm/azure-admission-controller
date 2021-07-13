@@ -185,6 +185,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
 				CtrlClient: ctrlClient,
+				Decoder:    unittest.NewFakeDecoder(),
 				Location:   "westeurope",
 				Logger:     newLogger,
 				VMcaps:     vmcaps,
