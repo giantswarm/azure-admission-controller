@@ -167,6 +167,7 @@ func mainError() error {
 	{
 		c := azureupdate.AzureConfigWebhookHandlerConfig{
 			CtrlClient: ctrlClient,
+			Decoder:    universalDeserializer,
 			Logger:     newLogger,
 		}
 		azureConfigWebhookHandler, err = azureupdate.NewAzureConfigWebhookHandler(c)
