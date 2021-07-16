@@ -18,7 +18,7 @@ import (
 )
 
 type HttpHandlerFactoryConfig struct {
-	CtrlCache  client.Reader
+	CtrlReader client.Reader
 	CtrlClient client.Client
 }
 
@@ -29,15 +29,15 @@ type HttpHandlerFactory struct {
 }
 
 func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory, error) {
-	if config.CtrlCache == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlCache must not be empty", config)
+	if config.CtrlReader == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlReader must not be empty", config)
 	}
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
 
 	h := &HttpHandlerFactory{
-		ctrlCache:  config.CtrlCache,
+		ctrlCache:  config.CtrlReader,
 		ctrlClient: config.CtrlClient,
 	}
 

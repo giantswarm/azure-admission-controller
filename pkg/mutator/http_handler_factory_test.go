@@ -104,7 +104,7 @@ func TestHttpHandler(t *testing.T) {
 			var httpHandlerFactory *HttpHandlerFactory
 			{
 				c := HttpHandlerFactoryConfig{
-					CtrlCache:  ctrlClient, // Passing client here, for the sake of simpler test code
+					CtrlReader: ctrlClient, // Passing client here, for the sake of simpler test code
 					CtrlClient: ctrlClient,
 				}
 				httpHandlerFactory, err = NewHttpHandlerFactory(c)
