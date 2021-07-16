@@ -22,6 +22,22 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
+// RegisterWebhookHandlers first creates all required webhook handlers and then it adds registers
+// them to the specified HttpRequestHandler with appropriate paths.
+//
+// Examples:
+//
+// - A webhook handler implementation that implements validator.WebhookCreateHandler will be
+// registered to handle HTTP requests at path `/validate/<resource name>/create`.
+//
+// - A webhook handler implementation that implements validator.WebhookUpdateHandler will be
+// registered to handle HTTP requests at path `/validate/<resource name>/update`.
+//
+// - A webhook handler implementation that implements mutator.WebhookCreateHandler will be
+// registered to handle HTTP requests at path `/mutate/<resource name>/create`.
+//
+// - A webhook handler implementation that implements mutator.WebhookUpdateHandler will be
+// registered to handle HTTP requests at path `/mutate/<resource name>/update`.
 func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.Config, newLogger micrologger.Logger, ctrlClient client.Client, ctrlReader client.Reader, vmcaps *vmcapabilities.VMSKU) error {
 	var err error
 
