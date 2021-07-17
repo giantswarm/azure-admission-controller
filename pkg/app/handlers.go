@@ -46,6 +46,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		c := validator.HttpHandlerFactoryConfig{
 			CtrlClient: ctrlClient,
 			CtrlReader: ctrlReader,
+			Logger:     newLogger,
 		}
 		validatorHttpHandlerFactory, err = validator.NewHttpHandlerFactory(c)
 		if err != nil {
@@ -58,6 +59,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		c := mutator.HttpHandlerFactoryConfig{
 			CtrlClient: ctrlClient,
 			CtrlReader: ctrlReader,
+			Logger:     newLogger,
 		}
 		mutatorHttpHandlerFactory, err = mutator.NewHttpHandlerFactory(c)
 		if err != nil {
