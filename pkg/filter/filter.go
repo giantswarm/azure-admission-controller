@@ -28,7 +28,9 @@ func IsObjectReconciledByLegacyRelease(ctx context.Context, logger micrologger.L
 
 	// Now when we have release CR, let's check if this is a legacy release.
 	isLegacy := release.IsLegacy(releaseCR)
-	if !isLegacy {
+	if isLegacy {
+		logger.Debugf(ctx, "Object is reconciled by a legacy release.")
+	} else {
 		logger.Debugf(ctx, "Object not reconciled by a legacy release.")
 	}
 
