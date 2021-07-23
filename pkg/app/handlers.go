@@ -22,7 +22,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
-// RegisterWebhookHandlers first creates all required webhook handlers and then it adds registers
+// RegisterWebhookHandlers first creates all required webhook handlers and then it registers
 // them to the specified HttpRequestHandler with appropriate paths.
 //
 // Examples:
