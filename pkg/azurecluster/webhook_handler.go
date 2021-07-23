@@ -14,7 +14,7 @@ import (
 
 type WebhookHandler struct {
 	baseDomain string
-	ctrlCache  client.Reader
+	ctrlReader client.Reader
 	ctrlClient client.Client
 	decoder    runtime.Decoder
 	location   string
@@ -52,7 +52,7 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 
 	v := &WebhookHandler{
 		baseDomain: config.BaseDomain,
-		ctrlCache:  config.CtrlReader,
+		ctrlReader: config.CtrlReader,
 		ctrlClient: config.CtrlClient,
 		decoder:    config.Decoder,
 		location:   config.Location,

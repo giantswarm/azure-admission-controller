@@ -26,7 +26,7 @@ type HttpHandlerFactoryConfig struct {
 
 // HttpHandlerFactory creates HTTP handlers for mutating create and update requests.
 type HttpHandlerFactory struct {
-	ctrlCache  client.Reader
+	ctrlReader client.Reader
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
@@ -43,7 +43,7 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 	}
 
 	h := &HttpHandlerFactory{
-		ctrlCache:  config.CtrlReader,
+		ctrlReader: config.CtrlReader,
 		ctrlClient: config.CtrlClient,
 		logger:     config.Logger,
 	}
@@ -70,7 +70,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http
 		}
 
 		// Check if the CR should be mutated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlCache, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -110,7 +110,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http
 		}
 
 		// Check if the CR should be mutated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlCache, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

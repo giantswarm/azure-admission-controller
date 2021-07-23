@@ -25,7 +25,7 @@ type HttpHandlerFactoryConfig struct {
 
 // HttpHandlerFactory creates HTTP handlers for validating create and update requests.
 type HttpHandlerFactory struct {
-	ctrlCache  client.Reader
+	ctrlReader client.Reader
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
@@ -42,7 +42,7 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 	}
 
 	h := &HttpHandlerFactory{
-		ctrlCache:  config.CtrlReader,
+		ctrlReader: config.CtrlReader,
 		ctrlClient: config.CtrlClient,
 		logger:     config.Logger,
 	}
@@ -69,7 +69,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreate
 		}
 
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlCache, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -107,7 +107,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdate
 		}
 
 		// Check if the CR should be validated by the azure-admission-controller.
-		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlCache, object, ownerClusterGetter)
+		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
 			return microerror.Mask(err)
 		}
