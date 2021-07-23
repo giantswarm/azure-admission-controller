@@ -45,6 +45,6 @@ func Test_RegisterWebhookHandlers(t *testing.T) {
 	// Run webhook handlers registration.
 	err = RegisterWebhookHandlers(handler, cfg, logger, ctrlClient, ctrlClient, vmcaps)
 	if err != nil {
-		t.Errorf("Error while registering webhook handlers %#v", err)
+		t.Fatalf("Error while registering webhook handlers %#v", err)
 	}
 }
