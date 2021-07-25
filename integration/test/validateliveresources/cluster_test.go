@@ -19,7 +19,7 @@ import (
 func TestClusterFiltering(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
-	ctrlClient := NewCtrlClient(t)
+	ctrlClient := NewReadOnlyCtrlClient(t)
 
 	var clusterList capi.ClusterList
 	err := ctrlClient.List(ctx, &clusterList)
@@ -52,7 +52,7 @@ func TestClusterWebhookHandler(t *testing.T) {
 
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
-	ctrlClient := NewCtrlClient(t)
+	ctrlClient := NewReadOnlyCtrlClient(t)
 
 	var clusterWebhookHandler *clusterpkg.WebhookHandler
 	{

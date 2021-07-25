@@ -28,7 +28,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 )
 
-func NewCtrlClient(t *testing.T) client.Client {
+func NewReadOnlyCtrlClient(t *testing.T) client.Client {
 	var err error
 
 	schemeBuilder := runtime.SchemeBuilder{
@@ -67,7 +67,12 @@ func NewCtrlClient(t *testing.T) client.Client {
 		t.Fatal(err)
 	}
 
-	return ctrlClient
+	readOnlyClient := &ReadOnlyCtrlClient{
+		t:      t,
+		client: ctrlClient,
+	}
+
+	return readOnlyClient
 }
 
 func NewDecoder() runtime.Decoder {

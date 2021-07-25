@@ -21,7 +21,7 @@ import (
 func TestMachinePoolFiltering(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
-	ctrlClient := NewCtrlClient(t)
+	ctrlClient := NewReadOnlyCtrlClient(t)
 
 	var machinePoolList capiexp.MachinePoolList
 	err := ctrlClient.List(ctx, &machinePoolList)
@@ -59,7 +59,7 @@ func TestMachinePoolWebhookHandler(t *testing.T) {
 
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
-	ctrlClient := NewCtrlClient(t)
+	ctrlClient := NewReadOnlyCtrlClient(t)
 	SetAzureEnvironmentVariables(t, ctx, ctrlClient)
 
 	var machinePoolWebhookHandler *machinepoolpkg.WebhookHandler
