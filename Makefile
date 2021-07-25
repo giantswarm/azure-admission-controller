@@ -24,6 +24,6 @@ help: ## Display this help.
 
 .PHONY: live-installation-test
 ## live-installation-test: runs CR validation tests on a live installation
-live-installation-test:
+test-live-crs:
 	@echo "====> $@"
 	go test -ldflags "$(LDFLAGS)" -tags="liveinstallation" -race ./integration/test/validateliveresources
