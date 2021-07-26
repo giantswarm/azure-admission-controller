@@ -22,8 +22,14 @@ include Makefile.*.mk
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-.PHONY: live-installation-test
-## live-installation-test: runs CR validation tests on a live installation
+.PHONY: test-live-crs
+## test-live-crs: runs CR validation tests on a real management cluster
 test-live-crs:
 	@echo "====> $@"
-	go test -ldflags "$(LDFLAGS)" -tags="liveinstallation" -race ./integration/test/validateliveresources
+ifeq ($(MANAGEMENT_CLUSTER),)
+	@echo "MANAGEMENT_CLUSTER not set, exiting"
+else
+	@echo "Testing CRs in ${MANAGEMENT_CLUSTER}"
+	opsctl create kubeconfig -i "${MANAGEMENT_CLUSTER}"
+	go test -count=1 -ldflags "$(LDFLAGS)" -tags="liveinstallation" -race ./integration/test/validateliveresources
+endif
