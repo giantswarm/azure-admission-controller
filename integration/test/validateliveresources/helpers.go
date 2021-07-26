@@ -9,6 +9,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/micrologger"
@@ -32,6 +34,8 @@ func NewReadOnlyCtrlClient(t *testing.T) client.Client {
 	var err error
 
 	schemeBuilder := runtime.SchemeBuilder{
+		v1alpha1.AddToScheme,
+		corev1alpha1.AddToScheme,
 		corev1.AddToScheme,
 		capi.AddToScheme,
 		capiexp.AddToScheme,
