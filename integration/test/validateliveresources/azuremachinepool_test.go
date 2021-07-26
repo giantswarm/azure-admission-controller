@@ -46,11 +46,11 @@ func TestAzureMachinePoolFiltering(t *testing.T) {
 		}
 
 		if result == false {
-			azureMachinePoolName := fmt.Sprintf("%s/%s", azureMachinePool.Namespace, azureMachinePool.Name)
+			objectName := fmt.Sprintf("%s/%s", azureMachinePool.Namespace, azureMachinePool.Name)
 			t.Errorf("Expected 'true' (AzureMachinePool %s is reconciled by legacy release), got 'false' "+
 				"(AzureMachinePool %s is not reconciled by a legacy release).",
-				azureMachinePoolName,
-				azureMachinePoolName)
+				objectName,
+				objectName)
 		}
 	}
 }

@@ -46,11 +46,11 @@ func TestMachinePoolFiltering(t *testing.T) {
 		}
 
 		if result == false {
-			machinePoolName := fmt.Sprintf("%s/%s", machinePool.Namespace, machinePool.Name)
+			objectName := fmt.Sprintf("%s/%s", machinePool.Namespace, machinePool.Name)
 			t.Errorf("Expected 'true' (MachinePool %s is reconciled by legacy release), got 'false' "+
 				"(MachinePool %s is not reconciled by a legacy release).",
-				machinePoolName,
-				machinePoolName)
+				objectName,
+				objectName)
 		}
 	}
 }

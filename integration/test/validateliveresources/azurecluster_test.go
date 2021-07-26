@@ -47,11 +47,11 @@ func TestAzureClusterFiltering(t *testing.T) {
 		}
 
 		if result == false {
-			clusterName := fmt.Sprintf("%s/%s", azureCluster.Namespace, azureCluster.Name)
+			objectName := fmt.Sprintf("%s/%s", azureCluster.Namespace, azureCluster.Name)
 			t.Errorf("Expected 'true' (AzureCluster %s is reconciled by legacy release), got 'false' "+
 				"(AzureCluster %s is not reconciled by a legacy release).",
-				clusterName,
-				clusterName)
+				objectName,
+				objectName)
 		}
 	}
 }
@@ -106,12 +106,12 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		updatedCluster := azureCluster.DeepCopy()
-		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
+		updatedAzureCluster := azureCluster.DeepCopy()
+		updatedAzureCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
 		// Test mutating webhook, on update. Here we are passing the pointer to a copy of the
 		// object, because the OnUpdateMutate func can change it.
-		patches, err = azureClusterWebhookHandler.OnUpdateMutate(ctx, &azureCluster, updatedCluster.DeepCopy())
+		patches, err = azureClusterWebhookHandler.OnUpdateMutate(ctx, &azureCluster, updatedAzureCluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -121,7 +121,7 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 		}
 
 		// Test validating webhook, on update.
-		err = azureClusterWebhookHandler.OnUpdateValidate(ctx, &azureCluster, updatedCluster)
+		err = azureClusterWebhookHandler.OnUpdateValidate(ctx, &azureCluster, updatedAzureCluster)
 		if err != nil {
 			t.Fatal(err)
 		}

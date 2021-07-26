@@ -39,11 +39,11 @@ func TestClusterFiltering(t *testing.T) {
 		}
 
 		if result == false {
-			clusterName := fmt.Sprintf("%s/%s", cluster.Namespace, cluster.Name)
+			objectName := fmt.Sprintf("%s/%s", cluster.Namespace, cluster.Name)
 			t.Errorf("Expected 'true' (Cluster %s is reconciled by legacy release), got 'false' "+
 				"(Cluster %s is not reconciled by a legacy release).",
-				clusterName,
-				clusterName)
+				objectName,
+				objectName)
 		}
 	}
 }
