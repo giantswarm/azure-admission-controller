@@ -91,7 +91,7 @@ func TestAzureConfigWebhookHandler(t *testing.T) {
 			// Skip CRs that are being deleted.
 			continue
 		}
-		
+
 		updatedAzureConfig := azureConfig.DeepCopy()
 		updatedAzureConfig.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
