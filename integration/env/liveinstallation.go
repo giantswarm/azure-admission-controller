@@ -17,8 +17,8 @@ const (
 	// EnvVarBaseDomain is the process environment variable representing the
 	// E2E_BASE_DOMAIN env var which is set to k8s cluster base domain.
 	// For example, if we have a cluster named "mycluster" with API Server
-	// domain is api.mycluster.k8s.example.com, then the base domain is
-	// k8s.example.com.
+	// domain is api.mycluster.k8s.giant.region.example.com, then the base domain is
+	// k8s.giant.region.example.com.
 	envVarBaseDomain = "E2E_BASE_DOMAIN"
 
 	// EnvVarE2EKubeconfig is the process environment variable representing the
@@ -29,6 +29,7 @@ const (
 var (
 	e2eBaseDomain string
 	kubeconfig    string
+	location      string
 )
 
 func init() {
@@ -59,14 +60,18 @@ func init() {
 			panic(fmt.Sprintf("env var '%s' must not be empty, or correct kubeconfig must be specified, error %#v", envVarBaseDomain, err))
 		}
 
-		// hostname has form "g8s.<installation name>.example.com"
+		// hostname has form "g8s.<installation name>.region.example.com"
 		hostname := url.Hostname()
 
-		// We need "k8s.<installation name>.example.com" for base domain
+		// We need "k8s.<installation name>.region.example.com" for base domain
 		parts := strings.Split(hostname, ".")
 		parts[0] = "k8s"
 		e2eBaseDomain = strings.Join(parts, ".")
 	}
+
+	// Base domain has format "k8s.<installation name>.region.example.com",
+	// so the region/location name is 3rd part of the name.
+	location = strings.Split(e2eBaseDomain, ".")[2]
 }
 
 func BaseDomain() string {
@@ -75,4 +80,8 @@ func BaseDomain() string {
 
 func KubeConfig() string {
 	return kubeconfig
+}
+
+func Location() string {
+	return location
 }
