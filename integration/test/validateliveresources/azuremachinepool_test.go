@@ -31,6 +31,11 @@ func TestAzureMachinePoolFiltering(t *testing.T) {
 	}
 
 	for _, azureMachinePool := range azureMachinePoolList.Items {
+		if !azureMachinePool.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, ctrlClient, objectMeta)
 			if err != nil {
@@ -85,6 +90,11 @@ func TestAzureMachinePoolWebhookHandler(t *testing.T) {
 	}
 
 	for _, azureMachinePool := range azureMachinePoolList.Items {
+		if !azureMachinePool.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the
 		// object, because the OnCreateMutate func can change it.
 		_, err = azureMachinePoolWebhookHandler.OnCreateMutate(ctx, azureMachinePool.DeepCopy())

@@ -32,6 +32,11 @@ func TestAzureClusterFiltering(t *testing.T) {
 	}
 
 	for _, azureCluster := range azureClusterList.Items {
+		if !azureCluster.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, ctrlClient, objectMeta)
 			if err != nil {
@@ -87,6 +92,11 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 	}
 
 	for _, azureCluster := range azureClusterList.Items {
+		if !azureCluster.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		var patches []mutator.PatchOperation
 
 		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the

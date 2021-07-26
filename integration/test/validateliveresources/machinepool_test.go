@@ -31,6 +31,11 @@ func TestMachinePoolFiltering(t *testing.T) {
 	}
 
 	for _, machinePool := range machinePoolList.Items {
+		if !machinePool.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, ctrlClient, objectMeta)
 			if err != nil {
@@ -84,6 +89,11 @@ func TestMachinePoolWebhookHandler(t *testing.T) {
 	}
 
 	for _, machinePool := range machinePoolList.Items {
+		if !machinePool.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		var patches []mutator.PatchOperation
 
 		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the

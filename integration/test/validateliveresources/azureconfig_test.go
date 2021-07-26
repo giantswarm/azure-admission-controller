@@ -30,6 +30,11 @@ func TestAzureConfigFiltering(t *testing.T) {
 	}
 
 	for _, azureConfig := range azureConfigList.Items {
+		if !azureConfig.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, ctrlClient, objectMeta)
 			if err != nil {
@@ -82,6 +87,11 @@ func TestAzureConfigWebhookHandler(t *testing.T) {
 	}
 
 	for _, azureConfig := range azureConfigList.Items {
+		if !azureConfig.GetDeletionTimestamp().IsZero() {
+			// Skip CRs that are being deleted.
+			continue
+		}
+		
 		updatedAzureConfig := azureConfig.DeepCopy()
 		updatedAzureConfig.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
