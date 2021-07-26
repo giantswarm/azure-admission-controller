@@ -16,6 +16,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	machinepoolpkg "github.com/giantswarm/azure-admission-controller/pkg/machinepool"
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 func TestMachinePoolFiltering(t *testing.T) {
@@ -83,13 +84,20 @@ func TestMachinePoolWebhookHandler(t *testing.T) {
 	}
 
 	for _, machinePool := range machinePoolList.Items {
-		// Test mutating webhook, on create
-		_, err = machinePoolWebhookHandler.OnCreateMutate(ctx, &machinePool)
+		var patches []mutator.PatchOperation
+
+		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the
+		// object, because the OnCreateMutate func can change it.
+		patches, err = machinePoolWebhookHandler.OnCreateMutate(ctx, machinePool.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on create, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on create
+		// Test validating webhook, on create.
 		err = machinePoolWebhookHandler.OnCreateValidate(ctx, &machinePool)
 		if err != nil {
 			t.Fatal(err)
@@ -98,13 +106,18 @@ func TestMachinePoolWebhookHandler(t *testing.T) {
 		updatedMachinePool := machinePool.DeepCopy()
 		updatedMachinePool.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
-		// Test mutating webhook, on update
-		_, err = machinePoolWebhookHandler.OnUpdateMutate(ctx, &machinePool, updatedMachinePool)
+		// Test mutating webhook, on update. Here we are passing the pointer to a copy of the
+		// object, because the OnUpdateMutate func can change it.
+		patches, err = machinePoolWebhookHandler.OnUpdateMutate(ctx, &machinePool, updatedMachinePool.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on update, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on update
+		// Test validating webhook, on update.
 		err = machinePoolWebhookHandler.OnUpdateValidate(ctx, &machinePool, updatedMachinePool)
 		if err != nil {
 			t.Fatal(err)

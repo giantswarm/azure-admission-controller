@@ -17,6 +17,7 @@ import (
 	azureclusterpkg "github.com/giantswarm/azure-admission-controller/pkg/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 func TestAzureClusterFiltering(t *testing.T) {
@@ -69,7 +70,7 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 			BaseDomain: env.BaseDomain(),
 			Decoder:    NewDecoder(),
 			CtrlClient: ctrlClient,
-			Location:   "testregion", // TODO: get from installation base domain
+			Location:   env.Location(),
 			CtrlReader: ctrlClient,
 			Logger:     logger,
 		}
@@ -86,13 +87,20 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 	}
 
 	for _, azureCluster := range azureClusterList.Items {
-		// Test mutating webhook, on create
-		_, err = azureClusterWebhookHandler.OnCreateMutate(ctx, &azureCluster)
+		var patches []mutator.PatchOperation
+
+		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the
+		// object, because the OnCreateMutate func can change it.
+		patches, err = azureClusterWebhookHandler.OnCreateMutate(ctx, azureCluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on create, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on create
+		// Test validating webhook, on create.
 		err = azureClusterWebhookHandler.OnCreateValidate(ctx, &azureCluster)
 		if err != nil {
 			t.Fatal(err)
@@ -101,13 +109,18 @@ func TestAzureClusterWebhookHandler(t *testing.T) {
 		updatedCluster := azureCluster.DeepCopy()
 		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
-		// Test mutating webhook, on update
-		_, err = azureClusterWebhookHandler.OnUpdateMutate(ctx, &azureCluster, updatedCluster)
+		// Test mutating webhook, on update. Here we are passing the pointer to a copy of the
+		// object, because the OnUpdateMutate func can change it.
+		patches, err = azureClusterWebhookHandler.OnUpdateMutate(ctx, &azureCluster, updatedCluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on update, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on update
+		// Test validating webhook, on update.
 		err = azureClusterWebhookHandler.OnUpdateValidate(ctx, &azureCluster, updatedCluster)
 		if err != nil {
 			t.Fatal(err)

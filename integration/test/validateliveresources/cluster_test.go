@@ -14,6 +14,7 @@ import (
 	"github.com/giantswarm/azure-admission-controller/integration/env"
 	clusterpkg "github.com/giantswarm/azure-admission-controller/pkg/cluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
 
 func TestClusterFiltering(t *testing.T) {
@@ -76,28 +77,40 @@ func TestClusterWebhookHandler(t *testing.T) {
 	}
 
 	for _, cluster := range clusterList.Items {
-		// Test mutating webhook, on create
-		_, err = clusterWebhookHandler.OnCreateMutate(ctx, &cluster)
+		var patches []mutator.PatchOperation
+
+		// Test mutating webhook, on create. Here we are passing the pointer to a copy of the
+		// object, because the OnCreateMutate func can change it.
+		patches, err = clusterWebhookHandler.OnCreateMutate(ctx, cluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on create, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on create
+		// Test validating webhook, on create.
 		err = clusterWebhookHandler.OnCreateValidate(ctx, &cluster)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		updatedCluster := cluster.DeepCopy()
-		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
-
-		// Test mutating webhook, on update
-		_, err = clusterWebhookHandler.OnUpdateMutate(ctx, &cluster, updatedCluster)
+		// Test mutating webhook, on update. Here we are passing the pointer to a copy of the
+		// object, because the OnUpdateMutate func can change it.
+		patches, err = clusterWebhookHandler.OnUpdateMutate(ctx, &cluster, cluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(patches) > 0 {
+			t.Fatalf("CRs from a real management cluster must not require patches on update, " +
+				"because they should already have all fields set correctly.")
+		}
 
-		// Test validating webhook, on update
+		updatedCluster := cluster.DeepCopy()
+		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
+
+		// Test validating webhook, on update.
 		err = clusterWebhookHandler.OnUpdateValidate(ctx, &cluster, updatedCluster)
 		if err != nil {
 			t.Fatal(err)
