@@ -96,9 +96,13 @@ func TestClusterWebhookHandler(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		updatedCluster := cluster.DeepCopy()
+		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
+
+		// Test validating webhook, on update.
 		// Test mutating webhook, on update. Here we are passing the pointer to a copy of the
 		// object, because the OnUpdateMutate func can change it.
-		patches, err = clusterWebhookHandler.OnUpdateMutate(ctx, &cluster, cluster.DeepCopy())
+		patches, err = clusterWebhookHandler.OnUpdateMutate(ctx, &cluster, updatedCluster.DeepCopy())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -107,10 +111,6 @@ func TestClusterWebhookHandler(t *testing.T) {
 				"because they should already have all fields set correctly.")
 		}
 
-		updatedCluster := cluster.DeepCopy()
-		updatedCluster.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
-
-		// Test validating webhook, on update.
 		err = clusterWebhookHandler.OnUpdateValidate(ctx, &cluster, updatedCluster)
 		if err != nil {
 			t.Fatal(err)
