@@ -92,7 +92,7 @@ func TestAzureConfigWebhookHandler(t *testing.T) {
 		updatedAzureConfig := azureConfig.DeepCopy()
 		updatedAzureConfig.Labels["test.giantswarm.io/dummy"] = "this is not really saved"
 
-		// Test mutating webhook, on create.
+		// Test validating webhook, on update.
 		err = azureConfigWebhookHandler.OnUpdateValidate(ctx, &azureConfig, updatedAzureConfig)
 		if err != nil {
 			t.Fatal(err)
