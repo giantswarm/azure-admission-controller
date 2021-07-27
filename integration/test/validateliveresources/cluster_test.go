@@ -45,10 +45,7 @@ func TestClusterFiltering(t *testing.T) {
 
 		if result == false {
 			objectName := fmt.Sprintf("%s/%s", cluster.Namespace, cluster.Name)
-			t.Errorf("Expected 'true' (Cluster %s is reconciled by legacy release), got 'false' "+
-				"(Cluster %s is not reconciled by a legacy release).",
-				objectName,
-				objectName)
+			t.Errorf("Expected Cluster '%s' to be reconciled by a legacy release, but it's not.", objectName)
 		}
 	}
 }

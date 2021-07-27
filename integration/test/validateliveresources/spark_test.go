@@ -52,10 +52,7 @@ func TestSparkFiltering(t *testing.T) {
 
 		if result == false {
 			objectName := fmt.Sprintf("%s/%s", spark.Namespace, spark.Name)
-			t.Errorf("Expected 'true' (Spark %s is reconciled by legacy release), got 'false' "+
-				"(Spark %s is not reconciled by a legacy release).",
-				objectName,
-				objectName)
+			t.Errorf("Expected Spark '%s' to be reconciled by a legacy release, but it's not.", objectName)
 		}
 	}
 }

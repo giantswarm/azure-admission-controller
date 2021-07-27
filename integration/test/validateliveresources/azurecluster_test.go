@@ -53,10 +53,7 @@ func TestAzureClusterFiltering(t *testing.T) {
 
 		if result == false {
 			objectName := fmt.Sprintf("%s/%s", azureCluster.Namespace, azureCluster.Name)
-			t.Errorf("Expected 'true' (AzureCluster %s is reconciled by legacy release), got 'false' "+
-				"(AzureCluster %s is not reconciled by a legacy release).",
-				objectName,
-				objectName)
+			t.Errorf("Expected AzureCluster '%s' to be reconciled by a legacy release, but it's not.", objectName)
 		}
 	}
 }

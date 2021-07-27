@@ -53,10 +53,7 @@ func TestAzureMachineFiltering(t *testing.T) {
 
 		if result == false {
 			objectName := fmt.Sprintf("%s/%s", azureMachine.Namespace, azureMachine.Name)
-			t.Errorf("Expected 'true' (AzureMachine %s is reconciled by legacy release), got 'false' "+
-				"(AzureMachine %s is not reconciled by a legacy release).",
-				objectName,
-				objectName)
+			t.Errorf("Expected AzureMachine '%s' to be reconciled by a legacy release, but it's not.", objectName)
 		}
 	}
 }

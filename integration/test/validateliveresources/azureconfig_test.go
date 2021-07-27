@@ -51,10 +51,7 @@ func TestAzureConfigFiltering(t *testing.T) {
 
 		if result == false {
 			objectName := fmt.Sprintf("%s/%s", azureConfig.Namespace, azureConfig.Name)
-			t.Errorf("Expected 'true' (AzureConfig %s is reconciled by legacy release), got 'false' "+
-				"(AzureConfig %s is not reconciled by a legacy release).",
-				objectName,
-				objectName)
+			t.Errorf("Expected AzureConfig '%s' to be reconciled by a legacy release, but it's not.", objectName)
 		}
 	}
 }
