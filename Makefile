@@ -27,9 +27,9 @@ help: ## Display this help.
 test-live-crs:
 	@echo "====> $@"
 ifeq ($(MANAGEMENT_CLUSTER),)
-	@echo "MANAGEMENT_CLUSTER not set, exiting"
+	@echo "MANAGEMENT_CLUSTER not set, using current kubectl context."
 else
-	@echo "Testing CRs in ${MANAGEMENT_CLUSTER}"
+	@echo "Testing CRs in ${MANAGEMENT_CLUSTER}, changing kubectl context."
 	opsctl create kubeconfig -i "${MANAGEMENT_CLUSTER}"
-	go test -count=1 -ldflags "$(LDFLAGS)" -tags="liveinstallation" -race ./integration/test/validateliveresources
 endif
+	go test -count=1 -ldflags "$(LDFLAGS)" -tags="liveinstallation" -race ./integration/test/validateliveresources
