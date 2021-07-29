@@ -2,7 +2,6 @@ package values
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 
 	"github.com/giantswarm/microerror"
@@ -49,8 +48,6 @@ func YAML(clientID, clientSecret, subscriptionID, tenantID string) (string, erro
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
-
-	fmt.Printf("\ndebug\n---\n%s\n---\n", tpl.String())
 
 	return tpl.String(), nil
 }
