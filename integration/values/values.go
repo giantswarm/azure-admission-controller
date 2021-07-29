@@ -10,7 +10,7 @@ import (
 const Template = `workloadCluster:
   kubernetes:
     api:
-	  endpointBase: k8s.test.westeurope.azure.gigantic.io
+      endpointBase: k8s.test.westeurope.azure.gigantic.io
 provider:
   location: westeurope
 registry:
