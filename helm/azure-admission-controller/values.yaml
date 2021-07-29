@@ -11,9 +11,8 @@ workloadCluster:
     api:
       endpointBase: k8s.test.westeurope.azure.gigantic.io
 
-provider:
-  azure:
-    location: westeurope
+azure:
+  location: westeurope
 
 registry:
   domain: docker.io
