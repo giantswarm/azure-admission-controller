@@ -18,7 +18,7 @@ registry:
 
 azureSecret:
   service:
-	azure:
+    azure:
       clientID: {{.ClientID}}
       clientSecret: {{.ClientSecret}}
       tenantID: {{.TenantID}}
