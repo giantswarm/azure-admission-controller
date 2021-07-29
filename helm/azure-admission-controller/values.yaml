@@ -17,9 +17,10 @@ azure:
 registry:
   domain: docker.io
 
-credentiald:
-  credentialDefault:
-    clientID: ""
-    clientSecret: ""
-    tenantID: ""
-    subscriptionID: ""
+azureSecret:
+  service:
+    azure:
+      clientID: ""
+      clientSecret: ""
+      tenantID: ""
+      subscriptionID: ""
