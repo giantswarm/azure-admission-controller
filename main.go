@@ -20,8 +20,6 @@ import (
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/client-go/rest"
 	restclient "k8s.io/client-go/rest"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
@@ -125,10 +123,6 @@ func mainError() error {
 			return microerror.Mask(errors.New("couldn't wait for cache sync"))
 		}
 	}
-
-	scheme := runtime.NewScheme()
-	codecs := serializer.NewCodecFactory(scheme)
-	universalDeserializer := codecs.UniversalDeserializer()
 
 	var resourceSkusClient compute.ResourceSkusClient
 	{
