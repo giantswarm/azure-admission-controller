@@ -334,30 +334,6 @@ func mainError() error {
 		}
 	}
 
-	var validatorHttpHandlerFactory *validator.HttpHandlerFactory
-	{
-		c := validator.HttpHandlerFactoryConfig{
-			CtrlClient: ctrlClient,
-			CtrlCache:  ctrlCache,
-		}
-		validatorHttpHandlerFactory, err = validator.NewHttpHandlerFactory(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var mutatorHttpHandlerFactory *mutator.HttpHandlerFactory
-	{
-		c := mutator.HttpHandlerFactoryConfig{
-			CtrlClient: ctrlClient,
-			CtrlCache:  ctrlCache,
-		}
-		mutatorHttpHandlerFactory, err = mutator.NewHttpHandlerFactory(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
 	// Mutators.
