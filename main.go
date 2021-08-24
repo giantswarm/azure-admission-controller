@@ -136,7 +136,7 @@ func mainError() error {
 		}
 		for _, envVarName := range envVarNames {
 			if v := os.Getenv(envVarName); v == "" {
-				return microerror.Mask(errors.New(fmt.Sprintf("Empty value or missing required env variable %q", envVarName)))
+				return microerror.Mask(fmt.Errorf("empty value or missing required env variable %q", envVarName))
 			}
 		}
 		settings, err := auth.GetSettingsFromEnvironment()
