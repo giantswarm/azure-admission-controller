@@ -47,7 +47,7 @@ func ValidateUpgradeScheduleTime(updateTime string) bool {
 	if t.Location().String() != "UTC" {
 		return false
 	}
-	//time already passed or is less than 16 minutes in the future
+	// time already passed or is less than 16 minutes in the future
 	if t.Before(time.Now().UTC().Add(16 * time.Minute)) {
 		return false
 	}
