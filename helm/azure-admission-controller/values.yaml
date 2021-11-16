@@ -24,3 +24,7 @@ azureSecret:
       clientSecret: ""
       tenantID: ""
       subscriptionID: ""
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
