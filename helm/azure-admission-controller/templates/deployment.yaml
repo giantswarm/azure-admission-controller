@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "labels.common" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 3
   selector:
     matchLabels:
