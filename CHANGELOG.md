@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Adjust the number of replicas to 3.
+- Adjust the number of replicas to 2.
 
 ## [3.2.0] - 2021-10-04
 
