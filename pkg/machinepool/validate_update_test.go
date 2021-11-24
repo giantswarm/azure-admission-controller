@@ -59,7 +59,6 @@ func TestMachinePoolUpdateValidate(t *testing.T) {
 			fakeK8sClient := unittest.FakeK8sClient()
 			ctrlClient := fakeK8sClient.CtrlClient()
 
-			//stubAPI := unittest.NewEmptyResourceSkuStubAPI()
 			vmcaps, err := vmcapabilities.NewFactory(newLogger)
 			if err != nil {
 				t.Fatal(microerror.JSON(err))
