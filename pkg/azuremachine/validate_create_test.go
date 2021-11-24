@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -120,21 +119,14 @@ func TestAzureMachineCreateValidate(t *testing.T) {
 					},
 				},
 			}
-			stubAPI := unittest.NewResourceSkuStubAPI(stubbedSKUs)
-			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-				Azure:  stubAPI,
-				Logger: newLogger,
-			})
-			if err != nil {
-				t.Fatal(err)
-			}
+			vmcaps := unittest.NewVMCapsStubFactory(stubbedSKUs, newLogger)
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
-				CtrlClient: ctrlClient,
-				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
-				Logger:     newLogger,
-				VMcaps:     vmcaps,
+				CtrlClient:    ctrlClient,
+				Decoder:       unittest.NewFakeDecoder(),
+				Location:      "westeurope",
+				Logger:        newLogger,
+				VMcapsFactory: vmcaps,
 			})
 			if err != nil {
 				t.Fatal(err)

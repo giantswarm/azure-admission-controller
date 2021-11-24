@@ -25,17 +25,22 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 		return microerror.Mask(err)
 	}
 
-	err = checkInstanceTypeIsValid(ctx, h.vmcaps, azureMPNewCR)
+	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, azureMPNewCR.ObjectMeta)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	err = checkAcceleratedNetworking(ctx, h.vmcaps, azureMPNewCR)
+	err = checkInstanceTypeIsValid(ctx, vmcaps, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	err = checkStorageAccountTypeIsValid(ctx, h.vmcaps, azureMPNewCR)
+	err = checkAcceleratedNetworking(ctx, vmcaps, azureMPNewCR)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	err = checkStorageAccountTypeIsValid(ctx, vmcaps, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}

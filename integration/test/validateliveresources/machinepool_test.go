@@ -68,10 +68,10 @@ func TestMachinePoolWebhookHandler(t *testing.T) {
 	var machinePoolWebhookHandler *machinepoolpkg.WebhookHandler
 	{
 		c := machinepoolpkg.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    NewDecoder(),
-			Logger:     logger,
-			VMcaps:     NewVMCapabilities(t, logger),
+			CtrlClient:    ctrlClient,
+			Decoder:       NewDecoder(),
+			Logger:        logger,
+			VMcapsFactory: NewVMCapabilities(t, logger),
 		}
 		machinePoolWebhookHandler, err = machinepoolpkg.NewWebhookHandler(c)
 		if err != nil {

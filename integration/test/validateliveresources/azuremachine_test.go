@@ -69,11 +69,11 @@ func TestAzureMachineWebhookHandler(t *testing.T) {
 	var azureMachineWebhookHandler *azuremachinepkg.WebhookHandler
 	{
 		c := azuremachinepkg.WebhookHandlerConfig{
-			Decoder:    NewDecoder(),
-			CtrlClient: ctrlClient,
-			Location:   env.Location(),
-			Logger:     logger,
-			VMcaps:     NewVMCapabilities(t, logger),
+			Decoder:       NewDecoder(),
+			CtrlClient:    ctrlClient,
+			Location:      env.Location(),
+			Logger:        logger,
+			VMcapsFactory: NewVMCapabilities(t, logger),
 		}
 		azureMachineWebhookHandler, err = azuremachinepkg.NewWebhookHandler(c)
 		if err != nil {

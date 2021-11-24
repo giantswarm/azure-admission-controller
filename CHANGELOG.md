@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Split VM type capabilities client by subscription.
+
+### Added
+
+- Check Failure Domain is valid for AzureMachine and MachinePools.
+
 ## [3.4.0] - 2021-11-25
 
 ### Removed

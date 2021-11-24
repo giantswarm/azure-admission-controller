@@ -104,7 +104,7 @@ func NewVMCapabilities(t *testing.T, logger micrologger.Logger) *vmcapabilities.
 
 	var vmCapabilities *vmcapabilities.VMSKU
 	{
-		vmCapabilities, err = vmcapabilities.New(vmcapabilities.Config{
+		vmCapabilities, err = vmcapabilities.new(vmcapabilities.Config{
 			Logger: logger,
 			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: &resourceSkusClient}),
 		})

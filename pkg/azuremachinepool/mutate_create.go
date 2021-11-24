@@ -88,8 +88,13 @@ func (h *WebhookHandler) ensureStorageAccountType(ctx context.Context, mpCR *cap
 			location = h.location
 		}
 
+		vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, mpCR.ObjectMeta)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
 		// Check if the VM has Premium Storage capability.
-		premium, err := h.vmcaps.HasCapability(ctx, location, mpCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
+		premium, err := vmcaps.HasCapability(ctx, location, mpCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

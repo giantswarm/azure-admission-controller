@@ -16,7 +16,6 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
@@ -136,14 +135,7 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 					},
 				},
 			}
-			stubAPI := unittest.NewResourceSkuStubAPI(stubbedSKUs)
-			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-				Azure:  stubAPI,
-				Logger: newLogger,
-			})
-			if err != nil {
-				panic(microerror.JSON(err))
-			}
+			vmcaps := unittest.NewVMCapsStubFactory(stubbedSKUs, newLogger)
 
 			ctx := context.Background()
 			fakeK8sClient := unittest.FakeK8sClient()
@@ -184,11 +176,11 @@ func TestAzureMachinePoolCreateMutate(t *testing.T) {
 			}
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
-				CtrlClient: ctrlClient,
-				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
-				Logger:     newLogger,
-				VMcaps:     vmcaps,
+				CtrlClient:    ctrlClient,
+				Decoder:       unittest.NewFakeDecoder(),
+				Location:      "westeurope",
+				Logger:        newLogger,
+				VMcapsFactory: vmcaps,
 			})
 			if err != nil {
 				t.Fatal(err)

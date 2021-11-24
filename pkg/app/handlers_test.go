@@ -31,10 +31,7 @@ func Test_RegisterWebhookHandlers(t *testing.T) {
 	fakeK8sClient := unittest.FakeK8sClient()
 	ctrlClient := fakeK8sClient.CtrlClient()
 
-	vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-		Azure:  unittest.NewEmptyResourceSkuStubAPI(),
-		Logger: logger,
-	})
+	vmcaps, err := vmcapabilities.NewFactory(logger)
 	if err != nil {
 		t.Fatal(microerror.JSON(err))
 	}

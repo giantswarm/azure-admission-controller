@@ -10,8 +10,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/dyson/certman"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
@@ -124,50 +122,17 @@ func mainError() error {
 		}
 	}
 
-	var resourceSkusClient compute.ResourceSkusClient
-	{
-		// Azure sdk does not fail initializing the client if the environment variables are empty.
-		// We need to ensure ENV variables are set.
-		envVarNames := []string{
-			auth.ClientID,
-			auth.ClientSecret,
-			auth.SubscriptionID,
-			auth.TenantID,
-		}
-		for _, envVarName := range envVarNames {
-			if v := os.Getenv(envVarName); v == "" {
-				return microerror.Mask(fmt.Errorf("empty value or missing required env variable %q", envVarName))
-			}
-		}
-		settings, err := auth.GetSettingsFromEnvironment()
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		authorizer, err := settings.GetAuthorizer()
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		resourceSkusClient = compute.NewResourceSkusClient(settings.GetSubscriptionID())
-		resourceSkusClient.Client.Authorizer = authorizer
-	}
-
-	var vmcaps *vmcapabilities.VMSKU
-	{
-		vmcaps, err = vmcapabilities.New(vmcapabilities.Config{
-			Logger: newLogger,
-			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: &resourceSkusClient}),
-		})
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
 	// Here we register our endpoints.
 	handler := http.NewServeMux()
 	handler.HandleFunc("/healthz", healthCheck)
 
+	vmcapsFactory, err := vmcapabilities.NewFactory(newLogger)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
 	// Register all webhook handlers
-	err = app.RegisterWebhookHandlers(handler, cfg, newLogger, ctrlClient, ctrlCache, vmcaps)
+	err = app.RegisterWebhookHandlers(handler, cfg, newLogger, ctrlClient, ctrlCache, vmcapsFactory)
 	if err != nil {
 		return microerror.Mask(err)
 	}

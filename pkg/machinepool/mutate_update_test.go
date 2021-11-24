@@ -260,20 +260,17 @@ func TestMachinePoolUpdateMutate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			stubAPI := unittest.NewEmptyResourceSkuStubAPI()
-			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-				Azure:  stubAPI,
-				Logger: newLogger,
-			})
+			//stubAPI := unittest.NewEmptyResourceSkuStubAPI()
+			vmcaps, err := vmcapabilities.NewFactory(newLogger)
 			if err != nil {
 				t.Fatal(microerror.JSON(err))
 			}
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
-				CtrlClient: ctrlClient,
-				Decoder:    unittest.NewFakeDecoder(),
-				Logger:     newLogger,
-				VMcaps:     vmcaps,
+				CtrlClient:    ctrlClient,
+				Decoder:       unittest.NewFakeDecoder(),
+				Logger:        newLogger,
+				VMcapsFactory: vmcaps,
 			})
 			if err != nil {
 				t.Fatal(err)

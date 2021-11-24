@@ -13,17 +13,17 @@ import (
 )
 
 type WebhookHandler struct {
-	ctrlClient client.Client
-	decoder    runtime.Decoder
-	logger     micrologger.Logger
-	vmcaps     *vmcapabilities.VMSKU
+	ctrlClient    client.Client
+	decoder       runtime.Decoder
+	logger        micrologger.Logger
+	vmcapsFactory vmcapabilities.Factory
 }
 
 type WebhookHandlerConfig struct {
-	CtrlClient client.Client
-	Decoder    runtime.Decoder
-	Logger     micrologger.Logger
-	VMcaps     *vmcapabilities.VMSKU
+	CtrlClient    client.Client
+	Decoder       runtime.Decoder
+	Logger        micrologger.Logger
+	VMcapsFactory vmcapabilities.Factory
 }
 
 func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
@@ -36,15 +36,15 @@ func NewWebhookHandler(config WebhookHandlerConfig) (*WebhookHandler, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.VMcaps == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.VMcaps must not be empty", config)
+	if config.VMcapsFactory == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.VMcapsFactory must not be empty", config)
 	}
 
 	handler := &WebhookHandler{
-		ctrlClient: config.CtrlClient,
-		decoder:    config.Decoder,
-		logger:     config.Logger,
-		vmcaps:     config.VMcaps,
+		ctrlClient:    config.CtrlClient,
+		decoder:       config.Decoder,
+		logger:        config.Logger,
+		vmcapsFactory: config.VMcapsFactory,
 	}
 
 	return handler, nil

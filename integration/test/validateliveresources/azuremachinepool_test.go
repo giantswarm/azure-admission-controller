@@ -68,11 +68,11 @@ func TestAzureMachinePoolWebhookHandler(t *testing.T) {
 	var azureMachinePoolWebhookHandler *azuremachinepoolpkg.WebhookHandler
 	{
 		c := azuremachinepoolpkg.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    NewDecoder(),
-			Location:   env.Location(),
-			Logger:     logger,
-			VMcaps:     NewVMCapabilities(t, logger),
+			CtrlClient:    ctrlClient,
+			Decoder:       NewDecoder(),
+			Location:      env.Location(),
+			Logger:        logger,
+			VMcapsFactory: NewVMCapabilities(t, logger),
 		}
 		azureMachinePoolWebhookHandler, err = azuremachinepoolpkg.NewWebhookHandler(c)
 		if err != nil {

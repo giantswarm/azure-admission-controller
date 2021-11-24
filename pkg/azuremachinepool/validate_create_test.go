@@ -131,7 +131,8 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 			// Create cluster CR.
 			cluster := &capi.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ab123",
+					Name:      "ab123",
+					Namespace: "org-giantswarm",
 					Labels: map[string]string{
 						label.Cluster:      "ab123",
 						label.Organization: "giantswarm",
@@ -247,21 +248,15 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 					},
 				},
 			}
-			stubAPI := unittest.NewResourceSkuStubAPI(stubbedSKUs)
-			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-				Azure:  stubAPI,
-				Logger: newLogger,
-			})
-			if err != nil {
-				panic(microerror.JSON(err))
-			}
+
+			vmcapsFactory := unittest.NewVMCapsStubFactory(stubbedSKUs, newLogger)
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
-				CtrlClient: ctrlClient,
-				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
-				Logger:     newLogger,
-				VMcaps:     vmcaps,
+				CtrlClient:    ctrlClient,
+				Decoder:       unittest.NewFakeDecoder(),
+				Location:      "westeurope",
+				Logger:        newLogger,
+				VMcapsFactory: vmcapsFactory,
 			})
 			if err != nil {
 				t.Fatal(err)
