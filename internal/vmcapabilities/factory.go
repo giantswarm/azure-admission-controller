@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/internal/capz"
+	"github.com/giantswarm/azure-admission-controller/internal/capzcredentials"
 )
 
 type FactoryImpl struct {
@@ -26,7 +26,7 @@ func NewFactory(logger micrologger.Logger) (*FactoryImpl, error) {
 }
 
 func (f *FactoryImpl) GetClient(ctx context.Context, ctrlClient client.Client, objectMeta v1.ObjectMeta) (*VMSKU, error) {
-	subscriptionID, clientID, clientSecret, tenantID, err := capz.GetAzureCredentialsFromMetadata(ctx, ctrlClient, objectMeta)
+	subscriptionID, clientID, clientSecret, tenantID, err := capzcredentials.GetAzureCredentialsFromMetadata(ctx, ctrlClient, objectMeta)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

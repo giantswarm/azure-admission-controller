@@ -1,4 +1,4 @@
-package capz
+package capzcredentials
 
 import (
 	"context"
