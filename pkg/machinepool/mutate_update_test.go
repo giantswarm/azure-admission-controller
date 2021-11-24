@@ -260,7 +260,6 @@ func TestMachinePoolUpdateMutate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			//stubAPI := unittest.NewEmptyResourceSkuStubAPI()
 			vmcaps, err := vmcapabilities.NewFactory(newLogger)
 			if err != nil {
 				t.Fatal(microerror.JSON(err))

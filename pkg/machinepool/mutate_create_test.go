@@ -206,7 +206,6 @@ func TestMachinePoolCreateMutate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			//stubAPI := unittest.NewEmptyResourceSkuStubAPI()
 			vmcapsFactory, err := vmcapabilities.NewFactory(newLogger)
 			if err != nil {
 				t.Fatal(err)
