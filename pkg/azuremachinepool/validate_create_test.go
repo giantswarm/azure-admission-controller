@@ -131,8 +131,7 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 			// Create cluster CR.
 			cluster := &capi.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "ab123",
-					Namespace: "org-giantswarm",
+					Name: "ab123",
 					Labels: map[string]string{
 						label.Cluster:      "ab123",
 						label.Organization: "giantswarm",
