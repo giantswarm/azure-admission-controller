@@ -85,7 +85,11 @@ func TestCreateCluster(t *testing.T) {
 	}
 
 	{
-		err = appTest.EnsureCRDs(ctx, getRequiredCRDs())
+		crds, err := getRequiredCRDs(logger)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = appTest.EnsureCRDs(ctx, crds)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -141,11 +145,13 @@ func TestCreateCluster(t *testing.T) {
 	}
 }
 
-func getRequiredCRDs() []*apiextensionsv1.CustomResourceDefinition {
-	crdgetter, err := crd.NewCRDGetter(crd.Config{})
+func getRequiredCRDs(logger micrologger.Logger) ([]*apiextensionsv1.CustomResourceDefinition, error) {
+	crdgetter, err := crd.NewCRDGetter(crd.Config{
+		Logger: logger,
+	})
 
 	if err != nil {
-		panic(err)
+		return nil, microerror.Mask(err)
 	}
 
 	var ret []*apiextensionsv1.CustomResourceDefinition
@@ -201,10 +207,10 @@ func getRequiredCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	for _, tcrd := range crds {
 		c, err := crdgetter.LoadCRD(context.Background(), tcrd.group, tcrd.kind)
 		if err != nil {
-			panic(err)
+			return nil, microerror.Mask(err)
 		}
 		ret = append(ret, c)
 	}
 
-	return ret
+	return ret, nil
 }
