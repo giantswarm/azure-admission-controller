@@ -9,10 +9,9 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
-	"github.com/giantswarm/apiextensions/v3/pkg/crd"
+	"github.com/giantswarm/app/v5/pkg/crd"
 	"github.com/giantswarm/apptest"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
@@ -37,6 +36,7 @@ const (
 	testCatalogName = "control-plane-test-catalog"
 	// API Groups for upstream Cluster API types.
 	giantswarmCoreAPIGroup             = "core.giantswarm.io"
+	giantswarmProviderAPIGroup         = "provider.giantswarm.io"
 	clusterAPIGroup                    = "cluster.x-k8s.io"
 	infrastructureAPIGroup             = "infrastructure.cluster.x-k8s.io"
 	experimentalClusterAPIGroup        = "exp.cluster.x-k8s.io"
@@ -142,16 +142,69 @@ func TestCreateCluster(t *testing.T) {
 }
 
 func getRequiredCRDs() []*apiextensionsv1.CustomResourceDefinition {
-	return []*apiextensionsv1.CustomResourceDefinition{
-		corev1alpha1.NewAzureClusterConfigCRD(),
-		providerv1alpha1.NewAzureConfigCRD(),
-		crd.LoadV1(infrastructureAPIGroup, "AzureCluster"),
-		crd.LoadV1(infrastructureAPIGroup, "AzureMachine"),
-		crd.LoadV1(experimentalInfrastructureAPIGroup, "AzureMachinePool"),
-		crd.LoadV1(clusterAPIGroup, "Cluster"),
-		crd.LoadV1(experimentalClusterAPIGroup, "MachinePool"),
-		crd.LoadV1(securityAPIGroup, "Organization"),
-		crd.LoadV1(releaseAPIGroup, "Release"),
-		crd.LoadV1(giantswarmCoreAPIGroup, "Spark"),
+	crdgetter, err := crd.NewCRDGetter(crd.Config{})
+
+	if err != nil {
+		panic(err)
 	}
+
+	var ret []*apiextensionsv1.CustomResourceDefinition
+
+	type typedCrd struct {
+		group string
+		kind  string
+	}
+
+	crds := []typedCrd{
+		{
+			group: giantswarmCoreAPIGroup,
+			kind:  "AzureClusterConfig",
+		},
+		{
+			group: giantswarmProviderAPIGroup,
+			kind:  "AzureConfig",
+		},
+		{
+			group: infrastructureAPIGroup,
+			kind:  "AzureCluster",
+		},
+		{
+			group: infrastructureAPIGroup,
+			kind:  "AzureMachine",
+		},
+		{
+			group: experimentalInfrastructureAPIGroup,
+			kind:  "AzureMachinePool",
+		},
+		{
+			group: clusterAPIGroup,
+			kind:  "Cluster",
+		},
+		{
+			group: experimentalClusterAPIGroup,
+			kind:  "MachinePool",
+		},
+		{
+			group: securityAPIGroup,
+			kind:  "Organization",
+		},
+		{
+			group: releaseAPIGroup,
+			kind:  "Release",
+		},
+		{
+			group: giantswarmCoreAPIGroup,
+			kind:  "Spark",
+		},
+	}
+
+	for _, tcrd := range crds {
+		c, err := crdgetter.LoadCRD(context.Background(), tcrd.group, tcrd.kind)
+		if err != nil {
+			panic(err)
+		}
+		ret = append(ret, c)
+	}
+
+	return ret
 }
