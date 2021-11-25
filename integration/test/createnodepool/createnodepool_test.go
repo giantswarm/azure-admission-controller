@@ -147,7 +147,8 @@ func TestCreateCluster(t *testing.T) {
 
 func getRequiredCRDs(logger micrologger.Logger) ([]*apiextensionsv1.CustomResourceDefinition, error) {
 	crdgetter, err := crd.NewCRDGetter(crd.Config{
-		Logger: logger,
+		Logger:   logger,
+		Provider: "azure",
 	})
 
 	if err != nil {
