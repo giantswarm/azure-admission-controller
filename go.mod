@@ -18,7 +18,6 @@ require (
 	github.com/giantswarm/microerror v0.3.0
 	github.com/giantswarm/micrologger v0.5.0
 	github.com/google/go-cmp v0.5.6
-	github.com/google/go-github/v35 v35.3.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
