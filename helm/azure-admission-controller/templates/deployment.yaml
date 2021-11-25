@@ -28,27 +28,6 @@ spec:
       containers:
         - name: {{ include "name" . }}
           image: "{{ .Values.registry.domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
-          env:
-          - name: AZURE_CLIENT_ID
-            valueFrom:
-              secretKeyRef:
-                name: {{ include "resource.default.name"  . }}
-                key: clientID
-          - name: AZURE_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: {{ include "resource.default.name"  . }}
-                key: clientSecret
-          - name: AZURE_TENANT_ID
-            valueFrom:
-              secretKeyRef:
-                name: {{ include "resource.default.name"  . }}
-                key: tenantID
-          - name: AZURE_SUBSCRIPTION_ID
-            valueFrom:
-              secretKeyRef:
-                name: {{ include "resource.default.name"  . }}
-                key: subscriptionID
           args:
             - ./azure-admission-controller
             - --tls-cert-file=/certs/ca.crt
