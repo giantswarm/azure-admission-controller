@@ -58,12 +58,12 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 //
 //	return nil
 //}
-
-func inSlice(needle string, haystack []string) bool {
-	for _, supported := range haystack {
-		if needle == supported {
-			return true
-		}
-	}
-	return false
-}
+//
+//func inSlice(needle string, haystack []string) bool {
+//	for _, supported := range haystack {
+//		if needle == supported {
+//			return true
+//		}
+//	}
+//	return false
+//}
