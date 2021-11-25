@@ -38,26 +38,26 @@ func TestAzureMachineCreateValidate(t *testing.T) {
 			azureMachine: azureMachineObject("", "westpoland", nil, nil),
 			errorMatcher: IsUnexpectedLocationError,
 		},
-		//{
-		//	name:         "Case 3 - invalid failure domain",
-		//	azureMachine: azureMachineObject("", "westeurope", to.StringPtr("2"), nil),
-		//	errorMatcher: IsUnsupportedFailureDomainError,
-		//},
-		//{
-		//	name:         "Case 4 - valid failure domain",
-		//	azureMachine: azureMachineObject("", "westeurope", to.StringPtr("1"), nil),
-		//	errorMatcher: nil,
-		//},
-		//{
-		//	name:         "Case 5 - empty failure domain",
-		//	azureMachine: azureMachineObject("", "westeurope", to.StringPtr(""), nil),
-		//	errorMatcher: nil,
-		//},
-		//{
-		//	name:         "Case 6 - nil failure domain",
-		//	azureMachine: azureMachineObject("", "westeurope", nil, nil),
-		//	errorMatcher: nil,
-		//},
+		{
+			name:         "Case 3 - invalid failure domain",
+			azureMachine: azureMachineObject("", "westeurope", to.StringPtr("2"), nil),
+			errorMatcher: IsUnsupportedFailureDomainError,
+		},
+		{
+			name:         "Case 4 - valid failure domain",
+			azureMachine: azureMachineObject("", "westeurope", to.StringPtr("1"), nil),
+			errorMatcher: nil,
+		},
+		{
+			name:         "Case 5 - empty failure domain",
+			azureMachine: azureMachineObject("", "westeurope", to.StringPtr(""), nil),
+			errorMatcher: nil,
+		},
+		{
+			name:         "Case 6 - nil failure domain",
+			azureMachine: azureMachineObject("", "westeurope", nil, nil),
+			errorMatcher: nil,
+		},
 	}
 
 	for _, tc := range testCases {

@@ -9,3 +9,8 @@ var invalidObjectMetaError = &microerror.Error{
 var missingIdentityRefError = &microerror.Error{
 	Kind: "missingIdentityRefError",
 }
+
+// IsMissingIdentityRef asserts missingIdentityRefError.
+func IsMissingIdentityRef(err error) bool {
+	return microerror.Cause(err) == missingIdentityRefError
+}

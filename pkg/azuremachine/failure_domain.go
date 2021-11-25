@@ -1,31 +1,34 @@
 package azuremachine
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/giantswarm/microerror"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 )
 
-//func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string) error {
-//	// No failure domain specified.
-//	if azureMachine.Spec.FailureDomain == nil || *azureMachine.Spec.FailureDomain == "" {
-//		return nil
-//	}
-//
-//	for _, az := range supportedAZs {
-//		if *azureMachine.Spec.FailureDomain == az {
-//			// Failure Domain is valid.
-//			return nil
-//		}
-//	}
-//
-//	supportedAZsMsg := fmt.Sprintf("Location %#q supports Failure Domains %s for VM size %#q but got %#q", azureMachine.Spec.Location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
-//	if len(supportedAZs) == 0 {
-//		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q", azureMachine.Spec.Location, azureMachine.Spec.VMSize)
-//		return microerror.Maskf(locationWithNoFailureDomainSupportError, supportedAZsMsg)
-//	}
-//
-//	return microerror.Maskf(unsupportedFailureDomainError, supportedAZsMsg)
-//}
+func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string) error {
+	// No failure domain specified.
+	if azureMachine.Spec.FailureDomain == nil || *azureMachine.Spec.FailureDomain == "" {
+		return nil
+	}
+
+	for _, az := range supportedAZs {
+		if *azureMachine.Spec.FailureDomain == az {
+			// Failure Domain is valid.
+			return nil
+		}
+	}
+
+	supportedAZsMsg := fmt.Sprintf("Location %#q supports Failure Domains %s for VM size %#q but got %#q", azureMachine.Spec.Location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
+	if len(supportedAZs) == 0 {
+		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q", azureMachine.Spec.Location, azureMachine.Spec.VMSize)
+		return microerror.Maskf(locationWithNoFailureDomainSupportError, supportedAZsMsg)
+	}
+
+	return microerror.Maskf(unsupportedFailureDomainError, supportedAZsMsg)
+}
 
 func validateFailureDomainUnchanged(old capz.AzureMachine, new capz.AzureMachine) error {
 	// Was unspecified, stays unspecified.

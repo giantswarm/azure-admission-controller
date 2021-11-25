@@ -2,6 +2,15 @@ package vmcapabilities
 
 import "github.com/giantswarm/microerror"
 
+var credentialsNotFoundError = &microerror.Error{
+	Kind: "credentialsNotFoundError",
+}
+
+// IsCredentialsNotFoundError asserts credentialsNotFoundError.
+func IsCredentialsNotFoundError(err error) bool {
+	return microerror.Cause(err) == credentialsNotFoundError
+}
+
 var invalidRequestError = &microerror.Error{
 	Kind: "invalidRequestError",
 }
@@ -36,4 +45,17 @@ var skuNotFoundError = &microerror.Error{
 // IsSkuNotFoundError asserts skuNotFoundError.
 func IsSkuNotFoundError(err error) bool {
 	return microerror.Cause(err) == skuNotFoundError
+}
+
+var missingValueError = &microerror.Error{
+	Kind: "missingValueError",
+}
+
+var tooManyCredentialsError = &microerror.Error{
+	Kind: "tooManyCredentialsError",
+}
+
+// IsTooManyCredentials asserts tooManyCredentialsError.
+func IsTooManyCredentials(err error) bool {
+	return microerror.Cause(err) == tooManyCredentialsError
 }

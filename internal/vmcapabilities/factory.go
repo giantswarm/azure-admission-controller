@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -27,7 +28,14 @@ func NewFactory(logger micrologger.Logger) (*FactoryImpl, error) {
 
 func (f *FactoryImpl) GetClient(ctx context.Context, ctrlClient client.Client, objectMeta v1.ObjectMeta) (*VMSKU, error) {
 	subscriptionID, clientID, clientSecret, tenantID, err := capzcredentials.GetAzureCredentialsFromMetadata(ctx, ctrlClient, objectMeta)
-	if err != nil {
+	if capzcredentials.IsMissingIdentityRef(err) || errors.IsNotFound(err) {
+		// Unable to find the Identity Ref or one of the related resources.
+		// We need to fall back to the organization logic to retrieve credentials for azure API.
+		subscriptionID, clientID, clientSecret, tenantID, err = f.getLegacyCredentials(ctx, ctrlClient, objectMeta)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
