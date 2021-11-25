@@ -52,6 +52,12 @@ rules:
     verbs:
       - "*"
   - apiGroups:
+      - infrastructure.cluster.x-k8s.io
+    resources:
+      - azureclusteridentities
+    verbs:
+      - "get"
+  - apiGroups:
       - exp.cluster.x-k8s.io
     resources:
       - machinepools
