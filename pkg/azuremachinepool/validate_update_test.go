@@ -13,7 +13,6 @@ import (
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -283,21 +282,17 @@ func TestAzureMachinePoolUpdateValidate(t *testing.T) {
 					},
 				},
 			}
-			stubAPI := unittest.NewResourceSkuStubAPI(stubbedSKUs)
-			vmcaps, err := vmcapabilities.New(vmcapabilities.Config{
-				Azure:  stubAPI,
-				Logger: newLogger,
-			})
+			vmcaps := unittest.NewVMCapsStubFactory(stubbedSKUs, newLogger)
 			if err != nil {
 				panic(microerror.JSON(err))
 			}
 
 			handler, err := NewWebhookHandler(WebhookHandlerConfig{
-				CtrlClient: ctrlClient,
-				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
-				Logger:     newLogger,
-				VMcaps:     vmcaps,
+				CtrlClient:    ctrlClient,
+				Decoder:       unittest.NewFakeDecoder(),
+				Location:      "westeurope",
+				Logger:        newLogger,
+				VMcapsFactory: vmcaps,
 			})
 			if err != nil {
 				t.Fatal(err)

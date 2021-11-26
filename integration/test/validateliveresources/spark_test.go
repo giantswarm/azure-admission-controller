@@ -63,7 +63,6 @@ func TestSparkWebhookHandler(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
 	ctrlClient := NewReadOnlyCtrlClient(t)
-	SetAzureEnvironmentVariables(t, ctx, ctrlClient)
 
 	var sparkWebhookHandler *sparkpkg.WebhookHandler
 	{

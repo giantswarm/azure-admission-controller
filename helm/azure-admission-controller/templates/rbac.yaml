@@ -52,11 +52,24 @@ rules:
     verbs:
       - "*"
   - apiGroups:
+      - infrastructure.cluster.x-k8s.io
+    resources:
+      - azureclusteridentities
+    verbs:
+      - "get"
+  - apiGroups:
       - exp.cluster.x-k8s.io
     resources:
       - machinepools
     verbs:
       - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - "list"
+      - "get"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

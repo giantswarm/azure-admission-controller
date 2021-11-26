@@ -38,7 +38,7 @@ import (
 //
 // - A webhook handler implementation that implements mutator.WebhookUpdateHandler will be
 // registered to handle HTTP requests at path `/mutate/<resource name>/update`.
-func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.Config, newLogger micrologger.Logger, ctrlClient client.Client, ctrlReader client.Reader, vmcaps *vmcapabilities.VMSKU) error {
+func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.Config, newLogger micrologger.Logger, ctrlClient client.Client, ctrlReader client.Reader, vmcapsFactory vmcapabilities.Factory) error {
 	var err error
 
 	var validatorHttpHandlerFactory *validator.HttpHandlerFactory
@@ -67,7 +67,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		}
 	}
 
-	handlers, err := getAllHandlers(cfg, newLogger, ctrlClient, ctrlReader, vmcaps)
+	handlers, err := getAllHandlers(cfg, newLogger, ctrlClient, ctrlReader, vmcapsFactory)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -109,7 +109,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 	return nil
 }
 
-func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient client.Client, ctrlReader client.Reader, vmcaps *vmcapabilities.VMSKU) ([]ResourceHandler, error) {
+func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient client.Client, ctrlReader client.Reader, vmcapsFactory vmcapabilities.Factory) ([]ResourceHandler, error) {
 	scheme := runtime.NewScheme()
 	codecs := serializer.NewCodecFactory(scheme)
 	universalDeserializer := codecs.UniversalDeserializer()
@@ -159,11 +159,11 @@ func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient 
 
 	{
 		c := azuremachine.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    universalDeserializer,
-			Location:   cfg.Location,
-			Logger:     newLogger,
-			VMcaps:     vmcaps,
+			CtrlClient:    ctrlClient,
+			Decoder:       universalDeserializer,
+			Location:      cfg.Location,
+			Logger:        newLogger,
+			VMcapsFactory: vmcapsFactory,
 		}
 		azureMachineWebhookHandler, err := azuremachine.NewWebhookHandler(c)
 		if err != nil {
@@ -174,11 +174,11 @@ func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient 
 
 	{
 		c := azuremachinepool.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    universalDeserializer,
-			Location:   cfg.Location,
-			Logger:     newLogger,
-			VMcaps:     vmcaps,
+			CtrlClient:    ctrlClient,
+			Decoder:       universalDeserializer,
+			Location:      cfg.Location,
+			Logger:        newLogger,
+			VMcapsFactory: vmcapsFactory,
 		}
 		azureMachinePoolWebhookHandler, err := azuremachinepool.NewWebhookHandler(c)
 		if err != nil {
@@ -204,10 +204,10 @@ func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient 
 
 	{
 		c := machinepool.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    universalDeserializer,
-			Logger:     newLogger,
-			VMcaps:     vmcaps,
+			CtrlClient:    ctrlClient,
+			Decoder:       universalDeserializer,
+			Logger:        newLogger,
+			VMcapsFactory: vmcapsFactory,
 		}
 		machinePoolWebhookHandler, err := machinepool.NewWebhookHandler(c)
 		if err != nil {

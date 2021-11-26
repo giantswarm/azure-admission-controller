@@ -44,17 +44,22 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 		return microerror.Mask(err)
 	}
 
-	err = checkInstanceTypeIsValid(ctx, h.vmcaps, azureMPNewCR)
+	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, azureMPNewCR.ObjectMeta)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	err = h.checkAcceleratedNetworkingUpdateIsValid(ctx, azureMPOldCR, azureMPNewCR)
+	err = checkInstanceTypeIsValid(ctx, vmcaps, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	err = h.checkInstanceTypeChangeIsValid(ctx, azureMPOldCR, azureMPNewCR)
+	err = h.checkAcceleratedNetworkingUpdateIsValid(ctx, vmcaps, azureMPOldCR, azureMPNewCR)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	err = h.checkInstanceTypeChangeIsValid(ctx, vmcaps, azureMPOldCR, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -87,7 +92,7 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 	return nil
 }
 
-func (h *WebhookHandler) checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, azureMPOldCR *capzexp.AzureMachinePool, azureMPNewCR *capzexp.AzureMachinePool) error {
+func (h *WebhookHandler) checkAcceleratedNetworkingUpdateIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMPOldCR *capzexp.AzureMachinePool, azureMPNewCR *capzexp.AzureMachinePool) error {
 	if hasAcceleratedNetworkingPropertyChanged(ctx, azureMPOldCR, azureMPNewCR) {
 		return microerror.Maskf(acceleratedNetworkingWasChangedError, "It is not possible to change the AcceleratedNetworking on an existing node pool")
 	}
@@ -96,7 +101,7 @@ func (h *WebhookHandler) checkAcceleratedNetworkingUpdateIsValid(ctx context.Con
 		return nil
 	}
 
-	err := checkAcceleratedNetworking(ctx, h.vmcaps, azureMPNewCR)
+	err := checkAcceleratedNetworking(ctx, vmcaps, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -104,14 +109,14 @@ func (h *WebhookHandler) checkAcceleratedNetworkingUpdateIsValid(ctx context.Con
 	return nil
 }
 
-func (h *WebhookHandler) checkInstanceTypeChangeIsValid(ctx context.Context, azureMPOldCR *capzexp.AzureMachinePool, azureMPNewCR *capzexp.AzureMachinePool) error {
+func (h *WebhookHandler) checkInstanceTypeChangeIsValid(ctx context.Context, vmcaps *vmcapabilities.VMSKU, azureMPOldCR *capzexp.AzureMachinePool, azureMPNewCR *capzexp.AzureMachinePool) error {
 	// Check if the instance type has changed.
 	if azureMPOldCR.Spec.Template.VMSize != azureMPNewCR.Spec.Template.VMSize {
-		oldPremium, err := h.vmcaps.HasCapability(ctx, azureMPOldCR.Spec.Location, azureMPOldCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
+		oldPremium, err := vmcaps.HasCapability(ctx, azureMPOldCR.Spec.Location, azureMPOldCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		newPremium, err := h.vmcaps.HasCapability(ctx, azureMPNewCR.Spec.Location, azureMPNewCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
+		newPremium, err := vmcaps.HasCapability(ctx, azureMPNewCR.Spec.Location, azureMPNewCR.Spec.Template.VMSize, vmcapabilities.CapabilityPremiumIO)
 		if err != nil {
 			return microerror.Mask(err)
 		}

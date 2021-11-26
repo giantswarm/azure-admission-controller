@@ -17,14 +17,6 @@ azure:
 registry:
   domain: docker.io
 
-azureSecret:
-  service:
-    azure:
-      clientID: ""
-      clientSecret: ""
-      tenantID: ""
-      subscriptionID: ""
-
 podDisruptionBudget:
   enabled: true
   minAvailable: 1

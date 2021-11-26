@@ -3,8 +3,6 @@
 package validateliveresources
 
 import (
-	"context"
-	"os"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
@@ -85,7 +83,7 @@ func NewDecoder() runtime.Decoder {
 	return codecs.UniversalDeserializer()
 }
 
-func NewVMCapabilities(t *testing.T, logger micrologger.Logger) *vmcapabilities.VMSKU {
+func NewVMCapabilitiesFactory(t *testing.T, logger micrologger.Logger) vmcapabilities.Factory {
 	var err error
 
 	var resourceSkusClient compute.ResourceSkusClient
@@ -102,60 +100,13 @@ func NewVMCapabilities(t *testing.T, logger micrologger.Logger) *vmcapabilities.
 		resourceSkusClient.Client.Authorizer = authorizer
 	}
 
-	var vmCapabilities *vmcapabilities.VMSKU
+	var vmCapabilities vmcapabilities.Factory
 	{
-		vmCapabilities, err = vmcapabilities.New(vmcapabilities.Config{
-			Logger: logger,
-			Azure:  vmcapabilities.NewAzureAPI(vmcapabilities.AzureConfig{ResourceSkuClient: &resourceSkusClient}),
-		})
+		vmCapabilities, err = vmcapabilities.NewFactory(logger)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	return vmCapabilities
-}
-
-func SetAzureEnvironmentVariables(t *testing.T, ctx context.Context, ctrlReader client.Reader) {
-	var err error
-	objectKey := client.ObjectKey{
-		Namespace: "giantswarm",
-		Name:      "credential-default",
-	}
-
-	var secret corev1.Secret
-	err = ctrlReader.Get(ctx, objectKey, &secret)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Set AZURE_ENVIRONMENT
-	err = os.Setenv(auth.EnvironmentName, "AzurePublicCloud")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Set AZURE_TENANT_ID
-	err = os.Setenv(auth.TenantID, string(secret.Data["azure.azureoperator.tenantid"]))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Set AZURE_SUBSCRIPTION_ID
-	err = os.Setenv(auth.SubscriptionID, string(secret.Data["azure.azureoperator.subscriptionid"]))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Set AZURE_CLIENT_ID
-	err = os.Setenv(auth.ClientID, string(secret.Data["azure.azureoperator.clientid"]))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Set AZURE_CLIENT_SECRET
-	err = os.Setenv(auth.ClientSecret, string(secret.Data["azure.azureoperator.clientsecret"]))
-	if err != nil {
-		t.Fatal(err)
-	}
 }

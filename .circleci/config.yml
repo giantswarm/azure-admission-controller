@@ -57,6 +57,16 @@ workflows:
             tags:
               only: /^v.*/
 
+      - request-manual-approval:
+          type: approval
+          filters:
+            # Do not trigger the job on merge to master.
+            branches:
+              ignore:
+                - master
+          requires:
+            - push-azure-admission-controller-to-control-plane-app-catalog
+
       - architect/integration-test:
           context: architect
           name: admission-integration-test
@@ -69,4 +79,4 @@ workflows:
               ignore:
                 - master
           requires:
-            - push-azure-admission-controller-to-control-plane-app-catalog
+            - request-manual-approval

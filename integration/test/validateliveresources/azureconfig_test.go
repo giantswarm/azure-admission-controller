@@ -62,7 +62,6 @@ func TestAzureConfigWebhookHandler(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
 	ctrlClient := NewReadOnlyCtrlClient(t)
-	SetAzureEnvironmentVariables(t, ctx, ctrlClient)
 
 	var azureConfigWebhookHandler *azureupdate.AzureConfigWebhookHandler
 	{

@@ -64,16 +64,15 @@ func TestAzureMachineWebhookHandler(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := micrologger.New(micrologger.Config{})
 	ctrlClient := NewReadOnlyCtrlClient(t)
-	SetAzureEnvironmentVariables(t, ctx, ctrlClient)
 
 	var azureMachineWebhookHandler *azuremachinepkg.WebhookHandler
 	{
 		c := azuremachinepkg.WebhookHandlerConfig{
-			Decoder:    NewDecoder(),
-			CtrlClient: ctrlClient,
-			Location:   env.Location(),
-			Logger:     logger,
-			VMcaps:     NewVMCapabilities(t, logger),
+			Decoder:       NewDecoder(),
+			CtrlClient:    ctrlClient,
+			Location:      env.Location(),
+			Logger:        logger,
+			VMcapsFactory: NewVMCapabilitiesFactory(t, logger),
 		}
 		azureMachineWebhookHandler, err = azuremachinepkg.NewWebhookHandler(c)
 		if err != nil {
