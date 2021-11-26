@@ -15,14 +15,6 @@ provider:
   location: westeurope
 registry:
   domain: quay.io
-
-azureSecret:
-  service:
-    azure:
-      clientID: {{.ClientID}}
-      clientSecret: {{.ClientSecret}}
-      tenantID: {{.TenantID}}
-      subscriptionID: {{.SubscriptionID}}
 `
 
 type Credentials struct {

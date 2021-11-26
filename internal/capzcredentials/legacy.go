@@ -1,4 +1,4 @@
-package vmcapabilities
+package capzcredentials
 
 import (
 	"context"
@@ -21,52 +21,55 @@ const (
 	tenantIDKey       = "azure.azureoperator.tenantid"
 )
 
-func (f *FactoryImpl) getLegacyCredentials(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (string, string, string, string, error) {
-	credentialSecret, err := f.getCredentialSecret(ctx, ctrlClient, objectMeta)
+func getLegacyCredentials(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*AzureCredentials, error) {
+	credentialSecret, err := getCredentialSecret(ctx, ctrlClient, objectMeta)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
 	secret := &corev1.Secret{}
 	err = ctrlClient.Get(ctx, client.ObjectKey{Namespace: credentialSecret.Namespace, Name: credentialSecret.Name}, secret)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
 	clientID, err := valueFromSecret(secret, clientIDKey)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
 	clientSecret, err := valueFromSecret(secret, clientSecretKey)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
 	tenantID, err := valueFromSecret(secret, tenantIDKey)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
 	subscriptionID, err := valueFromSecret(secret, subscriptionIDKey)
 	if err != nil {
-		return "", "", "", "", microerror.Mask(err)
+		return nil, microerror.Mask(err)
 	}
 
-	return subscriptionID, clientID, clientSecret, tenantID, nil
+	return &AzureCredentials{
+		SubscriptionID: subscriptionID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+	}, nil
+
 }
 
-func (f *FactoryImpl) getCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
-	f.logger.Debugf(ctx, "finding credential secret")
-
+func getCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
 	var err error
 	var credentialSecret *v1alpha1.CredentialSecret
 
-	credentialSecret, err = f.getOrganizationCredentialSecret(ctx, ctrlClient, objectMeta)
+	credentialSecret, err = getOrganizationCredentialSecret(ctx, ctrlClient, objectMeta)
 	if IsCredentialsNotFoundError(err) {
-		credentialSecret, err = f.getLegacyCredentialSecret(ctx, ctrlClient, objectMeta)
+		credentialSecret, err = getLegacyCredentialSecret(ctx, ctrlClient, objectMeta)
 		if IsCredentialsNotFoundError(err) {
-			f.logger.Debugf(ctx, "did not find credential secret, using default '%s/%s'", credentialDefaultNamespace, credentialDefaultName)
 			return &v1alpha1.CredentialSecret{
 				Namespace: credentialDefaultNamespace,
 				Name:      credentialDefaultName,
@@ -82,8 +85,7 @@ func (f *FactoryImpl) getCredentialSecret(ctx context.Context, ctrlClient client
 }
 
 // getOrganizationCredentialSecret tries to find a Secret in the organization namespace.
-func (f *FactoryImpl) getOrganizationCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
-	f.logger.Debugf(ctx, "try in namespace %#q filtering by organization %#q", objectMeta.Namespace, organizationID(objectMeta))
+func getOrganizationCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
 	secretList := &corev1.SecretList{}
 	{
 		err := ctrlClient.List(
@@ -118,15 +120,12 @@ func (f *FactoryImpl) getOrganizationCredentialSecret(ctx context.Context, ctrlC
 		Name:      secret.Name,
 	}
 
-	f.logger.Debugf(ctx, "found credential secret %s/%s", credentialSecret.Namespace, credentialSecret.Name)
-
 	return credentialSecret, nil
 }
 
 // getLegacyCredentialSecret tries to find a Secret in the default credentials namespace but labeled with the organization name.
 // This is needed while we migrate everything to the org namespace and org credentials are created in the org namespace instead of the default namespace.
-func (f *FactoryImpl) getLegacyCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
-	f.logger.Debugf(ctx, "try in namespace %#q filtering by organization %#q", credentialDefaultNamespace, organizationID(objectMeta))
+func getLegacyCredentialSecret(ctx context.Context, ctrlClient client.Client, objectMeta metav1.ObjectMeta) (*v1alpha1.CredentialSecret, error) {
 	secretList := &corev1.SecretList{}
 	{
 		err := ctrlClient.List(
@@ -160,8 +159,6 @@ func (f *FactoryImpl) getLegacyCredentialSecret(ctx context.Context, ctrlClient 
 		Namespace: secret.Namespace,
 		Name:      secret.Name,
 	}
-
-	f.logger.Debugf(ctx, "found credential secret %s/%s", credentialSecret.Namespace, credentialSecret.Name)
 
 	return credentialSecret, nil
 }

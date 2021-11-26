@@ -7,7 +7,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -27,33 +26,26 @@ func NewFactory(logger micrologger.Logger) (*FactoryImpl, error) {
 }
 
 func (f *FactoryImpl) GetClient(ctx context.Context, ctrlClient client.Client, objectMeta v1.ObjectMeta) (*VMSKU, error) {
-	subscriptionID, clientID, clientSecret, tenantID, err := capzcredentials.GetAzureCredentialsFromMetadata(ctx, ctrlClient, objectMeta)
-	if capzcredentials.IsMissingIdentityRef(err) || errors.IsNotFound(err) {
-		// Unable to find the Identity Ref or one of the related resources.
-		// We need to fall back to the organization logic to retrieve credentials for azure API.
-		subscriptionID, clientID, clientSecret, tenantID, err = f.getLegacyCredentials(ctx, ctrlClient, objectMeta)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	} else if err != nil {
+	azureCredentials, err := capzcredentials.GetAzureCredentialsFromMetadata(ctx, ctrlClient, objectMeta)
+	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	if vmsku, hit := f.cache[subscriptionID]; hit {
-		f.logger.Debugf(ctx, "VMSKU client found in cache for subscription %q", subscriptionID)
+	if vmsku, hit := f.cache[azureCredentials.SubscriptionID]; hit {
+		f.logger.Debugf(ctx, "VMSKU client found in cache for subscription %q", azureCredentials.SubscriptionID)
 		return vmsku, nil
 	}
 
-	f.logger.Debugf(ctx, "Initializing VMSKU client for subscription %q", subscriptionID)
+	f.logger.Debugf(ctx, "Initializing VMSKU client for subscription %q", azureCredentials.SubscriptionID)
 
 	var resourceSkusClient compute.ResourceSkusClient
 	{
-		settings := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
+		settings := auth.NewClientCredentialsConfig(azureCredentials.ClientID, azureCredentials.ClientSecret, azureCredentials.TenantID)
 		authorizer, err := settings.Authorizer()
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
-		resourceSkusClient = compute.NewResourceSkusClient(subscriptionID)
+		resourceSkusClient = compute.NewResourceSkusClient(azureCredentials.SubscriptionID)
 		resourceSkusClient.Client.Authorizer = authorizer
 	}
 
@@ -65,7 +57,7 @@ func (f *FactoryImpl) GetClient(ctx context.Context, ctrlClient client.Client, o
 		return nil, microerror.Mask(err)
 	}
 
-	f.cache[subscriptionID] = vmsku
+	f.cache[azureCredentials.SubscriptionID] = vmsku
 
 	return vmsku, nil
 }
