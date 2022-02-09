@@ -11,24 +11,24 @@ require (
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/apiextensions/v3 v3.35.0
-	github.com/giantswarm/app/v5 v5.4.0
-	github.com/giantswarm/apptest v0.10.3
+	github.com/giantswarm/app/v5 v5.6.1
+	github.com/giantswarm/apptest v0.12.0
 	github.com/giantswarm/backoff v0.2.0
-	github.com/giantswarm/k8sclient/v5 v5.11.0
-	github.com/giantswarm/microerror v0.3.0
-	github.com/giantswarm/micrologger v0.5.0
+	github.com/giantswarm/k8sclient/v5 v5.12.0
+	github.com/giantswarm/microerror v0.4.0
+	github.com/giantswarm/micrologger v0.6.0
 	github.com/google/go-cmp v0.5.7
 	github.com/stretchr/testify v1.7.0
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	k8s.io/api v0.18.19
-	k8s.io/apiextensions-apiserver v0.18.19
-	k8s.io/apimachinery v0.18.19
-	k8s.io/client-go v0.18.19
+	k8s.io/api v0.20.15
+	k8s.io/apiextensions-apiserver v0.20.15
+	k8s.io/apimachinery v0.20.15
+	k8s.io/client-go v0.20.15
 	sigs.k8s.io/cluster-api v0.4.1
 	sigs.k8s.io/cluster-api-provider-azure v0.4.15
-	sigs.k8s.io/controller-runtime v0.6.4
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/controller-runtime v0.6.5
+	sigs.k8s.io/yaml v1.3.0
 )
 
 replace (
