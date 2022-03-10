@@ -18,7 +18,6 @@ import (
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -91,12 +90,6 @@ func TestAzureMachinePoolCreateValidate(t *testing.T) {
 		name:         fmt.Sprintf("case %d: invalid location", len(testCases)-1),
 		nodePool:     builder.BuildAzureMachinePool(builder.VMSize("Standard_D4_v3"), builder.Location("eastgalicia")),
 		errorMatcher: IsUnexpectedLocationError,
-	})
-
-	testCases = append(testCases, testCase{
-		name:         fmt.Sprintf("case %d: invalid organization", len(testCases)-1),
-		nodePool:     builder.BuildAzureMachinePool(builder.VMSize("Standard_D4_v3"), builder.Organization("wrongorg")),
-		errorMatcher: generic.IsNodepoolOrgDoesNotMatchClusterOrg,
 	})
 
 	for _, tc := range testCases {

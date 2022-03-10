@@ -7,7 +7,6 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,18 +57,6 @@ func TestClusterCreateMutate(t *testing.T) {
 			name:         "case 1: ControlPlaneEndpoint has a value",
 			cluster:      clusterObject("ab123", clusterNetwork, "api.giantswarm.io", 123, nil),
 			patches:      []mutator.PatchOperation{},
-			errorMatcher: nil,
-		},
-		{
-			name:    "case 2: Azure Operator version empty",
-			cluster: clusterObject("ab123", clusterNetwork, "api.giantswarm.io", 123, map[string]string{label.AzureOperatorVersion: ""}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-			},
 			errorMatcher: nil,
 		},
 	}

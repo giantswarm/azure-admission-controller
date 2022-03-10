@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove defaulting and validation that needs to read other CR's, to make the admission controller compatible with dry-run.
+
 ## [3.5.0] - 2021-11-26
 
 ### Changed

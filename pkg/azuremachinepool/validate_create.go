@@ -5,7 +5,6 @@ import (
 
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
 )
 
@@ -16,11 +15,6 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 	}
 
 	err = azureMPNewCR.ValidateCreate()
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	err = generic.ValidateOrganizationLabelMatchesCluster(ctx, h.ctrlClient, azureMPNewCR)
 	if err != nil {
 		return microerror.Mask(err)
 	}

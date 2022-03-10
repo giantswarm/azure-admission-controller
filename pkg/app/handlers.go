@@ -18,7 +18,6 @@ import (
 	"github.com/giantswarm/azure-admission-controller/pkg/config"
 	"github.com/giantswarm/azure-admission-controller/pkg/machinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
-	"github.com/giantswarm/azure-admission-controller/pkg/spark"
 	"github.com/giantswarm/azure-admission-controller/pkg/validator"
 )
 
@@ -214,19 +213,6 @@ func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient 
 			return nil, microerror.Mask(err)
 		}
 		handlers = append(handlers, machinePoolWebhookHandler)
-	}
-
-	{
-		c := spark.WebhookHandlerConfig{
-			CtrlClient: ctrlClient,
-			Decoder:    universalDeserializer,
-			Logger:     newLogger,
-		}
-		sparkWebhookHandler, err := spark.NewWebhookHandler(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		handlers = append(handlers, sparkWebhookHandler)
 	}
 
 	return handlers, nil

@@ -165,14 +165,10 @@ func (h *HttpHandlerFactory) newHttpHandler(webhookHandler WebhookHandlerBase, m
 		}
 
 		var patch []PatchOperation
-		if review.Request.DryRun != nil && *review.Request.DryRun {
-			webhookHandler.Log("level", "debug", "message", "Dry run is not supported. Request processing stopped.", "stack", microerror.JSON(err))
-		} else {
-			patch, err = mutateFunc(request.Context(), review)
-			if err != nil {
-				writeResponse(webhookHandler, writer, errorResponse(review.Request.UID, microerror.Mask(err)))
-				return
-			}
+		patch, err = mutateFunc(request.Context(), review)
+		if err != nil {
+			writeResponse(webhookHandler, writer, errorResponse(review.Request.UID, microerror.Mask(err)))
+			return
 		}
 
 		resourceName := fmt.Sprintf("%s %s/%s", review.Request.Kind, review.Request.Namespace, extractName(review.Request))
