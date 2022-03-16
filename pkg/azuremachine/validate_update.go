@@ -43,11 +43,6 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 		return microerror.Mask(err)
 	}
 
-	err = validateLocationUnchanged(*azureMachineOldCR, *azureMachineNewCR)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
 	err = validateFailureDomainUnchanged(*azureMachineOldCR, *azureMachineNewCR)
 	if err != nil {
 		return microerror.Mask(err)

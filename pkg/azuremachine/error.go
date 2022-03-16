@@ -49,24 +49,6 @@ func IsFailureDomainWasChangedError(err error) bool {
 	return microerror.Cause(err) == failureDomainWasChangedError
 }
 
-var locationWasChangedError = &microerror.Error{
-	Kind: "locationWasChangedError",
-}
-
-// IsLocationWasChangedError asserts locationWasChangedError.
-func IsLocationWasChangedError(err error) bool {
-	return microerror.Cause(err) == locationWasChangedError
-}
-
-var unexpectedLocationError = &microerror.Error{
-	Kind: "unexpectedLocationError",
-}
-
-// IsUnexpectedLocationError asserts unexpectedLocationError.
-func IsUnexpectedLocationError(err error) bool {
-	return microerror.Cause(err) == unexpectedLocationError
-}
-
 var sshFieldIsSetError = &microerror.Error{
 	Kind: "sshFieldIsSetError",
 }

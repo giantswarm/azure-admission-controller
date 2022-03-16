@@ -32,17 +32,12 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 		return microerror.Mask(err)
 	}
 
-	err = validateLocation(*cr, h.location)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
 	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, cr.ObjectMeta)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	supportedAZs, err := vmcaps.SupportedAZs(ctx, cr.Spec.Location, cr.Spec.VMSize)
+	supportedAZs, err := vmcaps.SupportedAZs(ctx, h.location, cr.Spec.VMSize)
 	if err != nil {
 		return microerror.Mask(err)
 	}

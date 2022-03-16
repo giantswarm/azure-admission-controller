@@ -5,7 +5,7 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 )
 
-func azureMachineObject(sshKey string, location string, failureDomain *string, labels map[string]string) *capz.AzureMachine {
+func azureMachineObject(sshKey string, failureDomain *string, labels map[string]string) *capz.AzureMachine {
 	mergedLabels := map[string]string{
 		"azure-operator.giantswarm.io/version": "5.0.0",
 		"giantswarm.io/cluster":                "ab123",
@@ -29,8 +29,7 @@ func azureMachineObject(sshKey string, location string, failureDomain *string, l
 			Labels:    mergedLabels,
 		},
 		Spec: capz.AzureMachineSpec{
-			AvailabilityZone: capz.AvailabilityZone{},
-			FailureDomain:    failureDomain,
+			FailureDomain: failureDomain,
 			Image: &capz.Image{
 				Marketplace: &capz.AzureMarketplaceImage{
 					Publisher:       "kinvolk",
@@ -40,7 +39,6 @@ func azureMachineObject(sshKey string, location string, failureDomain *string, l
 					ThirdPartyImage: false,
 				},
 			},
-			Location: location,
 			OSDisk: capz.OSDisk{
 				OSType:      "Linux",
 				CachingType: "ReadWrite",

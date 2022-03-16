@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove validation of `location` field in `AzureMachine` CRs.
+
 ## [3.5.0] - 2021-11-26
 
 ### Changed

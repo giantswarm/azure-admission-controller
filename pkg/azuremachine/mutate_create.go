@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/azure-admission-controller/internal/patches"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
@@ -19,15 +18,7 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 	}
 	azureMachineCROriginal := azureMachineCR.DeepCopy()
 
-	patch, err := h.ensureLocation(ctx, azureMachineCR)
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
-	patch, err = h.ensureOSDiskCachingType(ctx, azureMachineCR)
+	patch, err := h.ensureOSDiskCachingType(ctx, azureMachineCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
 	}
@@ -57,12 +48,4 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 	}
 
 	return result, nil
-}
-
-func (h *WebhookHandler) ensureLocation(_ context.Context, azureMachine *capz.AzureMachine) (*mutator.PatchOperation, error) {
-	if azureMachine.Spec.Location == "" {
-		return mutator.PatchAdd("/spec/location", h.location), nil
-	}
-
-	return nil, nil
 }
