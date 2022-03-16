@@ -134,7 +134,6 @@ func getAllHandlers(cfg config.Config, newLogger micrologger.Logger, ctrlClient 
 			CtrlReader: ctrlReader,
 			CtrlClient: ctrlClient,
 			Decoder:    universalDeserializer,
-			Location:   cfg.Location,
 			Logger:     newLogger,
 		}
 		azureClusterWebhookHandler, err := azurecluster.NewWebhookHandler(c)

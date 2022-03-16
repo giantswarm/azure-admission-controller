@@ -50,25 +50,7 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 			errorMatcher: nil,
 		},
 		{
-			name:         "case 2: Location empty",
-			azureCluster: builder.BuildAzureCluster(builder.Location("")),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/spec/location",
-					Value:     "westeurope",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 3: Location has value",
-			azureCluster: builder.BuildAzureCluster(),
-			patches:      []mutator.PatchOperation{},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 4: Azure operator label missing",
+			name:         "case 2: Azure operator label missing",
 			azureCluster: builder.BuildAzureCluster(builder.Labels(map[string]string{label.AzureOperatorVersion: ""})),
 			patches: []mutator.PatchOperation{
 				{
@@ -136,7 +118,6 @@ func TestAzureClusterCreateMutate(t *testing.T) {
 				CtrlReader: ctrlClient,
 				CtrlClient: ctrlClient,
 				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
 				Logger:     newLogger,
 			})
 			if err != nil {

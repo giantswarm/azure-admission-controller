@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove defaulting and validation of `location` field in `AzureCluster` as the field was removed from the CR in `v1beta1`.
+
 ## [3.5.0] - 2021-11-26
 
 ### Changed

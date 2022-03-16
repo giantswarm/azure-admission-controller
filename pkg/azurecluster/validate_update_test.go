@@ -69,7 +69,6 @@ func TestAzureClusterUpdateValidate(t *testing.T) {
 				CtrlReader: ctrlClient,
 				CtrlClient: ctrlClient,
 				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
 				Logger:     newLogger,
 			})
 			if err != nil {

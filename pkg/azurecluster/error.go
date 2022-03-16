@@ -48,21 +48,3 @@ var controlPlaneEndpointWasChangedError = &microerror.Error{
 func IsControlPlaneEndpointWasChangedError(err error) bool {
 	return microerror.Cause(err) == controlPlaneEndpointWasChangedError
 }
-
-var locationWasChangedError = &microerror.Error{
-	Kind: "locationWasChangedError",
-}
-
-// IsFailureDomainWasChangedError asserts locationWasChangedError.
-func IsLocationWasChangedError(err error) bool {
-	return microerror.Cause(err) == locationWasChangedError
-}
-
-var unexpectedLocationError = &microerror.Error{
-	Kind: "unexpectedLocationError",
-}
-
-// IsUnexpectedLocationError asserts unexpectedLocationError.
-func IsUnexpectedLocationError(err error) bool {
-	return microerror.Cause(err) == unexpectedLocationError
-}

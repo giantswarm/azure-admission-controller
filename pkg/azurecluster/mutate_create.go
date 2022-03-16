@@ -36,14 +36,6 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 		result = append(result, *patch)
 	}
 
-	patch, err = h.ensureLocation(ctx, azureClusterCR)
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
 	patch, err = ensureAPIServerLB(azureClusterCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
@@ -88,14 +80,6 @@ func (h *WebhookHandler) ensureControlPlaneEndpointHost(ctx context.Context, clu
 func (h *WebhookHandler) ensureControlPlaneEndpointPort(ctx context.Context, clusterCR *capz.AzureCluster) (*mutator.PatchOperation, error) {
 	if clusterCR.Spec.ControlPlaneEndpoint.Port == 0 {
 		return mutator.PatchAdd("/spec/controlPlaneEndpoint/port", key.ControlPlaneEndpointPort), nil
-	}
-
-	return nil, nil
-}
-
-func (h *WebhookHandler) ensureLocation(ctx context.Context, azureCluster *capz.AzureCluster) (*mutator.PatchOperation, error) {
-	if azureCluster.Spec.Location == "" {
-		return mutator.PatchAdd("/spec/location", h.location), nil
 	}
 
 	return nil, nil

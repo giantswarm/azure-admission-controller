@@ -41,13 +41,6 @@ func Labels(labels map[string]string) BuilderOption {
 	}
 }
 
-func Location(location string) BuilderOption {
-	return func(azureCluster *capz.AzureCluster) *capz.AzureCluster {
-		azureCluster.Spec.Location = location
-		return azureCluster
-	}
-}
-
 func ControlPlaneEndpoint(controlPlaneEndpointHost string, controlPlaneEndpointPort int32) BuilderOption {
 	return func(azureCluster *capz.AzureCluster) *capz.AzureCluster {
 		azureCluster.Spec.ControlPlaneEndpoint.Host = controlPlaneEndpointHost

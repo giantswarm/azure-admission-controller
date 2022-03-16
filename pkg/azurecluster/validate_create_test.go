@@ -34,18 +34,13 @@ func TestAzureClusterCreateValidate(t *testing.T) {
 		},
 		{
 			name:         "case 2: Invalid Host",
-			azureCluster: builder.BuildAzureCluster(builder.ControlPlaneEndpoint("api.gigantic.io", 443), builder.Location("westeurope")),
+			azureCluster: builder.BuildAzureCluster(builder.ControlPlaneEndpoint("api.gigantic.io", 443)),
 			errorMatcher: IsInvalidControlPlaneEndpointHostError,
 		},
 		{
 			name:         "case 3: Valid values",
-			azureCluster: builder.BuildAzureCluster(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443), builder.Location("westeurope")),
+			azureCluster: builder.BuildAzureCluster(builder.Name("ab123"), builder.ControlPlaneEndpoint("api.ab123.k8s.test.westeurope.azure.gigantic.io", 443)),
 			errorMatcher: nil,
-		},
-		{
-			name:         "case 4: Invalid region",
-			azureCluster: builder.BuildAzureCluster(builder.Location("westpoland")),
-			errorMatcher: IsUnexpectedLocationError,
 		},
 	}
 
@@ -83,7 +78,6 @@ func TestAzureClusterCreateValidate(t *testing.T) {
 				CtrlReader: ctrlClient,
 				CtrlClient: ctrlClient,
 				Decoder:    unittest.NewFakeDecoder(),
-				Location:   "westeurope",
 				Logger:     newLogger,
 			})
 			if err != nil {
