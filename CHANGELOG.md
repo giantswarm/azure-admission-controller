@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove validation of `location` field in `AzureMachine` CRs.
 
+### Changed
+
+- Use location passed as flag to the controller for the failure domain validation on `AzureMachine` CRs.
+
 ## [3.5.0] - 2021-11-26
 
 ### Changed
