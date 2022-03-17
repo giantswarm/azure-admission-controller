@@ -26,26 +26,20 @@ func TestAzureMachineUpdateValidate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "Case 0 - empty ssh key",
-			oldAM:        azureMachineObject("", "westeurope", nil, nil),
-			newAM:        azureMachineObject("", "westeurope", nil, nil),
+			oldAM:        azureMachineObject("", nil, nil),
+			newAM:        azureMachineObject("", nil, nil),
 			errorMatcher: nil,
 		},
 		{
 			name:         "Case 1 - not empty ssh key",
-			oldAM:        azureMachineObject("", "westeurope", nil, nil),
-			newAM:        azureMachineObject("ssh-rsa 12345 giantswarm", "westeurope", nil, nil),
+			oldAM:        azureMachineObject("", nil, nil),
+			newAM:        azureMachineObject("ssh-rsa 12345 giantswarm", nil, nil),
 			errorMatcher: IsSSHFieldIsSetError,
 		},
 		{
-			name:         "Case 2 - location changed",
-			oldAM:        azureMachineObject("", "westeurope", nil, nil),
-			newAM:        azureMachineObject("", "westpoland", nil, nil),
-			errorMatcher: IsLocationWasChangedError,
-		},
-		{
-			name:         "Case 3 - failure domain changed",
-			oldAM:        azureMachineObject("", "westpoland", to.StringPtr("1"), nil),
-			newAM:        azureMachineObject("", "westpoland", to.StringPtr("2"), nil),
+			name:         "Case 2 - failure domain changed",
+			oldAM:        azureMachineObject("", to.StringPtr("1"), nil),
+			newAM:        azureMachineObject("", to.StringPtr("2"), nil),
 			errorMatcher: IsFailureDomainWasChangedError,
 		},
 	}

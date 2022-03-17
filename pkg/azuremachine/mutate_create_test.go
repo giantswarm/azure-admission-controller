@@ -26,26 +26,8 @@ func TestAzureMachineCreateMutate(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:         "case 0: Location empty",
-			azureMachine: azureMachineObject("ab132", "", nil, nil),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/spec/location",
-					Value:     "westeurope",
-				},
-			},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 1: Location has value",
-			azureMachine: azureMachineObject("ab132", "westeurope", nil, nil),
-			patches:      []mutator.PatchOperation{},
-			errorMatcher: nil,
-		},
-		{
-			name:         "case 2: Azure Operator version label empty",
-			azureMachine: azureMachineObject("ab132", "westeurope", nil, map[string]string{label.AzureOperatorVersion: ""}),
+			name:         "case 0: Azure Operator version label empty",
+			azureMachine: azureMachineObject("ab132", nil, map[string]string{label.AzureOperatorVersion: ""}),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
