@@ -20,3 +20,6 @@ registry:
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
+
+verticalPodAutoscaler:
+  enabled: true
