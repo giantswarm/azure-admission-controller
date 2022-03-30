@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove mutations on fields that are already defaulted on `kubectl-gs`.
+
 ## [3.7.0] - 2022-03-21
 
 ### Added
