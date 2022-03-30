@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Remove mutations on fields that are already defaulted on `kubectl-gs`.
+- Remove validation that checks that `AzureCluster` and `Cluster` have the same release label.
 
 ## [3.7.0] - 2022-03-21
 

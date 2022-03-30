@@ -5,7 +5,6 @@ import (
 
 	"github.com/giantswarm/microerror"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capiutil "sigs.k8s.io/cluster-api/util"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
@@ -60,22 +59,6 @@ func (h *WebhookHandler) validateRelease(ctx context.Context, azureClusterOldCR 
 	newClusterVersion, err := semverhelper.GetSemverFromLabels(azureClusterNewCR.Labels)
 	if err != nil {
 		return microerror.Maskf(errors.ParsingFailedError, "unable to parse version from applied AzureCluster")
-	}
-
-	if !newClusterVersion.Equals(oldClusterVersion) {
-		cluster, err := capiutil.GetOwnerCluster(ctx, h.ctrlClient, azureClusterNewCR.ObjectMeta)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		clusterCRReleaseVersion, err := semverhelper.GetSemverFromLabels(cluster.Labels)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		if !newClusterVersion.Equals(clusterCRReleaseVersion) {
-			return microerror.Maskf(errors.InvalidOperationError, "AzureCluster release version must be set to the same release version as Cluster CR release version label")
-		}
 	}
 
 	return releaseversion.Validate(ctx, h.ctrlClient, oldClusterVersion, newClusterVersion)
