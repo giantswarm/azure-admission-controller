@@ -45,22 +45,6 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 		result = append(result, *patch)
 	}
 
-	patch, err = mutator.EnsureReleaseVersionLabel(ctx, h.ctrlClient, azureMPCR.GetObjectMeta())
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
-	patch, err = mutator.CopyAzureOperatorVersionLabelFromAzureClusterCR(ctx, h.ctrlClient, azureMPCR.GetObjectMeta())
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
 	azureMPCR.Default()
 	{
 		var capiPatches []mutator.PatchOperation

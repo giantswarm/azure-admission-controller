@@ -24,20 +24,7 @@ func TestAzureMachineCreateMutate(t *testing.T) {
 		errorMatcher func(err error) bool
 	}
 
-	testCases := []testCase{
-		{
-			name:         "case 0: Azure Operator version label empty",
-			azureMachine: azureMachineObject("ab132", nil, map[string]string{label.AzureOperatorVersion: ""}),
-			patches: []mutator.PatchOperation{
-				{
-					Operation: "add",
-					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
-					Value:     "5.0.0",
-				},
-			},
-			errorMatcher: nil,
-		},
-	}
+	testCases := []testCase{}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -18,22 +18,6 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 	}
 	machinePoolCROriginal := machinePoolCR.DeepCopy()
 
-	patch, err := mutator.EnsureReleaseVersionLabel(ctx, h.ctrlClient, machinePoolCR.GetObjectMeta())
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
-	patch, err = mutator.CopyAzureOperatorVersionLabelFromAzureClusterCR(ctx, h.ctrlClient, machinePoolCR.GetObjectMeta())
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
-	}
-
 	autoscalingPatches := ensureAutoscalingAnnotations(h, machinePoolCR)
 	if autoscalingPatches != nil {
 		result = append(result, autoscalingPatches...)
