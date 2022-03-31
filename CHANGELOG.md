@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2022-03-31
+
 ### Removed
 
 - Remove mutations on fields that are already defaulted on `kubectl-gs`.
@@ -397,7 +399,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...v4.0.0
 [3.7.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.4.0...v3.5.0
