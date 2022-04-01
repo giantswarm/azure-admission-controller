@@ -5,8 +5,8 @@ import (
 
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func ensureAPIServerLB(cr *capz.AzureCluster) (*mutator.PatchOperation, error) {

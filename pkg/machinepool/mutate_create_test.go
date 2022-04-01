@@ -13,10 +13,10 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/machinepool"
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/machinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestMachinePoolCreateMutate(t *testing.T) {

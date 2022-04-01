@@ -7,9 +7,9 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/config"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/config"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func Test_RegisterWebhookHandlers(t *testing.T) {

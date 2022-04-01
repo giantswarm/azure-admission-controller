@@ -9,8 +9,8 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/test"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/test"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 type BuilderOption func(azureCluster *capz.AzureCluster) *capz.AzureCluster

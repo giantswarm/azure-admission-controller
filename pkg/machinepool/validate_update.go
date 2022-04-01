@@ -7,8 +7,8 @@ import (
 	"github.com/giantswarm/microerror"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interface{}, object interface{}) error {

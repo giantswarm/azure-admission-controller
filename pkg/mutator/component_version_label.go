@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/release"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/release"
 )
 
 func CopyAzureOperatorVersionLabelFromAzureClusterCR(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (*PatchOperation, error) {

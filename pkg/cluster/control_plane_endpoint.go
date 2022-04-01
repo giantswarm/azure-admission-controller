@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 func validateClusterNetwork(cluster capi.Cluster) error {

@@ -8,8 +8,8 @@ import (
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{}) error {

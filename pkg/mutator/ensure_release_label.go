@@ -12,7 +12,7 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
 )
 
 func EnsureReleaseVersionLabel(ctx context.Context, ctrlClient client.Client, meta metav1.Object) (*PatchOperation, error) {

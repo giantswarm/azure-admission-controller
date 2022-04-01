@@ -9,16 +9,16 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/azurecluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/azuremachine"
-	"github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"
-	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
-	"github.com/giantswarm/azure-admission-controller/pkg/cluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/config"
-	"github.com/giantswarm/azure-admission-controller/pkg/machinepool"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
-	"github.com/giantswarm/azure-admission-controller/pkg/validator"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/azurecluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/azuremachine"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/azuremachinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/azureupdate"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/cluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/config"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/machinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/validator"
 )
 
 // RegisterWebhookHandlers first creates all required webhook handlers and then it registers

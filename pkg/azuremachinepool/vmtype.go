@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
 )
 
 const (

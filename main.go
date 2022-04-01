@@ -27,10 +27,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/app"
-	"github.com/giantswarm/azure-admission-controller/pkg/config"
-	"github.com/giantswarm/azure-admission-controller/pkg/project"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/app"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/config"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/project"
 )
 
 func main() {
