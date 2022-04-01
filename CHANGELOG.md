@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.0] - 2022-04-01
 
+## [5.0.0] - 2022-04-01
+
 ## [4.0.0] - 2022-03-31
 
 ### Removed
@@ -402,6 +404,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First release.
 
 [Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v5.0.0...v5.0.0
 [5.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...v5.0.0
 [4.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...v4.0.0
 [3.7.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.6.0...v3.7.0
