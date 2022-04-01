@@ -136,6 +136,10 @@ jobs:
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
           if [ "${{ steps.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
             mod upgrade
+          else
+            echo "It's major: ${{ steps.gather_facts.outputs.is_major }}\n"
+            echo "Now fail if go.mod doesn't exist"
+            test -f "go.mod"
           fi
       - name: Create release commit
         env:
