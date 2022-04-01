@@ -129,7 +129,7 @@ jobs:
       - name: Install github.com/marwan-at-work/mod
         run: |
           pushd /tmp
-          git clone git@github.com:marwan-at-work/mod.git
+          git clone https://github.com/marwan-at-work/mod.git
           cd ./mod/cmd/mod
           GO111MODULE=on go install
           popd
