@@ -121,11 +121,9 @@ jobs:
     env:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }}"
     steps:
-      - run: go version
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.17.0'
-      - run: go version
+          go-version: '^1.17.0'
       - name: Install architect
         uses: giantswarm/install-binary-action@v1.0.0
         with:
@@ -134,9 +132,8 @@ jobs:
       - name: Install github.com/marwan-at-work/mod
         run: |
           which -a mod
-          pushd /tmp && GO111MODULE=on go get github.com/marwan-at-work/mod/cmd/mod && popd
+          go install github.com/marwan-at-work/mod/cmd/mod@v0.4.1
           which -a mod
-          ls -lah $GOPATH/bin/
       - name: Checkout code
         uses: actions/checkout@v3
         with:
