@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 func validateControlPlaneEndpoint(azureCluster capz.AzureCluster, baseDomain string) error {

@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
 )
 
 type Mutator interface {

@@ -7,7 +7,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 )

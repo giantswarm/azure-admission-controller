@@ -6,9 +6,9 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/azure-admission-controller/internal/patches"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/patches"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func (h *WebhookHandler) OnUpdateMutate(ctx context.Context, _ interface{}, object interface{}) ([]mutator.PatchOperation, error) {

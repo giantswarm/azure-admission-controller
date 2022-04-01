@@ -5,7 +5,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
 )
 
 type conditionChangeValidation func(oldCondition, newCondition *capi.Condition) error

@@ -5,9 +5,9 @@ import (
 
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{}) error {

@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/micrologger"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/cluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/cluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestClusterUpdateValidate(t *testing.T) {

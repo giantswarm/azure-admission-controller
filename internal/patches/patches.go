@@ -9,7 +9,7 @@ import (
 	jsonpatch "gomodules.xyz/jsonpatch/v2"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func GenerateFrom(originalJSON []byte, current runtime.Object) ([]mutator.PatchOperation, error) {

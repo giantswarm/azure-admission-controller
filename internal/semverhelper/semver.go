@@ -5,7 +5,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
 )
 
 func GetSemverFromLabels(labels map[string]string) (semver.Version, error) {

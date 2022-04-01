@@ -7,7 +7,7 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiconditions "sigs.k8s.io/cluster-api/util/conditions"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
 )
 
 func ValidateClusterConditions(oldClusterCR *capi.Cluster, newClusterCR *capi.Cluster) error {

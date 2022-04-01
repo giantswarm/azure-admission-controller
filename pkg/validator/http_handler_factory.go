@@ -13,8 +13,8 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/filter"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
 )
 
 type HttpHandlerFactoryConfig struct {

@@ -11,9 +11,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/cluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/cluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestClusterUpdateMutate(t *testing.T) {

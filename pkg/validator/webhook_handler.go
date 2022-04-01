@@ -3,7 +3,7 @@ package validator
 import (
 	"context"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
 )
 
 type WebhookHandlerBase interface {

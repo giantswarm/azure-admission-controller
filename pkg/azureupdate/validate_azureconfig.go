@@ -12,10 +12,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
-	"github.com/giantswarm/azure-admission-controller/internal/semverhelper"
-	"github.com/giantswarm/azure-admission-controller/pkg/key"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/releaseversion"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/semverhelper"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/key"
 )
 
 type AzureConfigWebhookHandler struct {

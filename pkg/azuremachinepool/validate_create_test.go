@@ -16,10 +16,10 @@ import (
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/azuremachinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestAzureMachinePoolCreateValidate(t *testing.T) {

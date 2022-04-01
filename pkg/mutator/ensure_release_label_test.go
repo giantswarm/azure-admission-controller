@@ -12,8 +12,8 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func Test_EnsureReleaseLabel(t *testing.T) {

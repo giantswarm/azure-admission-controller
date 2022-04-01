@@ -19,9 +19,9 @@ import (
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/releaseversion"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestAzureClusterConfigValidate(t *testing.T) {

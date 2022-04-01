@@ -12,8 +12,8 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/azuremachinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 func TestAzureMachinePoolUpdateValidate(t *testing.T) {

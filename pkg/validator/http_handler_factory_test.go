@@ -22,9 +22,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
-	builder "github.com/giantswarm/azure-admission-controller/internal/test/cluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/release"
-	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
+	builder "github.com/giantswarm/azure-admission-controller/v2/internal/test/cluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/release"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/unittest"
 )
 
 const (

@@ -12,9 +12,9 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/internal/errors"
-	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
-	"github.com/giantswarm/azure-admission-controller/internal/semverhelper"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/errors"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/releaseversion"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/semverhelper"
 )
 
 func ValidateClusterAnnotationUpgradeTime(oldCluster *capi.Cluster, newCluster *capi.Cluster) error {
