@@ -128,7 +128,11 @@ jobs:
           version: "6.1.0"
       - name: Install github.com/marwan-at-work/mod
         run: |
-          pushd /tmp && GO111MODULE=on go get github.com/marwan-at-work/mod/cmd/mod && popd
+          pushd /tmp
+          git clone github.com/marwan-at-work/mod
+          cd ./mod/cmd/mod
+          GO111MODULE=on go install
+          popd
       - name: Checkout code
         uses: actions/checkout@v3
         with:
