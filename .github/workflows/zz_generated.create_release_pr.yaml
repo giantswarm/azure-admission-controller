@@ -128,9 +128,10 @@ jobs:
           version: "6.1.0"
       - name: Install github.com/marwan-at-work/mod
         run: |
+          which -a mod
           pushd /tmp && GO111MODULE=on go get github.com/marwan-at-work/mod/cmd/mod && popd
           which -a mod
-          ls -lah $GOPATH/bin
+          ls -lah $GOPATH/bin/
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -139,7 +140,7 @@ jobs:
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
           if [ "${{ needs.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
-            mod upgrade
+            $GOPATH/bin/mod upgrade
           else
             echo "It's major: ${{ steps.gather_facts.outputs.is_major }}\n"
             echo "Now fail if go.mod doesn't exist"
