@@ -24,8 +24,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
-	"github.com/giantswarm/azure-admission-controller/integration/env"
-	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
+	"github.com/giantswarm/azure-admission-controller/v2/internal/vmcapabilities"
+
+	"github.com/giantswarm/azure-admission-controller/v2/integration/env"
 )
 
 func NewReadOnlyCtrlClient(t *testing.T) client.Client {

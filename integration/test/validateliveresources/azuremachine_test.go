@@ -13,11 +13,12 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/integration/env"
-	azuremachinepkg "github.com/giantswarm/azure-admission-controller/pkg/azuremachine"
-	"github.com/giantswarm/azure-admission-controller/pkg/filter"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/integration/env"
+
+	azuremachinepkg "github.com/giantswarm/azure-admission-controller/v2/pkg/azuremachine"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func TestAzureMachineFiltering(t *testing.T) {

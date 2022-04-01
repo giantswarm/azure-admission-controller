@@ -13,10 +13,10 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/filter"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
-	machinepoolpkg "github.com/giantswarm/azure-admission-controller/pkg/machinepool"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
+	machinepoolpkg "github.com/giantswarm/azure-admission-controller/v2/pkg/machinepool"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func TestMachinePoolFiltering(t *testing.T) {

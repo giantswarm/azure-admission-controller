@@ -25,9 +25,9 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/integration/env"
-	"github.com/giantswarm/azure-admission-controller/integration/util"
-	"github.com/giantswarm/azure-admission-controller/integration/values"
+	"github.com/giantswarm/azure-admission-controller/v2/integration/env"
+	"github.com/giantswarm/azure-admission-controller/v2/integration/util"
+	"github.com/giantswarm/azure-admission-controller/v2/integration/values"
 )
 
 const (

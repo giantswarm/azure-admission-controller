@@ -11,10 +11,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/integration/env"
-	clusterpkg "github.com/giantswarm/azure-admission-controller/pkg/cluster"
-	"github.com/giantswarm/azure-admission-controller/pkg/filter"
-	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
+	"github.com/giantswarm/azure-admission-controller/v2/integration/env"
+
+	clusterpkg "github.com/giantswarm/azure-admission-controller/v2/pkg/cluster"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/mutator"
 )
 
 func TestClusterFiltering(t *testing.T) {

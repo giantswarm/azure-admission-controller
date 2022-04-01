@@ -13,9 +13,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/azure-admission-controller/pkg/azureupdate"
-	"github.com/giantswarm/azure-admission-controller/pkg/filter"
-	"github.com/giantswarm/azure-admission-controller/pkg/generic"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/azureupdate"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/filter"
+	"github.com/giantswarm/azure-admission-controller/v2/pkg/generic"
 )
 
 func TestAzureConfigFiltering(t *testing.T) {
