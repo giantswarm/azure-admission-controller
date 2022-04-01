@@ -44,6 +44,7 @@ jobs:
       repo_name: ${{ steps.gather_facts.outputs.repo_name }}
       branch: ${{ steps.gather_facts.outputs.branch }}
       base: ${{ steps.gather_facts.outputs.base }}
+      is_major: ${{ steps.gather_facts.outputs.is_major }}
       skip: ${{ steps.pr_exists.outputs.skip }}
       version: ${{ steps.gather_facts.outputs.version }}
     steps:
@@ -81,6 +82,7 @@ jobs:
                 version_major=$((version_major+1))
                 version_minor=0
                 version_patch=0
+                echo "::set-output name=is_major::true"
                 ;;
               *)
                 echo "Unknown Semver level provided"
@@ -122,6 +124,9 @@ jobs:
         with:
           binary: "architect"
           version: "6.1.0"
+      - name: Install github.com/marwan-at-work/mod
+        run: |
+          go get github.com/marwan-at-work/mod
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -129,6 +134,9 @@ jobs:
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
+          if ${{ steps.gather_facts.outputs.is_major }} && test -f "go.mod"; then
+            mod upgrade
+          fi
       - name: Create release commit
         env:
           version: "${{ needs.gather_facts.outputs.version }}"
