@@ -73,10 +73,12 @@ jobs:
             case ${version} in
               patch)
                 version_patch=$((version_patch+1))
+                echo "::set-output name=is_major::false"
                 ;;
               minor)
                 version_minor=$((version_minor+1))
                 version_patch=0
+                echo "::set-output name=is_major::false"
                 ;;
               major)
                 version_major=$((version_major+1))
@@ -134,7 +136,7 @@ jobs:
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
-          if [ "${{ steps.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
+          if [ "${{ needs.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
             mod upgrade
           else
             echo "It's major: ${{ steps.gather_facts.outputs.is_major }}\n"
