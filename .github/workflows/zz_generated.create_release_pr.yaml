@@ -73,12 +73,10 @@ jobs:
             case ${version} in
               patch)
                 version_patch=$((version_patch+1))
-                echo "::set-output name=is_major::false"
                 ;;
               minor)
                 version_minor=$((version_minor+1))
                 version_patch=0
-                echo "::set-output name=is_major::false"
                 ;;
               major)
                 version_major=$((version_major+1))
@@ -94,6 +92,12 @@ jobs:
             version="${version_major}.${version_minor}.${version_patch}"
           else
             version="${version#v}" # Strip "v" prefix.
+            version_major=$(echo "${version}" | cut -d "." -f 1)
+            version_minor=$(echo "${version}" | cut -d "." -f 2)
+            version_patch=$(echo "${version}" | cut -d "." -f 3)
+            if [[ $version_minor = 0 && $version_patch = 0 ]]; then
+              echo "::set-output name=is_major::true"
+            fi
           fi
           repo_name="$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')"
           echo "repo_name=\"$repo_name\" base=\"$base\" head=\"$head\" version=\"$version\""
@@ -141,10 +145,6 @@ jobs:
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
           if [ "${{ needs.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
             mod upgrade
-          else
-            echo "It's major: ${{ steps.gather_facts.outputs.is_major }}\n"
-            echo "Now fail if go.mod doesn't exist"
-            test -f "go.mod"
           fi
       - name: Create release commit
         env:
