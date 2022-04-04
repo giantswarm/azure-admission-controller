@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/azure-admission-controller/internal/patches"
+	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )
@@ -19,20 +20,28 @@ func (h *WebhookHandler) OnUpdateMutate(ctx context.Context, _ interface{}, obje
 	}
 	clusterCROriginal := clusterCR.DeepCopy()
 
-	patch, err := mutator.EnsureComponentVersionLabelFromRelease(ctx, h.ctrlReader, clusterCR.GetObjectMeta(), "azure-operator", label.AzureOperatorVersion)
+	// Check if this is a CAPI cluster.
+	capi, err := generic.IsCAPIRelease(clusterCR)
 	if err != nil {
 		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
 	}
 
-	patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, h.ctrlReader, clusterCR.GetObjectMeta(), "cluster-operator", label.ClusterOperatorVersion)
-	if err != nil {
-		return []mutator.PatchOperation{}, microerror.Mask(err)
-	}
-	if patch != nil {
-		result = append(result, *patch)
+	if !capi {
+		patch, err := mutator.EnsureComponentVersionLabelFromRelease(ctx, h.ctrlReader, clusterCR.GetObjectMeta(), "azure-operator", label.AzureOperatorVersion)
+		if err != nil {
+			return []mutator.PatchOperation{}, microerror.Mask(err)
+		}
+		if patch != nil {
+			result = append(result, *patch)
+		}
+
+		patch, err = mutator.EnsureComponentVersionLabelFromRelease(ctx, h.ctrlReader, clusterCR.GetObjectMeta(), "cluster-operator", label.ClusterOperatorVersion)
+		if err != nil {
+			return []mutator.PatchOperation{}, microerror.Mask(err)
+		}
+		if patch != nil {
+			result = append(result, *patch)
+		}
 	}
 
 	clusterCR.Default()

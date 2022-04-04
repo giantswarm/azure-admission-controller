@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add defaulting of `azure-operator.giantswarm.io/version` and `cluster-operator.giantswarm.io/version` for legacy cluster's `Cluster` CRs.
+
 ## [4.0.0] - 2022-03-31
 
 ### Removed

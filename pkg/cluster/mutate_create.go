@@ -44,6 +44,12 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 		result = append(result, *patch)
 	}
 
+	onMutateUpdatePatches, err := h.OnUpdateMutate(ctx, nil, clusterCR)
+	if err != nil {
+		return []mutator.PatchOperation{}, microerror.Mask(err)
+	}
+	result = append(result, onMutateUpdatePatches...)
+
 	clusterCR.Default()
 	{
 		var capiPatches []mutator.PatchOperation
