@@ -7,6 +7,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,10 +36,15 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 	}
 
+	operatorsLabels := map[string]string{
+		label.AzureOperatorVersion:   "5.0.0",
+		label.ClusterOperatorVersion: "1.2.3",
+	}
+
 	testCases := []testCase{
 		{
 			name:    "case 0: ControlPlaneEndpoint left empty",
-			cluster: clusterObject("ab123", clusterNetwork, "", 0, nil),
+			cluster: clusterObject("ab123", clusterNetwork, "", 0, operatorsLabels),
 			patches: []mutator.PatchOperation{
 				{
 					Operation: "add",
@@ -55,8 +61,25 @@ func TestClusterCreateMutate(t *testing.T) {
 		},
 		{
 			name:         "case 1: ControlPlaneEndpoint has a value",
-			cluster:      clusterObject("ab123", clusterNetwork, "api.giantswarm.io", 123, nil),
+			cluster:      clusterObject("ab123", clusterNetwork, "api.giantswarm.io", 123, operatorsLabels),
 			patches:      []mutator.PatchOperation{},
+			errorMatcher: nil,
+		},
+		{
+			name:    "case 2: Operator version labels missing",
+			cluster: clusterObject("ab123", clusterNetwork, "api.giantswarm.io", 123, nil),
+			patches: []mutator.PatchOperation{
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/azure-operator.giantswarm.io~1version",
+					Value:     "5.0.0",
+				},
+				{
+					Operation: "add",
+					Path:      "/metadata/labels/cluster-operator.giantswarm.io~1version",
+					Value:     "1.2.3",
+				},
+			},
 			errorMatcher: nil,
 		},
 	}
@@ -87,6 +110,9 @@ func TestClusterCreateMutate(t *testing.T) {
 						{
 							Name:    "azure-operator",
 							Version: "5.0.0",
+						}, {
+							Name:    "cluster-operator",
+							Version: "1.2.3",
 						},
 					},
 				},
@@ -102,7 +128,8 @@ func TestClusterCreateMutate(t *testing.T) {
 					Name:      "ab123",
 					Namespace: "default",
 					Labels: map[string]string{
-						"azure-operator.giantswarm.io/version": "5.0.0",
+						"azure-operator.giantswarm.io/version":   "5.0.0",
+						"cluster-operator.giantswarm.io/version": "1.2.3",
 					},
 				},
 			}
@@ -149,11 +176,10 @@ func TestClusterCreateMutate(t *testing.T) {
 
 func clusterObject(clusterName string, clusterNetwork *capi.ClusterNetwork, controlPlaneEndpointHost string, controlPlaneEndpointPort int32, labels map[string]string) *capi.Cluster {
 	mergedLabels := map[string]string{
-		"azure-operator.giantswarm.io/version": "5.0.0",
-		"cluster.x-k8s.io/cluster-name":        clusterName,
-		"giantswarm.io/cluster":                clusterName,
-		"giantswarm.io/organization":           "giantswarm",
-		"release.giantswarm.io/version":        "13.0.0-alpha4",
+		"cluster.x-k8s.io/cluster-name": clusterName,
+		"giantswarm.io/cluster":         clusterName,
+		"giantswarm.io/organization":    "giantswarm",
+		"release.giantswarm.io/version": "13.0.0-alpha4",
 	}
 	for k, v := range labels {
 		mergedLabels[k] = v
