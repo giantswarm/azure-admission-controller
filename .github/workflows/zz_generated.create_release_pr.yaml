@@ -1,6 +1,6 @@
 # DO NOT EDIT. Generated with:
 #
-#    devctl@4.23.0
+#    devctl@4.24.1
 #
 name: Create Release PR
 on:
@@ -44,7 +44,6 @@ jobs:
       repo_name: ${{ steps.gather_facts.outputs.repo_name }}
       branch: ${{ steps.gather_facts.outputs.branch }}
       base: ${{ steps.gather_facts.outputs.base }}
-      is_major: ${{ steps.gather_facts.outputs.is_major }}
       skip: ${{ steps.pr_exists.outputs.skip }}
       version: ${{ steps.gather_facts.outputs.version }}
     steps:
@@ -82,7 +81,6 @@ jobs:
                 version_major=$((version_major+1))
                 version_minor=0
                 version_patch=0
-                echo "::set-output name=is_major::true"
                 ;;
               *)
                 echo "Unknown Semver level provided"
@@ -92,12 +90,6 @@ jobs:
             version="${version_major}.${version_minor}.${version_patch}"
           else
             version="${version#v}" # Strip "v" prefix.
-            version_major=$(echo "${version}" | cut -d "." -f 1)
-            version_minor=$(echo "${version}" | cut -d "." -f 2)
-            version_patch=$(echo "${version}" | cut -d "." -f 3)
-            if [[ $version_minor = 0 && $version_patch = 0 ]]; then
-              echo "::set-output name=is_major::true"
-            fi
           fi
           repo_name="$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')"
           echo "repo_name=\"$repo_name\" base=\"$base\" head=\"$head\" version=\"$version\""
@@ -125,17 +117,11 @@ jobs:
     env:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }}"
     steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '=1.17.0'
       - name: Install architect
         uses: giantswarm/install-binary-action@v1.0.0
         with:
           binary: "architect"
           version: "6.1.0"
-      - name: Install github.com/marwan-at-work/mod
-        run: |
-          go install github.com/marwan-at-work/mod/cmd/mod@v0.4.1
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -143,9 +129,6 @@ jobs:
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
-          if [ "${{ needs.gather_facts.outputs.is_major }}" = true ] && test -f "go.mod"; then
-            mod upgrade
-          fi
       - name: Create release commit
         env:
           version: "${{ needs.gather_facts.outputs.version }}"
