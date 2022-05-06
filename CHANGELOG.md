@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1] - 2022-05-06
+
 ### Changed
 
 - Really use location passed as flag to the controller for the failure domain validation on `AzureMachine` CRs.
@@ -403,7 +405,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...v4.0.0
 [3.7.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.5.0...v3.6.0
