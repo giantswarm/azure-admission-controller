@@ -23,7 +23,7 @@ func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string
 
 	supportedAZsMsg := fmt.Sprintf("Location %#q supports Failure Domains %s for VM size %#q but got %#q", location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
 	if len(supportedAZs) == 0 {
-		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q", location, azureMachine.Spec.VMSize)
+		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q and the Failure Domain %#q was selected", location, azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
 		return microerror.Maskf(locationWithNoFailureDomainSupportError, supportedAZsMsg)
 	}
 
