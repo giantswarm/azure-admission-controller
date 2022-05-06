@@ -42,7 +42,7 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 		return microerror.Mask(err)
 	}
 
-	err = validateFailureDomain(*cr, supportedAZs)
+	err = validateFailureDomain(*cr, supportedAZs, h.location)
 	if err != nil {
 		return microerror.Mask(err)
 	}

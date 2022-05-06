@@ -8,7 +8,7 @@ import (
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 )
 
-func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string) error {
+func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string, location string) error {
 	// No failure domain specified.
 	if azureMachine.Spec.FailureDomain == nil || *azureMachine.Spec.FailureDomain == "" {
 		return nil
@@ -21,9 +21,9 @@ func validateFailureDomain(azureMachine capz.AzureMachine, supportedAZs []string
 		}
 	}
 
-	supportedAZsMsg := fmt.Sprintf("Location %#q supports Failure Domains %s for VM size %#q but got %#q", azureMachine.Spec.Location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
+	supportedAZsMsg := fmt.Sprintf("Location %#q supports Failure Domains %s for VM size %#q but got %#q", location, strings.Join(supportedAZs, ", "), azureMachine.Spec.VMSize, *azureMachine.Spec.FailureDomain)
 	if len(supportedAZs) == 0 {
-		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q", azureMachine.Spec.Location, azureMachine.Spec.VMSize)
+		supportedAZsMsg = fmt.Sprintf("Location %#q does not support specifying a Failure Domain for VM size %#q", location, azureMachine.Spec.VMSize)
 		return microerror.Maskf(locationWithNoFailureDomainSupportError, supportedAZsMsg)
 	}
 

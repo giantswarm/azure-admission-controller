@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Really use location passed as flag to the controller for the failure domain validation on `AzureMachine` CRs.
+
 ## [4.0.0] - 2022-03-31
 
 ### Removed
