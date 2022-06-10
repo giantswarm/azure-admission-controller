@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/test"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
@@ -83,19 +83,20 @@ func BuildAzureCluster(opts ...BuilderOption) *capz.AzureCluster {
 			},
 		},
 		Spec: capz.AzureClusterSpec{
-			ResourceGroup: clusterName,
-			Location:      "westeurope",
+			AzureEnvironment: "AzurePublicCloud",
+			ResourceGroup:    clusterName,
+			Location:         "westeurope",
 			ControlPlaneEndpoint: capi.APIEndpoint{
 				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
 				Port: 443,
 			},
 			NetworkSpec: capz.NetworkSpec{
 				Subnets: capz.Subnets{
-					&capz.SubnetSpec{
+					capz.SubnetSpec{
 						Role: "control-plane",
 						Name: key.MasterSubnetName(clusterName),
 					},
-					&capz.SubnetSpec{
+					capz.SubnetSpec{
 						Role: "node",
 						Name: clusterName,
 					},

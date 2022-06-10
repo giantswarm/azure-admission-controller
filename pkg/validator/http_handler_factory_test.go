@@ -12,10 +12,10 @@ import (
 	"strings"
 	"testing"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -125,9 +125,9 @@ func TestHttpHandler(t *testing.T) {
 			var httpHandler http.HandlerFunc
 			switch tc.operation {
 			case admission.Create:
-				httpHandler = httpHandlerFactory.NewCreateHandler(&webhookHandlerMock)
+				httpHandler = httpHandlerFactory.NewCreateHandler("", &webhookHandlerMock)
 			case admission.Update:
-				httpHandler = httpHandlerFactory.NewUpdateHandler(&webhookHandlerMock)
+				httpHandler = httpHandlerFactory.NewUpdateHandler("", &webhookHandlerMock)
 			default:
 				t.Fatal("Unsupported operation")
 			}

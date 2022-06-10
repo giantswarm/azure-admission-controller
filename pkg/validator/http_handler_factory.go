@@ -8,9 +8,10 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"go.opentelemetry.io/otel"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
@@ -29,6 +30,10 @@ type HttpHandlerFactory struct {
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
+
+const (
+	telemetryName = "validate"
+)
 
 func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory, error) {
 	if config.CtrlReader == nil {
@@ -51,7 +56,7 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 }
 
 // NewCreateHandler returns a HTTP handler for validating create requests.
-func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewCreateHandler(pattern string, webhookCreateHandler WebhookCreateHandler) http.HandlerFunc {
 	validateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) error {
 		// Decode the new CR from the request.
 		object, err := webhookCreateHandler.Decode(review.Request.Object)
@@ -89,16 +94,20 @@ func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreate
 }
 
 // NewUpdateHandler returns a HTTP handler for validating update requests.
-func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, webhookUpdateHandler WebhookUpdateHandler) http.HandlerFunc {
 	validateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) error {
+		ctx, span := otel.Tracer(telemetryName).Start(ctx, pattern)
+
 		// Decode the new updated CR from the request.
 		object, err := webhookUpdateHandler.Decode(review.Request.Object)
 		if err != nil {
+			span.End()
 			return microerror.Mask(err)
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
+			span.End()
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}
@@ -109,6 +118,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdate
 		// Check if the CR should be validated by the azure-admission-controller.
 		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
+			span.End()
 			return microerror.Mask(err)
 		}
 
@@ -116,16 +126,19 @@ func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdate
 			// Decode the old CR from the request (before the update).
 			oldObject, err := webhookUpdateHandler.Decode(review.Request.OldObject)
 			if err != nil {
+				span.End()
 				return microerror.Mask(err)
 			}
 
 			// Validate the CR.
 			err = webhookUpdateHandler.OnUpdateValidate(ctx, oldObject, object)
 			if err != nil {
+				span.End()
 				return microerror.Mask(err)
 			}
 		}
 
+		span.End()
 		return nil
 	}
 

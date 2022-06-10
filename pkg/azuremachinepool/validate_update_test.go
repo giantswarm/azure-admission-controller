@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/apimachinery/pkg/api/resource"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azuremachinepool"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"

@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/machinepool"
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"

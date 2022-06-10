@@ -76,7 +76,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		// register a handler function for validating create requests.
 		if webhookHandler, ok := h.(validator.WebhookCreateHandler); ok {
 			pattern := fmt.Sprintf("/validate/%s/create", webhookHandler.Resource())
-			httpHandlerFunc := validatorHttpHandlerFactory.NewCreateHandler(webhookHandler)
+			httpHandlerFunc := validatorHttpHandlerFactory.NewCreateHandler(pattern, webhookHandler)
 			httpRequestHandler.Handle(pattern, httpHandlerFunc)
 		}
 
@@ -84,7 +84,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		// register a handler function for validating update requests.
 		if webhookHandler, ok := h.(validator.WebhookUpdateHandler); ok {
 			pattern := fmt.Sprintf("/validate/%s/update", webhookHandler.Resource())
-			httpHandlerFunc := validatorHttpHandlerFactory.NewUpdateHandler(webhookHandler)
+			httpHandlerFunc := validatorHttpHandlerFactory.NewUpdateHandler(pattern, webhookHandler)
 			httpRequestHandler.Handle(pattern, httpHandlerFunc)
 		}
 
@@ -92,7 +92,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		// register a handler function for validating create requests.
 		if webhookHandler, ok := h.(mutator.WebhookCreateHandler); ok {
 			pattern := fmt.Sprintf("/mutate/%s/create", webhookHandler.Resource())
-			httpHandlerFunc := mutatorHttpHandlerFactory.NewCreateHandler(webhookHandler)
+			httpHandlerFunc := mutatorHttpHandlerFactory.NewCreateHandler(pattern, webhookHandler)
 			httpRequestHandler.Handle(pattern, httpHandlerFunc)
 		}
 
@@ -100,7 +100,7 @@ func RegisterWebhookHandlers(httpRequestHandler HttpRequestHandler, cfg config.C
 		// register a handler function for validating update requests.
 		if webhookHandler, ok := h.(mutator.WebhookUpdateHandler); ok {
 			pattern := fmt.Sprintf("/mutate/%s/update", webhookHandler.Resource())
-			httpHandlerFunc := mutatorHttpHandlerFactory.NewUpdateHandler(webhookHandler)
+			httpHandlerFunc := mutatorHttpHandlerFactory.NewUpdateHandler(pattern, webhookHandler)
 			httpRequestHandler.Handle(pattern, httpHandlerFunc)
 		}
 	}

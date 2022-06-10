@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"

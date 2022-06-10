@@ -9,9 +9,10 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"go.opentelemetry.io/otel"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/filter"
@@ -30,6 +31,10 @@ type HttpHandlerFactory struct {
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
+
+const (
+	telemetryName = "mutate"
+)
 
 func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory, error) {
 	if config.CtrlReader == nil {
@@ -52,16 +57,20 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 }
 
 // NewCreateHandler returns a HTTP handler for mutating create requests.
-func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewCreateHandler(pattern string, mutator WebhookCreateHandler) http.HandlerFunc {
 	mutateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) ([]PatchOperation, error) {
+		ctx, span := otel.Tracer(telemetryName).Start(ctx, pattern)
+
 		// Decode the new CR from the request.
 		object, err := mutator.Decode(review.Request.Object)
 		if err != nil {
+			span.End()
 			return nil, microerror.Mask(err)
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
+			span.End()
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}
@@ -72,6 +81,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http
 		// Check if the CR should be mutated by the azure-admission-controller.
 		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
+			span.End()
 			return nil, microerror.Mask(err)
 		}
 
@@ -81,10 +91,12 @@ func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http
 			// Mutate the CR and get patch for those mutations.
 			patch, err = mutator.OnCreateMutate(ctx, object)
 			if err != nil {
+				span.End()
 				return nil, microerror.Mask(err)
 			}
 		}
 
+		span.End()
 		return patch, nil
 	}
 
@@ -92,16 +104,20 @@ func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http
 }
 
 // NewUpdateHandler returns a HTTP handler for mutating update requests.
-func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, mutator WebhookUpdateHandler) http.HandlerFunc {
 	mutateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) ([]PatchOperation, error) {
+		ctx, span := otel.Tracer(telemetryName).Start(ctx, pattern)
+
 		// Decode the new updated CR from the request.
 		object, err := mutator.Decode(review.Request.Object)
 		if err != nil {
+			span.End()
 			return nil, microerror.Mask(err)
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
+			span.End()
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}
@@ -112,6 +128,7 @@ func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http
 		// Check if the CR should be mutated by the azure-admission-controller.
 		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
+			span.End()
 			return nil, microerror.Mask(err)
 		}
 
@@ -121,16 +138,19 @@ func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http
 			// Decode the old CR from the request (before the update).
 			oldObject, err := mutator.Decode(review.Request.OldObject)
 			if err != nil {
+				span.End()
 				return nil, microerror.Mask(err)
 			}
 
 			// Mutate the CR and get patch for those mutations.
 			patch, err = mutator.OnUpdateMutate(ctx, oldObject, object)
 			if err != nil {
+				span.End()
 				return nil, microerror.Mask(err)
 			}
 		}
 
+		span.End()
 		return patch, nil
 	}
 

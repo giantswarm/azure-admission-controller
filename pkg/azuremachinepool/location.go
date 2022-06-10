@@ -2,7 +2,7 @@ package azuremachinepool
 
 import (
 	"github.com/giantswarm/microerror"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 )
 
 func checkLocation(azureMachinePool capzexp.AzureMachinePool, expectedLocation string) error {

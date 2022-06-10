@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 )
 
 func checkSSHKeyIsEmpty(ctx context.Context, mp *capzexp.AzureMachinePool) error {

@@ -3,13 +3,13 @@ package key
 import (
 	"fmt"
 
-	corev1alpha1v3 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	corev1alpha1v3 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
+	"github.com/giantswarm/apiextensions/v6/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 )

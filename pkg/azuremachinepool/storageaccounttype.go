@@ -5,7 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-03-01/compute"
 	"github.com/giantswarm/microerror"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 )

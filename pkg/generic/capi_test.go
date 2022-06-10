@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
