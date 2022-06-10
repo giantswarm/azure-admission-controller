@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2022-06-10
+
+### Changed
+
+- Set VPA to never go below 250m CPU limit.
+- Switch to RollingUpdate strategy.
+
 ## [4.0.1] - 2022-05-06
 
 ### Changed
@@ -405,7 +412,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...v4.0.0
 [3.7.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.6.0...v3.7.0
