@@ -339,7 +339,8 @@ func newFakeClient() client.Client {
 		panic(err)
 	}
 
-	return fake.NewFakeClientWithScheme(scheme)
+	builder := fake.NewClientBuilder().WithScheme(scheme)
+	return builder.Build()
 }
 
 type object interface {

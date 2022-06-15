@@ -82,7 +82,8 @@ func Test_WhenCreatingClusterWithNonExistingOrganizationThenValidationFails(t *t
 		Spec: securityv1alpha1.OrganizationSpec{},
 	}
 
-	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
+	builder := fake.NewClientBuilder().WithScheme(scheme).WithObjects(organization)
+	ctrlClient := builder.Build()
 
 	obj := newObjectWithOrganization(to.StringPtr("non-existing"))
 	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, ctrlClient, obj)
@@ -108,7 +109,8 @@ func Test_WhenCreatingClusterWithExistingOrganizationWithNonNormalizedNameThenVa
 		Spec: securityv1alpha1.OrganizationSpec{},
 	}
 
-	ctrlClient := fake.NewFakeClientWithScheme(scheme, organization)
+	builder := fake.NewClientBuilder().WithScheme(scheme).WithObjects(organization)
+	ctrlClient := builder.Build()
 
 	obj := newObjectWithOrganization(to.StringPtr("My Awesome Organization"))
 	err = ValidateOrganizationLabelContainsExistingOrganization(ctx, ctrlClient, obj)
