@@ -65,17 +65,13 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 		amp := v1alpha3.AzureMachinePool{}
 		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
 		if errors.IsNotFound(err) {
-			// Did not find, we fallback to the exp AMP.
+			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
 		location = amp.Spec.Location
 		vmsize = amp.Spec.Template.VMSize
-	}
-
-	if location == "" || vmsize == "" {
-		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool (looking for %q in ns %q)", mp.Spec.Template.Spec.InfrastructureRef.Name, mp.Spec.Template.Spec.InfrastructureRef.Namespace)
 	}
 
 	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, mp.ObjectMeta)
