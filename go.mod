@@ -24,10 +24,10 @@ require (
 	github.com/stretchr/testify v1.7.1
 	gomodules.xyz/jsonpatch/v2 v2.2.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	k8s.io/api v0.22.2
+	k8s.io/api v0.22.5
 	k8s.io/apiextensions-apiserver v0.22.2
-	k8s.io/apimachinery v0.22.2
-	k8s.io/client-go v0.22.2
+	k8s.io/apimachinery v0.22.5
+	k8s.io/client-go v0.22.5
 	sigs.k8s.io/cluster-api v1.0.5
 	sigs.k8s.io/cluster-api-provider-azure v1.0.2
 	sigs.k8s.io/controller-runtime v0.10.3
@@ -37,6 +37,9 @@ require (
 require github.com/go-logr/logr v1.2.3 // indirect
 
 replace (
+	github.com/aws/aws-sdk-go => github.com/aws/aws-sdk-go v1.44.34
+	github.com/containerd/containerd => github.com/containerd/containerd v1.6.6
+	github.com/containerd/imgcrypt => github.com/containerd/imgcrypt v1.1.6
 	github.com/aws/aws-sdk-go => github.com/aws/aws-sdk-go v1.44.31
 	github.com/caddyserver/caddy => github.com/caddyserver/caddy v1.0.5
 	// Required to replace version with vulnerabilities.
