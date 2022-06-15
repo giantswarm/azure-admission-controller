@@ -111,6 +111,7 @@ func BuildAzureCluster(opts ...BuilderOption) *capz.AzureCluster {
 						},
 					},
 				},
+				NodeOutboundLB: &capz.LoadBalancerSpec{},
 			},
 		},
 	}

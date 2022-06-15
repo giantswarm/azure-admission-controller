@@ -31,13 +31,7 @@ func TestAzureMachineUpdateValidate(t *testing.T) {
 			errorMatcher: nil,
 		},
 		{
-			name:         "Case 1 - not empty ssh key",
-			oldAM:        azureMachineObject("", nil, nil),
-			newAM:        azureMachineObject("ssh-rsa 12345 giantswarm", nil, nil),
-			errorMatcher: IsSSHFieldIsSetError,
-		},
-		{
-			name:         "Case 2 - failure domain changed",
+			name:         "Case 1 - failure domain changed",
 			oldAM:        azureMachineObject("", to.StringPtr("1"), nil),
 			newAM:        azureMachineObject("", to.StringPtr("2"), nil),
 			errorMatcher: IsFailureDomainWasChangedError,
