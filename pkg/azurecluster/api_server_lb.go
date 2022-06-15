@@ -12,8 +12,10 @@ import (
 func ensureAPIServerLB(cr *capz.AzureCluster) (*mutator.PatchOperation, error) {
 	apiServerLB := capz.LoadBalancerSpec{
 		Name: key.APIServerLBName(cr.Name),
-		SKU:  capz.SKU(key.APIServerLBSKU()),
-		Type: capz.LBType(key.APIServerLBType()),
+		LoadBalancerClassSpec: capz.LoadBalancerClassSpec{
+			SKU:  capz.SKU(key.APIServerLBSKU()),
+			Type: capz.LBType(key.APIServerLBType()),
+		},
 		FrontendIPs: []capz.FrontendIP{
 			{Name: key.APIServerLBFrontendIPName(cr.Name)},
 		},

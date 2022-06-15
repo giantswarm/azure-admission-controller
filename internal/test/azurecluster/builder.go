@@ -83,28 +83,31 @@ func BuildAzureCluster(opts ...BuilderOption) *capz.AzureCluster {
 			},
 		},
 		Spec: capz.AzureClusterSpec{
-			AzureEnvironment: "AzurePublicCloud",
-			ResourceGroup:    clusterName,
-			Location:         "westeurope",
-			ControlPlaneEndpoint: capi.APIEndpoint{
-				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
-				Port: 443,
+			AzureClusterClassSpec: capz.AzureClusterClassSpec{
+				Location:         "westeurope",
+				AzureEnvironment: "AzurePublicCloud",
 			},
 			NetworkSpec: capz.NetworkSpec{
 				Subnets: capz.Subnets{
 					capz.SubnetSpec{
-						Role: "control-plane",
+						SubnetClassSpec: capz.SubnetClassSpec{
+							Role: "control-plane",
+						},
 						Name: key.MasterSubnetName(clusterName),
 					},
 					capz.SubnetSpec{
-						Role: "node",
+						SubnetClassSpec: capz.SubnetClassSpec{
+							Role: "node",
+						},
 						Name: clusterName,
 					},
 				},
 				APIServerLB: capz.LoadBalancerSpec{
 					Name: key.APIServerLBName(clusterName),
-					SKU:  capz.SKU(key.APIServerLBSKU()),
-					Type: capz.LBType(key.APIServerLBType()),
+					LoadBalancerClassSpec: capz.LoadBalancerClassSpec{
+						SKU:  capz.SKU(key.APIServerLBSKU()),
+						Type: capz.LBType(key.APIServerLBType()),
+					},
 					FrontendIPs: []capz.FrontendIP{
 						{
 							Name: key.APIServerLBFrontendIPName(clusterName),
@@ -112,6 +115,11 @@ func BuildAzureCluster(opts ...BuilderOption) *capz.AzureCluster {
 					},
 				},
 				NodeOutboundLB: &capz.LoadBalancerSpec{},
+			},
+			ResourceGroup: clusterName,
+			ControlPlaneEndpoint: capi.APIEndpoint{
+				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
+				Port: 443,
 			},
 		},
 	}

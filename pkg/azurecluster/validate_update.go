@@ -34,6 +34,8 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 	// TODO(axbarsan): Remove this once all the older clusters have it.
 	err = errors.IgnoreCAPIErrorForField("spec.networkSpec.apiServerLB", err)
 	err = errors.IgnoreCAPIErrorForField("spec.SubscriptionID", err)
+	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Host", err)
+	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Port", err)
 	if err != nil {
 		return microerror.Mask(err)
 	}
