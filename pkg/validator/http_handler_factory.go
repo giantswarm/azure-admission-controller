@@ -8,7 +8,6 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"go.opentelemetry.io/otel"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -96,18 +95,14 @@ func (h *HttpHandlerFactory) NewCreateHandler(pattern string, webhookCreateHandl
 // NewUpdateHandler returns a HTTP handler for validating update requests.
 func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, webhookUpdateHandler WebhookUpdateHandler) http.HandlerFunc {
 	validateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) error {
-		ctx, span := otel.Tracer(telemetryName).Start(ctx, pattern)
-
 		// Decode the new updated CR from the request.
 		object, err := webhookUpdateHandler.Decode(review.Request.Object)
 		if err != nil {
-			span.End()
 			return microerror.Mask(err)
 		}
 
 		ownerClusterGetter := func(objectMeta metav1.ObjectMetaAccessor) (capi.Cluster, bool, error) {
 			ownerCluster, ok, err := generic.TryGetOwnerCluster(ctx, h.ctrlClient, object)
-			span.End()
 			if err != nil {
 				return capi.Cluster{}, false, microerror.Mask(err)
 			}
@@ -118,7 +113,6 @@ func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, webhookUpdateHandl
 		// Check if the CR should be validated by the azure-admission-controller.
 		ok, err := filter.IsObjectReconciledByLegacyRelease(ctx, h.logger, h.ctrlReader, object, ownerClusterGetter)
 		if err != nil {
-			span.End()
 			return microerror.Mask(err)
 		}
 
@@ -126,19 +120,16 @@ func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, webhookUpdateHandl
 			// Decode the old CR from the request (before the update).
 			oldObject, err := webhookUpdateHandler.Decode(review.Request.OldObject)
 			if err != nil {
-				span.End()
 				return microerror.Mask(err)
 			}
 
 			// Validate the CR.
 			err = webhookUpdateHandler.OnUpdateValidate(ctx, oldObject, object)
 			if err != nil {
-				span.End()
 				return microerror.Mask(err)
 			}
 		}
 
-		span.End()
 		return nil
 	}
 
