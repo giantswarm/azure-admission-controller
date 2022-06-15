@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added webhooks for non-exp apiVersions.
+- Added webhooks for v1beta2.
+
 ## [4.0.1] - 2022-05-06
 
 ### Changed
