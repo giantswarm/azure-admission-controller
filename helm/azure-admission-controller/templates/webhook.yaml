@@ -23,6 +23,7 @@ webhooks:
         - "azureclusters"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - CREATE
   sideEffects: None
@@ -41,6 +42,7 @@ webhooks:
         - "azureclusters"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - UPDATE
   sideEffects: None
@@ -59,6 +61,7 @@ webhooks:
         - "azuremachines"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - CREATE
   sideEffects: None
@@ -77,6 +80,7 @@ webhooks:
         - "azuremachines"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - UPDATE
   sideEffects: None
@@ -90,11 +94,12 @@ webhooks:
       path: /mutate/azuremachinepool/create
     caBundle: Cg==
   rules:
-    - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
+    - apiGroups: ["exp.infrastructure.cluster.x-k8s.io", "infrastructure.cluster.x-k8s.io"]
       resources:
         - "azuremachinepools"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - CREATE
   sideEffects: None
@@ -108,11 +113,12 @@ webhooks:
       path: /mutate/azuremachinepool/update
     caBundle: Cg==
   rules:
-    - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
+    - apiGroups: ["exp.infrastructure.cluster.x-k8s.io", "infrastructure.cluster.x-k8s.io"]
       resources:
         - "azuremachinepools"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - UPDATE
   sideEffects: None
@@ -131,6 +137,7 @@ webhooks:
         - "clusters"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - CREATE
   sideEffects: None
@@ -149,6 +156,7 @@ webhooks:
         - "clusters"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - UPDATE
   sideEffects: None
@@ -162,11 +170,12 @@ webhooks:
       path: /mutate/machinepool/create
     caBundle: Cg==
   rules:
-    - apiGroups: ["exp.cluster.x-k8s.io"]
+    - apiGroups: ["exp.cluster.x-k8s.io", "cluster.x-k8s.io"]
       resources:
         - "machinepools"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - CREATE
   sideEffects: None
@@ -180,11 +189,12 @@ webhooks:
       path: /mutate/machinepool/update
     caBundle: Cg==
   rules:
-    - apiGroups: ["exp.cluster.x-k8s.io"]
+    - apiGroups: ["exp.cluster.x-k8s.io", "cluster.x-k8s.io"]
       resources:
         - "machinepools"
       apiVersions:
         - "v1alpha3"
+        - "v1beta1"
       operations:
         - UPDATE
   sideEffects: None
@@ -245,11 +255,12 @@ webhooks:
         path: /validate/azuremachinepool/create
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
+      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io", "infrastructure.cluster.x-k8s.io"]
         resources:
           - "azuremachinepools"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - CREATE
     sideEffects: None
@@ -263,11 +274,12 @@ webhooks:
         path: /validate/azuremachinepool/update
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io"]
+      - apiGroups: ["exp.infrastructure.cluster.x-k8s.io", "infrastructure.cluster.x-k8s.io"]
         resources:
           - "azuremachinepools"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - UPDATE
     sideEffects: None
@@ -286,6 +298,7 @@ webhooks:
           - "azureclusters"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - CREATE
     sideEffects: None
@@ -304,6 +317,7 @@ webhooks:
           - "azureclusters"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - UPDATE
     sideEffects: None
@@ -322,6 +336,7 @@ webhooks:
           - "azuremachines"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - CREATE
     sideEffects: None
@@ -340,6 +355,7 @@ webhooks:
           - "azuremachines"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - UPDATE
     sideEffects: None
@@ -358,6 +374,7 @@ webhooks:
           - "clusters"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - CREATE
     sideEffects: None
@@ -376,6 +393,7 @@ webhooks:
           - "clusters"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - UPDATE
     sideEffects: None
@@ -389,11 +407,12 @@ webhooks:
         path: /validate/machinepool/create
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.cluster.x-k8s.io"]
+      - apiGroups: ["exp.cluster.x-k8s.io", "cluster.x-k8s.io"]
         resources:
           - "machinepools"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - CREATE
     sideEffects: None
@@ -407,11 +426,12 @@ webhooks:
         path: /validate/machinepool/update
       caBundle: Cg==
     rules:
-      - apiGroups: ["exp.cluster.x-k8s.io"]
+      - apiGroups: ["exp.cluster.x-k8s.io", "cluster.x-k8s.io"]
         resources:
           - "machinepools"
         apiVersions:
           - "v1alpha3"
+          - "v1beta1"
         operations:
           - UPDATE
     sideEffects: None
