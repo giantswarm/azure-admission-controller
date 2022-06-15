@@ -45,6 +45,7 @@ replace (
 	// Required to replace version with vulnerabilities.
 	github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3.3.24+incompatible
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
+	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.8.1
 	github.com/go-ldap/ldap/v3 => github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
 	github.com/go-logr/stdr => github.com/go-logr/stdr v0.4.0
