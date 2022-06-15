@@ -125,9 +125,9 @@ func TestHttpHandler(t *testing.T) {
 			var httpHandler http.HandlerFunc
 			switch tc.operation {
 			case admission.Create:
-				httpHandler = httpHandlerFactory.NewCreateHandler("", &webhookHandlerMock)
+				httpHandler = httpHandlerFactory.NewCreateHandler(&webhookHandlerMock)
 			case admission.Update:
-				httpHandler = httpHandlerFactory.NewUpdateHandler("", &webhookHandlerMock)
+				httpHandler = httpHandlerFactory.NewUpdateHandler(&webhookHandlerMock)
 			default:
 				t.Fatal("Unsupported operation")
 			}
