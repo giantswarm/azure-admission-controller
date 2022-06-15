@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/dyson/certman"
+	expcapz "github.com/giantswarm/apiextensions/v6/pkg/apis/capzexp/v1alpha3"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/k8sclient/v7/pkg/k8sclient"
@@ -68,6 +69,7 @@ func mainError() error {
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				capi.AddToScheme,
 				capz.AddToScheme,
+				expcapz.AddToScheme,
 				providerv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
 				releasev1alpha1.AddToScheme,

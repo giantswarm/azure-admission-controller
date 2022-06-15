@@ -53,7 +53,7 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 		if errors.IsNotFound(err) {
 			// Did not find, we fallback to the exp AMP.
 		} else if err != nil {
-			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool (looking for %q in ns %q)", mp.Spec.Template.Spec.InfrastructureRef.Name, mp.Spec.Template.Spec.InfrastructureRef.Namespace)
+			return microerror.Mask(err)
 		} else {
 			location = amp.Spec.Location
 			vmsize = amp.Spec.Template.VMSize
@@ -64,8 +64,10 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 	if location == "" || vmsize == "" {
 		amp := v1alpha3.AzureMachinePool{}
 		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
-		if err != nil {
-			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool (looking for %q in ns %q)", mp.Spec.Template.Spec.InfrastructureRef.Name, mp.Spec.Template.Spec.InfrastructureRef.Namespace)
+		if errors.IsNotFound(err) {
+			// Did not find, we fallback to the exp AMP.
+		} else if err != nil {
+			return microerror.Mask(err)
 		}
 
 		location = amp.Spec.Location
