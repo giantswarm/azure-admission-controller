@@ -31,10 +31,6 @@ type HttpHandlerFactory struct {
 	logger     micrologger.Logger
 }
 
-const (
-	telemetryName = "mutate"
-)
-
 func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory, error) {
 	if config.CtrlReader == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlReader must not be empty", config)

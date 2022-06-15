@@ -244,7 +244,8 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 				panic(err)
 			}
 
-			ctrlClient := fake.NewFakeClientWithScheme(scheme)
+			builder := fake.NewClientBuilder().WithScheme(scheme)
+			ctrlClient := builder.Build()
 
 			handler, err := NewAzureClusterConfigWebhookHandler(AzureClusterConfigWebhookHandlerConfig{
 				CtrlClient: ctrlClient,

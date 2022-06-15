@@ -50,5 +50,7 @@ func getFakeCtrlClient() (client.Client, error) {
 		panic(err)
 	}
 
-	return fake.NewFakeClientWithScheme(scheme), nil
+	builder := fake.NewClientBuilder().WithScheme(scheme)
+
+	return builder.Build(), nil
 }
