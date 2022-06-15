@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -41,10 +42,30 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 	if mp.Spec.Template.Spec.InfrastructureRef.Namespace == "" || mp.Spec.Template.Spec.InfrastructureRef.Name == "" {
 		return microerror.Maskf(azureMachinePoolNotFoundError, "MachinePool's InfrastructureRef has to be set")
 	}
-	amp := capzexp.AzureMachinePool{}
-	err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
-	if err != nil {
-		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
+
+	var location string
+	var vmsize string
+	// Try with exp api group.
+	{
+		amp := capzexp.AzureMachinePool{}
+		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
+		if err != nil {
+			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
+		}
+
+		location = amp.Spec.Location
+		vmsize = amp.Spec.Template.VMSize
+	}
+	if location == "" || vmsize == "" {
+		// try with non-exp api group.
+		amp := capz.AzureMachinePool{}
+		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
+		if err != nil {
+			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
+		}
+
+		location = amp.Spec.Location
+		vmsize = amp.Spec.Template.VMSize
 	}
 
 	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, mp.ObjectMeta)
@@ -52,7 +73,7 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 		return microerror.Mask(err)
 	}
 
-	supportedZones, err := vmcaps.SupportedAZs(ctx, amp.Spec.Location, amp.Spec.Template.VMSize)
+	supportedZones, err := vmcaps.SupportedAZs(ctx, location, vmsize)
 	if err != nil {
 		return microerror.Mask(err)
 	}
