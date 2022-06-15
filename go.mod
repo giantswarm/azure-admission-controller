@@ -45,10 +45,17 @@ replace (
 	// Required to replace version with vulnerabilities.
 	github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3.3.24+incompatible
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
+	github.com/go-ldap/ldap/v3 => github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
 	github.com/go-logr/stdr => github.com/go-logr/stdr v0.4.0
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket v1.4.0 => github.com/gorilla/websocket v1.4.2
+	github.com/microcosm-cc/bluemonday => github.com/microcosm-cc/bluemonday v1.0.18
+	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.2.0
+	github.com/nats-io/nats-server/v2 => github.com/nats-io/nats-server/v2 v2.8.3
+	github.com/pkg/sftp => github.com/pkg/sftp v1.13.4
+	github.com/valyala/fasthttp => github.com/valyala/fasthttp v1.37.0
+	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.9.1
 	go.uber.org/goleak => go.uber.org/goleak v1.1.10
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.9.0
 	sigs.k8s.io/cluster-api => sigs.k8s.io/cluster-api v1.0.5
