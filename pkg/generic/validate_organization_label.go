@@ -3,9 +3,9 @@ package generic
 import (
 	"context"
 
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	"github.com/giantswarm/microerror"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"

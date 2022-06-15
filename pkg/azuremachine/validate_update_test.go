@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 

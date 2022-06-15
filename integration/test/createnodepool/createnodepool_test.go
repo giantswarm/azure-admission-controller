@@ -1,4 +1,5 @@
 //go:build k8srequired
+// +build k8srequired
 
 package createcluster
 
@@ -9,12 +10,12 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/app/v5/pkg/crd"
 	"github.com/giantswarm/apptest"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"

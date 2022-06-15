@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/microerror"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

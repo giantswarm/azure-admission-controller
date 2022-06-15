@@ -6,10 +6,10 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
