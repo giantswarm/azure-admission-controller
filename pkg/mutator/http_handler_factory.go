@@ -52,7 +52,7 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 }
 
 // NewCreateHandler returns a HTTP handler for mutating create requests.
-func (h *HttpHandlerFactory) NewCreateHandler(pattern string, mutator WebhookCreateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewCreateHandler(mutator WebhookCreateHandler) http.HandlerFunc {
 	mutateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) ([]PatchOperation, error) {
 		// Decode the new CR from the request.
 		object, err := mutator.Decode(review.Request.Object)
@@ -92,7 +92,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(pattern string, mutator WebhookCre
 }
 
 // NewUpdateHandler returns a HTTP handler for mutating update requests.
-func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, mutator WebhookUpdateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewUpdateHandler(mutator WebhookUpdateHandler) http.HandlerFunc {
 	mutateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) ([]PatchOperation, error) {
 		// Decode the new updated CR from the request.
 		object, err := mutator.Decode(review.Request.Object)

@@ -51,7 +51,7 @@ func NewHttpHandlerFactory(config HttpHandlerFactoryConfig) (*HttpHandlerFactory
 }
 
 // NewCreateHandler returns a HTTP handler for validating create requests.
-func (h *HttpHandlerFactory) NewCreateHandler(pattern string, webhookCreateHandler WebhookCreateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewCreateHandler(webhookCreateHandler WebhookCreateHandler) http.HandlerFunc {
 	validateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) error {
 		// Decode the new CR from the request.
 		object, err := webhookCreateHandler.Decode(review.Request.Object)
@@ -89,7 +89,7 @@ func (h *HttpHandlerFactory) NewCreateHandler(pattern string, webhookCreateHandl
 }
 
 // NewUpdateHandler returns a HTTP handler for validating update requests.
-func (h *HttpHandlerFactory) NewUpdateHandler(pattern string, webhookUpdateHandler WebhookUpdateHandler) http.HandlerFunc {
+func (h *HttpHandlerFactory) NewUpdateHandler(webhookUpdateHandler WebhookUpdateHandler) http.HandlerFunc {
 	validateFunc := func(ctx context.Context, review v1beta1.AdmissionReview) error {
 		// Decode the new updated CR from the request.
 		object, err := webhookUpdateHandler.Decode(review.Request.Object)
