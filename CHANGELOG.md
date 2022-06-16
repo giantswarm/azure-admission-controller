@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2022-06-16
+
 ### Added
 
 - Bump CAPI to v1.1.1 and CAPZ to v1.3.2.
@@ -418,7 +420,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/giantswarm/azure-admission-controller/compare/v3.7.0...v4.0.0
