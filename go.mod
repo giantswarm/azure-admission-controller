@@ -12,8 +12,8 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/apiextensions-application v0.4.0
 	github.com/giantswarm/apiextensions/v6 v6.2.0
-	github.com/giantswarm/app/v5 v5.4.0
-	github.com/giantswarm/apptest v0.10.3
+	github.com/giantswarm/app/v5 v5.6.1
+	github.com/giantswarm/apptest v0.12.0
 	github.com/giantswarm/backoff v1.0.0
 	github.com/giantswarm/k8sclient/v7 v7.0.1
 	github.com/giantswarm/microerror v0.4.0
@@ -54,8 +54,8 @@ require (
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/giantswarm/apiextensions/v3 v3.35.0 // indirect
-	github.com/giantswarm/appcatalog v0.4.1 // indirect
+	github.com/giantswarm/apiextensions/v3 v3.38.0 // indirect
+	github.com/giantswarm/appcatalog v0.6.0 // indirect
 	github.com/giantswarm/k8smetadata v0.10.1 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
