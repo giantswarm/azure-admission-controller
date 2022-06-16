@@ -2,7 +2,7 @@ package azurecluster
 
 import (
 	"github.com/giantswarm/microerror"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 )
 
 func validateLocation(azureCluster capz.AzureCluster, expectedLocation string) error {

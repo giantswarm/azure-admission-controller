@@ -1,8 +1,9 @@
 package azuremachine
 
 import (
+	"github.com/giantswarm/to"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 )
 
 func azureMachineObject(sshKey string, failureDomain *string, labels map[string]string) *capz.AzureMachine {
@@ -42,8 +43,8 @@ func azureMachineObject(sshKey string, failureDomain *string, labels map[string]
 			OSDisk: capz.OSDisk{
 				OSType:      "Linux",
 				CachingType: "ReadWrite",
-				DiskSizeGB:  50,
-				ManagedDisk: capz.ManagedDisk{
+				DiskSizeGB:  to.Int32P(50),
+				ManagedDisk: &capz.ManagedDiskParameters{
 					StorageAccountType: "Premium_LRS",
 				},
 			},

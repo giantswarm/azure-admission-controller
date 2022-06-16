@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/azurecluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"

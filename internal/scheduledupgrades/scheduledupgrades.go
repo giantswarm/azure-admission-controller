@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"github.com/giantswarm/apiextensions/v6/pkg/annotation"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"

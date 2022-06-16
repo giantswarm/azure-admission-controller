@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/giantswarm/microerror"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"

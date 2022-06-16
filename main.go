@@ -11,18 +11,19 @@ import (
 	"syscall"
 
 	"github.com/dyson/certman"
-	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
-	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
+	expcapz "github.com/giantswarm/apiextensions/v6/pkg/apis/capzexp/v1alpha3"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/k8sclient/v7/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
 	"k8s.io/client-go/rest"
 	restclient "k8s.io/client-go/rest"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -68,6 +69,7 @@ func mainError() error {
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				capi.AddToScheme,
 				capz.AddToScheme,
+				expcapz.AddToScheme,
 				providerv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
 				releasev1alpha1.AddToScheme,
@@ -105,10 +107,7 @@ func mainError() error {
 		}
 
 		go func() {
-			// XXX: This orphaned throw-away stop channel is very ugly, but
-			// will go away once `controller-runtime` library is updated. In
-			// 0.8.x it's `context.Context` instead of channel.
-			err = ctrlCache.Start(make(<-chan struct{}))
+			err = ctrlCache.Start(context.Background())
 			if err != nil {
 				// XXX: Due to asynchronous nature, there's no reasonable way
 				// to return error from here, hence panic().
@@ -116,7 +115,7 @@ func mainError() error {
 			}
 		}()
 
-		ok := ctrlCache.WaitForCacheSync(make(<-chan struct{}))
+		ok := ctrlCache.WaitForCacheSync(context.Background())
 		if !ok {
 			return microerror.Mask(errors.New("couldn't wait for cache sync"))
 		}

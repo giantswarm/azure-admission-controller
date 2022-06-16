@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"testing"
 
-	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	providerv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/core/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/v6/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
@@ -244,7 +244,8 @@ func TestAzureClusterConfigValidate(t *testing.T) {
 				panic(err)
 			}
 
-			ctrlClient := fake.NewFakeClientWithScheme(scheme)
+			builder := fake.NewClientBuilder().WithScheme(scheme)
+			ctrlClient := builder.Build()
 
 			handler, err := NewAzureClusterConfigWebhookHandler(AzureClusterConfigWebhookHandlerConfig{
 				CtrlClient: ctrlClient,

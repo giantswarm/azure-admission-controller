@@ -10,8 +10,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/integration/env"
 	azuremachinepoolpkg "github.com/giantswarm/azure-admission-controller/pkg/azuremachinepool"

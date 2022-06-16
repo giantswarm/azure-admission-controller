@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/test"
 	"github.com/giantswarm/azure-admission-controller/pkg/key"
@@ -83,33 +83,43 @@ func BuildAzureCluster(opts ...BuilderOption) *capz.AzureCluster {
 			},
 		},
 		Spec: capz.AzureClusterSpec{
-			ResourceGroup: clusterName,
-			Location:      "westeurope",
-			ControlPlaneEndpoint: capi.APIEndpoint{
-				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
-				Port: 443,
+			AzureClusterClassSpec: capz.AzureClusterClassSpec{
+				Location:         "westeurope",
+				AzureEnvironment: "AzurePublicCloud",
 			},
 			NetworkSpec: capz.NetworkSpec{
 				Subnets: capz.Subnets{
-					&capz.SubnetSpec{
-						Role: "control-plane",
+					capz.SubnetSpec{
+						SubnetClassSpec: capz.SubnetClassSpec{
+							Role: "control-plane",
+						},
 						Name: key.MasterSubnetName(clusterName),
 					},
-					&capz.SubnetSpec{
-						Role: "node",
+					capz.SubnetSpec{
+						SubnetClassSpec: capz.SubnetClassSpec{
+							Role: "node",
+						},
 						Name: clusterName,
 					},
 				},
 				APIServerLB: capz.LoadBalancerSpec{
 					Name: key.APIServerLBName(clusterName),
-					SKU:  capz.SKU(key.APIServerLBSKU()),
-					Type: capz.LBType(key.APIServerLBType()),
+					LoadBalancerClassSpec: capz.LoadBalancerClassSpec{
+						SKU:  capz.SKU(key.APIServerLBSKU()),
+						Type: capz.LBType(key.APIServerLBType()),
+					},
 					FrontendIPs: []capz.FrontendIP{
 						{
 							Name: key.APIServerLBFrontendIPName(clusterName),
 						},
 					},
 				},
+				NodeOutboundLB: &capz.LoadBalancerSpec{},
+			},
+			ResourceGroup: clusterName,
+			ControlPlaneEndpoint: capi.APIEndpoint{
+				Host: fmt.Sprintf("api.%s.k8s.test.westeurope.azure.gigantic.io", clusterName),
+				Port: 443,
 			},
 		},
 	}

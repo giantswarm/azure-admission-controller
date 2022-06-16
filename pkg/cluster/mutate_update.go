@@ -3,7 +3,7 @@ package cluster
 import (
 	"context"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/azure-admission-controller/internal/patches"
