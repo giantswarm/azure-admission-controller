@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	"github.com/giantswarm/apiextensions/v6/pkg/annotation"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/mutator"
 )

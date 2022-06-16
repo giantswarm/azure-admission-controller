@@ -3,9 +3,11 @@ package machinepool
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/v6/pkg/apis/capzexp/v1alpha3"
 	"github.com/giantswarm/microerror"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capiexp "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	"k8s.io/apimachinery/pkg/api/errors"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capiexp "sigs.k8s.io/cluster-api/exp/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/pkg/generic"
@@ -41,10 +43,35 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 	if mp.Spec.Template.Spec.InfrastructureRef.Namespace == "" || mp.Spec.Template.Spec.InfrastructureRef.Name == "" {
 		return microerror.Maskf(azureMachinePoolNotFoundError, "MachinePool's InfrastructureRef has to be set")
 	}
-	amp := capzexp.AzureMachinePool{}
-	err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
-	if err != nil {
-		return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
+
+	var location string
+	var vmsize string
+	// Try with the non-exp AMP
+	{
+		amp := capzexp.AzureMachinePool{}
+		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
+		if errors.IsNotFound(err) {
+			// Did not find, we fallback to the exp AMP.
+		} else if err != nil {
+			return microerror.Mask(err)
+		} else {
+			location = amp.Spec.Location
+			vmsize = amp.Spec.Template.VMSize
+		}
+	}
+
+	// Fallback to exp AMP
+	if location == "" || vmsize == "" {
+		amp := v1alpha3.AzureMachinePool{}
+		err := h.ctrlClient.Get(ctx, client.ObjectKey{Namespace: mp.Spec.Template.Spec.InfrastructureRef.Namespace, Name: mp.Spec.Template.Spec.InfrastructureRef.Name}, &amp)
+		if errors.IsNotFound(err) {
+			return microerror.Maskf(azureMachinePoolNotFoundError, "AzureMachinePool has to be created before the related MachinePool")
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
+
+		location = amp.Spec.Location
+		vmsize = amp.Spec.Template.VMSize
 	}
 
 	vmcaps, err := h.vmcapsFactory.GetClient(ctx, h.ctrlClient, mp.ObjectMeta)
@@ -52,7 +79,7 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 		return microerror.Mask(err)
 	}
 
-	supportedZones, err := vmcaps.SupportedAZs(ctx, amp.Spec.Location, amp.Spec.Template.VMSize)
+	supportedZones, err := vmcaps.SupportedAZs(ctx, location, vmsize)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -60,7 +87,7 @@ func (h *WebhookHandler) checkAvailabilityZones(ctx context.Context, mp *capiexp
 	for _, zone := range mp.Spec.FailureDomains {
 		if !inSlice(zone, supportedZones) {
 			// Found one unsupported availability zone requested.
-			return microerror.Maskf(unsupportedFailureDomainError, "You requested the Machine Pool with type %s to be placed in the following FailureDomains (aka Availability zones): %v but the VM type only supports %v in %s", amp.Spec.Template.VMSize, mp.Spec.FailureDomains, supportedZones, amp.Spec.Location)
+			return microerror.Maskf(unsupportedFailureDomainError, "You requested the Machine Pool with type %s to be placed in the following FailureDomains (aka Availability zones): %v but the VM type only supports %v in %s", vmsize, mp.Spec.FailureDomains, supportedZones, location)
 		}
 	}
 

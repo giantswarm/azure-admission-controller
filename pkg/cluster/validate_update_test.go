@@ -7,7 +7,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	builder "github.com/giantswarm/azure-admission-controller/internal/test/cluster"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"

@@ -6,11 +6,11 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/giantswarm/apiextensions/v3/pkg/label"
+	"github.com/giantswarm/apiextensions/v6/pkg/label"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1alpha3"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
+	capzexp "sigs.k8s.io/cluster-api-provider-azure/exp/api/v1beta1"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/test"
 )
@@ -107,10 +107,10 @@ func BuildAzureMachinePool(opts ...BuilderOption) *capzexp.AzureMachinePool {
 		},
 		Spec: capzexp.AzureMachinePoolSpec{
 			Location: "westeurope",
-			Template: capzexp.AzureMachineTemplate{
+			Template: capzexp.AzureMachinePoolMachineTemplate{
 				VMSize: "Standard_D4_v3",
 				OSDisk: capz.OSDisk{
-					ManagedDisk: capz.ManagedDisk{
+					ManagedDisk: &capz.ManagedDiskParameters{
 						StorageAccountType: "Standard_LRS",
 					},
 				},

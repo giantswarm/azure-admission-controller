@@ -1,10 +1,10 @@
 package conditions
 
 import (
-	aeconditions "github.com/giantswarm/apiextensions/v3/pkg/conditions"
+	aeconditions "github.com/giantswarm/apiextensions/v6/pkg/conditions"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	capiconditions "sigs.k8s.io/cluster-api/util/conditions"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"

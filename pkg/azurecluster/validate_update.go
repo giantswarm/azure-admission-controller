@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"
 	"github.com/giantswarm/azure-admission-controller/internal/releaseversion"
@@ -34,6 +34,8 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 	// TODO(axbarsan): Remove this once all the older clusters have it.
 	err = errors.IgnoreCAPIErrorForField("spec.networkSpec.apiServerLB", err)
 	err = errors.IgnoreCAPIErrorForField("spec.SubscriptionID", err)
+	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Host", err)
+	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Port", err)
 	if err != nil {
 		return microerror.Mask(err)
 	}

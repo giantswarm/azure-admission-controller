@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	securityv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/security/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
 
 	"github.com/giantswarm/azure-admission-controller/internal/vmcapabilities"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
@@ -31,13 +31,7 @@ func TestAzureMachineUpdateValidate(t *testing.T) {
 			errorMatcher: nil,
 		},
 		{
-			name:         "Case 1 - not empty ssh key",
-			oldAM:        azureMachineObject("", nil, nil),
-			newAM:        azureMachineObject("ssh-rsa 12345 giantswarm", nil, nil),
-			errorMatcher: IsSSHFieldIsSetError,
-		},
-		{
-			name:         "Case 2 - failure domain changed",
+			name:         "Case 1 - failure domain changed",
 			oldAM:        azureMachineObject("", to.StringPtr("1"), nil),
 			newAM:        azureMachineObject("", to.StringPtr("2"), nil),
 			errorMatcher: IsFailureDomainWasChangedError,
