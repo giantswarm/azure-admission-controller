@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Ignore immutability error for `azureCluster.spec.networkSpec.nodeOutboundLB` for legacy clusters to allow migration from v1alpha3 to v1beta1.
+
 ## [4.2.0] - 2022-06-16
 
 ### Added
