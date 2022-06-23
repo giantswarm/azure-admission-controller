@@ -36,6 +36,13 @@ func (h *WebhookHandler) OnUpdateValidate(ctx context.Context, oldObject interfa
 	err = errors.IgnoreCAPIErrorForField("spec.SubscriptionID", err)
 	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Host", err)
 	err = errors.IgnoreCAPIErrorForField("spec.ControlPlaneEndpoint.Port", err)
+	isCapi, lerr := generic.IsCAPIRelease(azureClusterOldCR)
+	if lerr != nil {
+		return microerror.Mask(err)
+	}
+	if !isCapi {
+		err = errors.IgnoreCAPIErrorForField("spec.networkSpec.nodeOutboundLB", err)
+	}
 	if err != nil {
 		return microerror.Mask(err)
 	}
