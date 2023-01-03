@@ -10,7 +10,7 @@ The certificates for the webhook are created with CertManager and injected throu
 
 ## Ownership
 
-Team Celestial
+Team Phoenix
 
 ## CRs and fields managed
 
