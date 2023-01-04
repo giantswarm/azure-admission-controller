@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.2] - 2023-01-04
+
 ### Added
 
 - Validate if cluster already exists.
@@ -430,7 +432,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.1...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.2...HEAD
+[4.2.2]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.0.1...v4.1.0
