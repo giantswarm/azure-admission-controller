@@ -93,3 +93,12 @@ var parsingFailedError = &microerror.Error{
 func IsParsingFailed(err error) bool {
 	return microerror.Cause(err) == parsingFailedError
 }
+
+var notAllowedError = &microerror.Error{
+	Kind: "notAllowedError",
+}
+
+// IsNotAllowed asserts notAllowedError.
+func IsNotAllowed(err error) bool {
+	return microerror.Cause(err) == notAllowedError
+}

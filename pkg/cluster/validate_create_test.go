@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 
+	"github.com/giantswarm/azure-admission-controller/pkg/generic"
 	"github.com/giantswarm/azure-admission-controller/pkg/unittest"
 )
 
@@ -184,6 +185,98 @@ func TestClusterCreateValidate(t *testing.T) {
 				t.Fatalf("expected %#v got %#v", "error", nil)
 			case !tc.errorMatcher(err):
 				t.Fatalf("unexpected error: %#v", err)
+			}
+		})
+	}
+}
+
+func TestClusterExists(t *testing.T) {
+	type testCase struct {
+		name    string
+		cluster *capi.Cluster
+		valid   bool
+	}
+
+	clusterNetwork := &capi.ClusterNetwork{
+		APIServerPort: to.Int32Ptr(443),
+		ServiceDomain: "cluster.local",
+		Services: &capi.NetworkRanges{
+			CIDRBlocks: []string{
+				"172.31.0.0/16",
+			},
+		},
+	}
+
+	testCases := []testCase{
+		{
+			name:    "case 0: Cluster already exists",
+			cluster: clusterObject("ab123", clusterNetwork, "api.ab123.k8s.test.westeurope.azure.gigantic.io", 443, nil),
+			valid:   false,
+		},
+		{
+			name:    "case 1: Valid Cluster",
+			cluster: clusterObject("ab123", nil, "api.ab123.k8s.test.westeurope.azure.gigantic.io", 443, nil),
+			valid:   true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var err error
+
+			// Create a new logger that is used by all admitters.
+			var newLogger micrologger.Logger
+			{
+				newLogger, err = micrologger.New(micrologger.Config{})
+				if err != nil {
+					panic(microerror.JSON(err))
+				}
+			}
+
+			ctx := context.Background()
+			fakeK8sClient := unittest.FakeK8sClient()
+			ctrlClient := fakeK8sClient.CtrlClient()
+
+			// Create default GiantSwarm organization.
+			organization := &securityv1alpha1.Organization{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "giantswarm",
+				},
+				Spec: securityv1alpha1.OrganizationSpec{},
+			}
+			err = ctrlClient.Create(ctx, organization)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			handler, err := NewWebhookHandler(WebhookHandlerConfig{
+				BaseDomain: "k8s.test.westeurope.azure.gigantic.io",
+				CtrlClient: ctrlClient,
+				CtrlReader: ctrlClient,
+				Decoder:    unittest.NewFakeDecoder(),
+				Logger:     newLogger,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !tc.valid {
+				// create a cluster in giantswarm namespace
+				tc.cluster.Namespace = "giantswarm"
+				err := handler.ctrlClient.Create(context.TODO(), tc.cluster)
+				if err != nil {
+					t.Fatalf("unexpected error %v", err)
+				}
+			}
+
+			// Run validating webhook handler on Cluster creation.
+			err = generic.ClusterExists(ctx, handler.ctrlClient, tc.cluster)
+
+			if tc.valid && err != nil {
+				t.Fatalf("unexpected error %v", err)
+			}
+			if !tc.valid && err == nil {
+				t.Fatalf("expected error but returned %v", err)
 			}
 		})
 	}

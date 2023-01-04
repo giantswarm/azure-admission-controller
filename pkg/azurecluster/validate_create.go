@@ -24,6 +24,11 @@ func (h *WebhookHandler) OnCreateValidate(ctx context.Context, object interface{
 		return microerror.Mask(err)
 	}
 
+	err = generic.ClusterExists(ctx, h.ctrlClient, azureClusterCR)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
 	err = generic.ValidateOrganizationLabelContainsExistingOrganization(ctx, h.ctrlClient, azureClusterCR)
 	if err != nil {
 		return microerror.Mask(err)
