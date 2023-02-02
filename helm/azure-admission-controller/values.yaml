@@ -6,6 +6,12 @@ project:
   branch: "[[ .Branch ]]"
   commit: "[[ .SHA ]]"
 
+pod:
+  user:
+    id: 1000
+  group:
+    id: 1000
+
 workloadCluster:
   kubernetes:
     api:

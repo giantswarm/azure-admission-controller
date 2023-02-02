@@ -25,6 +25,9 @@ spec:
           secret:
             secretName: {{ include "resource.default.name"  . }}-certificates
       serviceAccountName: {{ include "resource.default.name"  . }}
+      securityContext:
+        runAsUser: {{ .Values.pod.user.id }}
+        runAsGroup: {{ .Values.pod.group.id }}
       containers:
         - name: {{ include "name" . }}
           image: "{{ .Values.registry.domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
