@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
 - Added the use of the runtime/default seccomp profile.
+
+## [4.3.1] - 2023-02-02
+
+### Fixed
+
+- Make container run as non root user.
 
 ## [4.3.0] - 2023-01-04
 
@@ -434,7 +442,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.3.0...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.3.1...HEAD
+[4.3.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.3.0...v4.3.1
 [4.3.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.1...v4.3.0
 [4.2.1]: https://github.com/giantswarm/azure-admission-controller/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.1.0...v4.2.0
