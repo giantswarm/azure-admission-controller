@@ -117,7 +117,7 @@ require (
 replace (
 	github.com/aws/aws-sdk-go => github.com/aws/aws-sdk-go v1.44.34
 	github.com/caddyserver/caddy => github.com/caddyserver/caddy v1.0.5
-	github.com/containerd/containerd => github.com/containerd/containerd v1.6.6
+	github.com/containerd/containerd => github.com/containerd/containerd v1.6.18
 	github.com/containerd/imgcrypt => github.com/containerd/imgcrypt v1.1.6
 	// Required to replace version with vulnerabilities.
 	github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3.3.24+incompatible
