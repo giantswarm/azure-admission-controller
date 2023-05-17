@@ -62,7 +62,7 @@ func (h *WebhookHandler) OnCreateMutate(ctx context.Context, object interface{})
 }
 
 func (h *WebhookHandler) ensureStorageAccountType(ctx context.Context, mpCR *capzexp.AzureMachinePool) (*mutator.PatchOperation, error) {
-	if mpCR.Spec.Template.OSDisk.ManagedDisk.StorageAccountType == "" {
+	if mpCR.Spec.Template.OSDisk.ManagedDisk == nil || mpCR.Spec.Template.OSDisk.ManagedDisk.StorageAccountType == "" {
 		// We need to set the default value as it is missing.
 
 		location := mpCR.Spec.Location

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix panic happening while defaulting storage account type on azuremachinepool CRs for v1beta1 types.
+
 ### Added
 
 - Added the use of the runtime/default seccomp profile.
