@@ -23,3 +23,9 @@ CVE-2022-42709
 CVE-2021-41803
 CVE-2022-23471
 sonatype-2022-5277
+
+# CVE in k8s.io/apiserver
+CVE-2020-8561 until=2023-06-30
+
+# CVE in helm helm.sh/helm
+CVE-2023-25165
