@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.5.0] - 2023-07-17
+
 ### Fixed
 
 - Fix deployment manifest indentation.
@@ -452,7 +454,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.4.0...HEAD
+[Unreleased]: https://github.com/giantswarm/azure-admission-controller/compare/v4.5.0...HEAD
+[4.5.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.4.0...v4.5.0
 [4.4.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.4.0...v4.4.0
 [4.4.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.4.0...v4.4.0
 [4.4.0]: https://github.com/giantswarm/azure-admission-controller/compare/v4.3.1...v4.4.0
