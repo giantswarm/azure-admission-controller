@@ -3,7 +3,7 @@ module github.com/giantswarm/azure-admission-controller
 go 1.18
 
 require (
-	github.com/Azure/azure-sdk-for-go v65.0.0+incompatible
+	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/blang/semver v3.5.1+incompatible
@@ -23,7 +23,7 @@ require (
 	github.com/giantswarm/to v0.4.0
 	github.com/google/go-cmp v0.5.8
 	github.com/stretchr/testify v1.7.2
-	gomodules.xyz/jsonpatch/v2 v2.2.0
+	gomodules.xyz/jsonpatch/v2/v3 v3.0.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	k8s.io/api v0.24.1
 	k8s.io/apiextensions-apiserver v0.24.1
@@ -116,7 +116,7 @@ require (
 
 replace (
 	github.com/aws/aws-sdk-go => github.com/aws/aws-sdk-go v1.44.34
-	github.com/caddyserver/caddy => github.com/caddyserver/caddy v1.0.5
+	github.com/caddyserver/caddy/v2 => github.com/caddyserver/caddy v2.7.5
 	github.com/containerd/containerd => github.com/containerd/containerd v1.6.18
 	github.com/containerd/imgcrypt => github.com/containerd/imgcrypt v1.1.6
 	// Required to replace version with vulnerabilities.
