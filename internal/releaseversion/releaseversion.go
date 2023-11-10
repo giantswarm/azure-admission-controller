@@ -6,7 +6,7 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/v3/api/v1alpha1"
+	"github.com/giantswarm/release-operator/v4/api/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/azure-admission-controller/internal/errors"

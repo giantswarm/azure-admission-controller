@@ -18,7 +18,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	securityv1alpha1 "github.com/giantswarm/organization-operator/api/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v4/api/v1alpha1"
 	"k8s.io/client-go/rest"
 	restclient "k8s.io/client-go/rest"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1beta1"
